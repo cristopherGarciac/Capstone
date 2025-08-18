@@ -24,21 +24,21 @@ export default function Home() {
       nombre: "Procesador Intel i7",
       descripcion: "11va generación, 3.8GHz",
       precio: "$250.000",
-      imagen: "https://via.placeholder.com/300x200",
+      imagen: "/images/i7.png", // Imagen de prueba
     },
     {
       id: 2,
       nombre: "Tarjeta Gráfica RTX 3060",
       descripcion: "12GB GDDR6",
       precio: "$399.000",
-      imagen: "https://via.placeholder.com/300x200",
+      imagen: "/images/3060.png",
     },
     {
       id: 3,
       nombre: "Memoria RAM Corsair 16GB",
       descripcion: "DDR4 3200MHz",
       precio: "$75.000",
-      imagen: "https://via.placeholder.com/300x200",
+      imagen: "/images/ddr.png",
     },
   ];
 
@@ -56,12 +56,20 @@ export default function Home() {
       {/* Navbar */}
       <nav className="bg-white shadow sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-          <h2 className="text-2xl font-bold text-[var(--color-primary)]">Blitz Hardware</h2>
+          {/* Reemplazamos el texto por el logo */}
+          <Link class="logo" href="/" className="text-2xl font-bold text-[var(--color-primary)]">
+            <img src="/images/blitz.png" alt="Blitz Hardware Logo" className="h-8" /> 
+          </Link>
           <div className="flex items-center space-x-6">
-            <Link href="/" className="text-gray-700 hover:text-[var(--color-accent)]">Inicio</Link>
-            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-accent)]">Catálogo</Link>
-            <Link href="/about" className="text-gray-700 hover:text-[var(--color-accent)]">About</Link>
-            
+            <Link href="/" className="text-gray-700 hover:text-[var(--color-accent)]">
+              Inicio
+            </Link>
+            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-accent)]">
+              Catálogo
+            </Link>
+            <Link href="/about" className="text-gray-700 hover:text-[var(--color-accent)]">
+              About
+            </Link>
             {/* Botón login */}
             <button
               onClick={() => setLoginOpen(true)}
@@ -78,7 +86,7 @@ export default function Home() {
 
       {/* Modal de login */}
       {loginOpen && (
-        <div className="fixed inset-0 bg-black  flex justify-center items-start pt-24 z-50">
+        <div className="fixed inset-0 bg-black  flex justify-center items-start pt-24 z-50" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
           <div className="bg-white rounded-xl shadow-lg w-96 p-6 relative">
             <button
               onClick={() => setLoginOpen(false)}
@@ -108,10 +116,7 @@ export default function Home() {
         <p className="mt-4 text-lg text-gray-600">
           Todo lo que necesitas para armar tu PC: desde procesadores hasta almacenamiento.
         </p>
-        <Link
-          href="/catalogo"
-          className="mt-6 inline-block btn-primary"
-        >
+        <Link href="/catalogo" className="mt-6 inline-block btn-primary">
           Ver Catálogo
         </Link>
       </section>
@@ -124,7 +129,8 @@ export default function Home() {
         <div className="flex overflow-x-auto space-x-6 px-6">
           {productosDestacados.map((prod) => (
             <div key={prod.id} className="card min-w-[250px]">
-              <img src={prod.imagen} alt={prod.nombre} className="rounded-t-xl w-full h-40 object-cover"/>
+              {/* Imagen centrada */}
+              <img src={prod.imagen} alt={prod.nombre} className="rounded-t-xl w-full h-40 object-contain mx-auto mb-4"/>
               <div className="p-4 text-center">
                 <h3 className="font-semibold text-[var(--color-secondary)]">{prod.nombre}</h3>
                 <p className="text-sm text-gray-500">{prod.descripcion}</p>

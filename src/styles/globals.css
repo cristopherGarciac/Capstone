@@ -4,6 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Variables de colores */
 :root {
   --color-primary: #facc15; /* Amarillo Blitz */
   --color-secondary: #1f2937; /* Gris oscuro */
@@ -11,20 +12,41 @@
   --color-bg: #f9fafb; /* Fondo claro */
 }
 
+/* Tipografía y pixel art */
 body {
   @apply bg-[var(--color-bg)] text-gray-800;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Press Start 2P', monospace; /* Fuente retro */
 }
 
+/* Tarjetas */
 .card {
   @apply bg-white rounded-xl shadow hover:shadow-lg transition;
+  border: 2px solid black; /* borde estilo retro */
 }
 
+/* Botones primarios */
 .btn-primary {
-  @apply px-6 py-3 rounded-lg font-semibold text-white shadow;
+  @apply px-6 py-3 rounded-none font-semibold text-white shadow-lg border-4 border-black;
   background-color: var(--color-primary);
 }
 
 .btn-primary:hover {
   background-color: #eab308;
+}
+
+
+/* Glow tipo retro para títulos */
+.pixel-glow {
+  text-shadow: 2px 2px #00ffea, -2px -2px #00ffea;
+}
+
+
+/* Modal login */
+.modal-bg {
+  background-color: rgba(0,0,0,0.3);
+}
+
+.logo {
+  width: auto; /* Asegúrate de que el contenedor se ajuste al tamaño de la imagen */
+  display: inline-block; /* Asegura que el contenedor no tenga un límite de tamaño */
 }
