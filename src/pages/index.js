@@ -66,6 +66,9 @@ export default function Home() {
             <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-accent)]">
               Catálogo
             </Link>
+            <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-accent)]">
+              <img src="/images/carrito.png" alt="Carrito Compra Logo" className="h-11 w-auto"/>
+            </Link>
             <Link href="/about" className="text-gray-700 hover:text-[var(--color-accent)]">
               About
             </Link>
@@ -160,7 +163,7 @@ export default function Home() {
   <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
     {/* Ayuda */}
     <div>
-      <h4 className="text-xl font-semibold mb-4 border-l-4 border-gray-300 pl-3">Ayuda</h4> {/* Cambié border-teal-400 a border-gray-300 */}
+      <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Ayuda</h4> {/* Cambié border-teal-400 a border-gray-300 */}
       <ul className="space-y-2 text-black">  {/* Cambié text-gray-200 a text-black */}
         <li><Link href="/ayuda" className="hover:text-teal-300">Centro de ayuda</Link></li>
         <li><Link href="/seguimiento" className="hover:text-teal-300">Seguimiento de mi compra</Link></li>
@@ -169,7 +172,7 @@ export default function Home() {
 
     {/* Nosotros */}
     <div>
-      <h4 className="text-xl font-semibold mb-4 border-l-4 border-gray-300 pl-3">Nosotros</h4> {/* Cambié border-teal-400 a border-gray-300 */}
+      <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Nosotros</h4> {/* Cambié border-teal-400 a border-gray-300 */}
       <ul className="space-y-2 text-black">  {/* Cambié text-gray-200 a text-black */}
         <li><Link href="/about" className="hover:text-teal-300">Quiénes somos</Link></li>
         <li><Link href="/corporativo" className="hover:text-teal-300">Ventas corporativas</Link></li>
@@ -179,7 +182,7 @@ export default function Home() {
 
     {/* Comunidad */}
     <div>
-      <h4 className="text-xl font-semibold mb-4 border-l-4 border-gray-300 pl-3">Comunidad SP</h4> {/* Cambié border-teal-400 a border-gray-300 */}
+      <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Comunidad Blitz</h4> {/* Cambié border-teal-400 a border-gray-300 */}
       <ul className="space-y-2 text-black">  {/* Cambié text-gray-200 a text-black */}
         <li><a href="https://www.instagram.com/mr.popo_lf" target="_blank" className="hover:text-teal-300">Instagram</a></li>
       </ul>
@@ -190,10 +193,8 @@ export default function Home() {
 
   {/* Medios de pago */}
   <div className="max-w-7xl mx-auto px-6 py-8">
-    <h5 className="text-lg font-semibold mb-6 border-l-4 border-gray-300 pl-3">Medios de pago</h5> {/* Cambié border-teal-400 a border-gray-300 */}
-    <div className="flex flex-wrap items-center gap-6 grayscale">
-      <span className="bg-white/5 px-4 py-2 rounded-md" ></span>
-      <img src="/images/webpay.png" alt="Web Pay" width={100} height={50} />
+    <h5 className="text-lg font-semibold mb-6 border-l-4  border-blue-300 pl-3">Medios de pago</h5> 
+    <div className="flex flex-wrap items-center gap-6 ">
       <span className="bg-white/5 px-4 py-2 rounded-md">
         <img src="/images/mercado.png" alt="Mercado Pago" width={100} height={50} />
       </span>

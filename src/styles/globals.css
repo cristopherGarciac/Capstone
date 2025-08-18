@@ -9,13 +9,15 @@
   --color-primary: #facc15; /* Amarillo Blitz */
   --color-secondary: #1f2937; /* Gris oscuro */
   --color-accent: #374151; /* Gris suave para hover */
-  --color-bg: #f9fafb; /* Fondo claro */
+  --color-bg: #f9fafb; /*Fondo claro*/
 }
 
-/* Tipografía y pixel art */
+/*Tipografía y pixel art */
 body {
-  @apply bg-[var(--color-bg)] text-gray-800;
-  font-family: 'Press Start 2P', monospace; /* Fuente retro */
+  
+  @apply bg-[var(--color-bg)] text-[var(--color-secondary)]; /*Cambié text-gray-800 a la variable definida */
+  font-family: 'Press Start 2P', monospace; /*Fuente retro */
+  
 }
 
 /* Tarjetas */
@@ -24,14 +26,16 @@ body {
   border: 2px solid black; /* borde estilo retro */
 }
 
-/* Botones primarios */
+/*Botones primarios*/
 .btn-primary {
   @apply px-6 py-3 rounded-none font-semibold text-white shadow-lg border-4 border-black;
   background-color: var(--color-primary);
+  color: var(--color-secondary); 
 }
 
 .btn-primary:hover {
   background-color: #eab308;
+  color: var(--color-accent); 
 }
 
 
@@ -47,6 +51,6 @@ body {
 }
 
 .logo {
-  width: auto; /* Asegúrate de que el contenedor se ajuste al tamaño de la imagen */
-  display: inline-block; /* Asegura que el contenedor no tenga un límite de tamaño */
+  width: auto; 
+  display: inline-block; 
 }

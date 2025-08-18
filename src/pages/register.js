@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Register() {
   // Estado para manejar los inputs
@@ -75,6 +76,18 @@ export default function Register() {
 
   return (
     <main className="min-h-screen bg-gray-100">
+      {/* Navbar */}
+      <nav className="bg-white shadow sticky top-0 z-50 w-full">
+        <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+          {/* Logo */}
+          <Link href="/" className="logo text-2xl font-bold text-[var(--color-primary)]">
+            <img src="/images/blitz.png" alt="Blitz Hardware Logo" className="h-20 w-auto" />
+          </Link>
+          
+        </div>
+      </nav>
+
+      {/* Sección de Registro */}
       <section className="max-w-7xl mx-auto p-8 bg-white rounded-lg shadow-md">
         <h1 className="text-3xl font-bold text-center text-[var(--color-secondary)] mb-8">Registro</h1>
 
