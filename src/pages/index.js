@@ -1,115 +1,153 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Link from "next/link";
 
 export default function Home() {
+  const promociones = [
+    { texto: "6 Cuotas Sin Interés", destaque: true },
+    { texto: "Despacho a Todo Chile", destaque: false },
+    { texto: "Marcas Exclusivas", destaque: false },
+  ];
+
+  const categorias = [
+    { nombre: "Procesadores", slug: "procesadores" },
+    { nombre: "Placas Madre", slug: "placas-madre" },
+    { nombre: "Tarjetas Gráficas", slug: "tarjetas-graficas" },
+    { nombre: "RAM", slug: "ram" },
+    { nombre: "Almacenamiento (SSD/HDD)", slug: "almacenamiento" },
+  ];
+
+  const productosDestacados = [
+    {
+      id: 1,
+      nombre: "Procesador Intel i7",
+      descripcion: "11va generación, 3.8GHz",
+      precio: "$250.000",
+      imagen: "https://via.placeholder.com/300x200",
+    },
+    {
+      id: 2,
+      nombre: "Tarjeta Gráfica RTX 3060",
+      descripcion: "12GB GDDR6",
+      precio: "$399.000",
+      imagen: "https://via.placeholder.com/300x200",
+    },
+    {
+      id: 3,
+      nombre: "Memoria RAM Corsair 16GB",
+      descripcion: "DDR4 3200MHz",
+      precio: "$75.000",
+      imagen: "https://via.placeholder.com/300x200",
+    },
+  ];
+
   return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20`}
-    >
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/pages/index.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <main className="min-h-screen bg-gray-100">
+      {/* Barra superior de promociones */}
+      <div className="bg-gray-800 text-white text-center py-2 text-sm">
+        {promociones.map((p, i) => (
+          <span key={i} className={`mx-4 ${p.destaque ? "font-semibold" : ""}`}>
+            {p.texto}
+          </span>
+        ))}
+      </div>
+
+      {/* Navbar fija */}
+      <nav className="bg-white shadow sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
+          <h2 className="text-2xl font-bold text-blue-600">PC Store</h2>
+          <div className="space-x-6">
+            <Link href="/" className="text-gray-700 hover:text-blue-600">
+              Inicio
+            </Link>
+            <Link href="/catalogo" className="text-gray-700 hover:text-blue-600">
+              Catálogo
+            </Link>
+            <Link href="/about" className="text-gray-700 hover:text-blue-600">
+              About
+            </Link>
+            <Link href="/contacto" className="text-gray-700 hover:text-blue-600">
+              Contacto
+            </Link>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </nav>
+
+      {/* Hero principal */}
+      <section className="bg-white py-16 text-center">
+        <h1 className="text-5xl font-bold text-gray-900">
+          Catálogo de Componentes para PC
+        </h1>
+        <p className="mt-4 text-lg text-gray-600">
+          Todo lo que necesitas para armar tu PC: desde procesadores hasta
+          almacenamiento.
+        </p>
+        <Link
+          href="/catalogo"
+          className="mt-6 inline-block bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700"
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          Ver Catálogo
+        </Link>
+      </section>
+
+      {/* Carrusel de productos destacados */}
+      <section className="bg-gray-50 py-12">
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
+          Productos Destacados
+        </h2>
+        <div className="flex overflow-x-auto space-x-6 px-6">
+          {productosDestacados.map((prod) => (
+            <div
+              key={prod.id}
+              className="min-w-[250px] bg-white rounded-lg shadow hover:shadow-lg transition"
+            >
+              <img
+                src={prod.imagen}
+                alt={prod.nombre}
+                className="rounded-t-lg w-full h-40 object-cover"
+              />
+              <div className="p-4 text-center">
+                <h3 className="font-semibold text-gray-700">{prod.nombre}</h3>
+                <p className="text-sm text-gray-500">{prod.descripcion}</p>
+                <p className="text-lg font-bold text-blue-600 mt-2">
+                  {prod.precio}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Categorías */}
+      <section className="max-w-6xl mx-auto py-12 grid grid-cols-2 md:grid-cols-5 gap-6 px-4">
+        {categorias.map((cat) => (
+          <Link
+            key={cat.slug}
+            href={`/catalogo?categoria=${cat.slug}`}
+            className="bg-white p-4 rounded-lg shadow hover:shadow-lg text-center transition"
+          >
+            <h3 className="font-semibold text-gray-700">{cat.nombre}</h3>
+          </Link>
+        ))}
+      </section>
+
+      {/* Filtros de prueba */}
+      <section className="max-w-6xl mx-auto py-12 px-4">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Filtrar Catálogo</h2>
+        <div className="flex flex-wrap gap-4">
+          <select className="border p-2 rounded w-48">
+            <option>Filtrar por Marca</option>
+            <option>Intel</option>
+            <option>AMD</option>
+            <option>NVIDIA</option>
+            <option>Corsair</option>
+          </select>
+          <select className="border p-2 rounded w-48">
+            <option>Filtrar por Precio</option>
+            <option>Menos de $100.000</option>
+            <option>$100.000 - $300.000</option>
+            <option>Más de $300.000</option>
+          </select>
+        </div>
+      </section>
+    </main>
   );
 }
