@@ -40,6 +40,22 @@ export default function Home() {
       imagen: "/images/ddr.png",
     },
   ];
+  
+  
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const images = [
+    "/images/blitzHardware banner.png",
+    "/images/componentes.png",
+    "/images/nvidia.png",
+  ];
+ const nextSlide = () => {
+    setCurrentSlide((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
 
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
@@ -115,18 +131,34 @@ export default function Home() {
         </div>
       )}
 
-      {/* Hero */}
-      <section className="bg-white py-16 text-center">
-        <h1 className="text-5xl font-bold text-[var(--color-secondary)]">
-          Catálogo de Componentes para PC
-        </h1>
-        <p className="mt-4 text-lg text-gray-600">
-          Todo lo que necesitas para armar tu PC: desde procesadores hasta almacenamiento.
-        </p>
-        <Link href="/catalogo" className="mt-6 inline-block btn-primary">
-          Ver Catálogo
-        </Link>
-      </section>
+<section>
+  {/* Carrusel */}
+  <div className="relative">
+    {/* Contenedor del carrusel con altura fija */}
+    <div className="w-full overflow-hidden rounded-lg h-96"> {/* Altura ajustada para el contenedor */}
+      {/* Imagen del carrusel */}
+      <img 
+        src={images[currentSlide]} 
+        alt="Carrusel" 
+        className="w-full h-full object-cover"  
+      />
+    </div>
+    {/* Botones de navegación */}
+    <button
+      className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black text-white p-2 rounded-full"
+      onClick={prevSlide}
+    >
+      &#10094;
+    </button>
+    <button
+      className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black text-white p-2 rounded-full"
+      onClick={nextSlide}
+    >
+      &#10095;
+    </button>
+  </div>
+</section>
+
 
       {/* Productos destacados */}
       <section className="bg-gray-50 py-12">
