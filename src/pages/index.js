@@ -85,9 +85,7 @@ export default function Home() {
             <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-accent)]">
               <img src="/images/carrito.png" alt="Carrito Compra Logo" className="h-11 w-auto"/>
             </Link>
-            <Link href="/about" className="text-gray-700 hover:text-[var(--color-accent)]">
-              About
-            </Link>
+
             {/* Botón login */}
             <button
               onClick={() => setLoginOpen(true)}
@@ -100,7 +98,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-      </nav>
+      </nav> 
 
       {/* Modal de login */}
       {loginOpen && (
@@ -206,8 +204,7 @@ export default function Home() {
     <div>
       <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Nosotros</h4> {/* Cambié border-teal-400 a border-gray-300 */}
       <ul className="space-y-2 text-black">  {/* Cambié text-gray-200 a text-black */}
-        <li><Link href="/about" className="hover:text-teal-300">Quiénes somos</Link></li>
-        <li><Link href="/corporativo" className="hover:text-teal-300">Ventas corporativas</Link></li>
+        <li><Link href="/quienes_somos" className="hover:text-teal-300">Quiénes somos</Link></li>
         <li><Link href="/terminos" className="hover:text-teal-300">Términos y Condiciones</Link></li>
       </ul>
     </div>
@@ -255,7 +252,7 @@ export default function Home() {
   </div>
 
   {/* Barra inferior */}
-  <div className="bg-black/30 text-center text-xs text-gray-300 py-3">
+  <div className="bg-black/30 text-center text-xs   -300 py-3">
     © 2025–2025 | Desarrollado por Cristopher Garcia, Jesus Lagos e Ignacio Varas, Proyecto Capstone
   </div>
 </footer>

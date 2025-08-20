@@ -1,60 +1,20 @@
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-export default function Catalogo() {
-  const [loginOpen, setLoginOpen] = useState(false);
 
-  const categorias = [
-    { nombre: "Procesadores", slug: "procesadores" },
-    { nombre: "Placas Madre", slug: "placas-madre" },
-    { nombre: "Tarjetas Gráficas", slug: "tarjetas-graficas" },
-    { nombre: "RAM", slug: "ram" },
-    { nombre: "Almacenamiento (SSD/HDD)", slug: "almacenamiento" },
-  ];
 
-  const productos = [
-    {
-      id: 1,
-      nombre: "Procesador Intel i7",
-      descripcion: "11va generación, 3.8GHz",
-      precio: "$250.000",
-      imagen: "/images/i7.png", // Asegúrate de que esta imagen esté en la carpeta "public/images"
-      categoria: "procesadores",
-    },
-    {
-      id: 2,
-      nombre: "Tarjeta Gráfica RTX 3060",
-      descripcion: "12GB GDDR6",
-      precio: "$399.000",
-      imagen: "/images/3060.png",
-      categoria: "tarjetas-graficas",
-    },
-    {
-      id: 3,
-      nombre: "Memoria RAM Corsair 16GB",
-      descripcion: "DDR4 3200MHz",
-      precio: "$75.000",
-      imagen: "/images/ddr.png",
-      categoria: "ram",
-    },
-  ];
 
-  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
-
-  const filtrarProductos = categoria => {
-    if (categoria === "todos") {
-      return productos;
-    }
-    return productos.filter(prod => prod.categoria === categoria);
-  };
+export default function QuienesSomos() {
+      const [loginOpen, setLoginOpen] = useState(false);
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)]">
+    <div className="min-h-screen bg-[var(--color-bg)]">
       {/* Navbar */}
       <nav className="bg-white shadow sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-          {/* Logo */}
-          <Link href="/" className="logo text-2xl font-bold text-[var(--color-primary)]">
+          {/* Reemplazamos el texto por el logo */}
+          <Link class="logo" href="/" className="text-2xl font-bold text-[var(--color-primary)]">
             <img src="/images/blitz.png" alt="Blitz Hardware Logo" className="h-20 w-auto" />
           </Link>
           <div className="flex items-center space-x-6">
@@ -64,10 +24,10 @@ export default function Catalogo() {
             <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-accent)]">
               Catálogo
             </Link>
-             <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-accent)]">
+            <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-accent)]">
               <img src="/images/carrito.png" alt="Carrito Compra Logo" className="h-11 w-auto"/>
             </Link>
-          
+
             {/* Botón login */}
             <button
               onClick={() => setLoginOpen(true)}
@@ -78,7 +38,11 @@ export default function Catalogo() {
               </svg>
               Iniciar sesión
             </button>
-            {/* Modal de login */}
+          </div>
+        </div>
+      </nav>
+
+      {/* Modal de login */}
       {loginOpen && (
         <div className="fixed inset-0 bg-black  flex justify-center items-start pt-24 z-50" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
           <div className="bg-white rounded-xl shadow-lg w-96 p-6 relative">
@@ -106,66 +70,45 @@ export default function Catalogo() {
           </div>
         </div>
       )}
-          </div>
-        </div>
-      </nav>
 
       {/* Contenido de la página */}
-      <div className="flex gap-8 px-6 py-12">
-        {/* Filtros a la izquierda */}
-        <div className="w-1/4 bg-white p-4 rounded-xl shadow-md">
-          <h2 className="text-2xl font-bold text-[var(--color-secondary)] mb-4">Categorías</h2>
-          <div className="flex flex-col space-y-2">
-            <button
-              onClick={() => setCategoriaSeleccionada("todos")}
-              className="btn-primary text-sm py-2 px-4 text-blue-600 hover:text-blue-800"
-            >
-              Todos
-            </button>
-            {categorias.map((cat) => (
-              <button
-                key={cat.slug}
-                onClick={() => setCategoriaSeleccionada(cat.slug)}
-                className="btn-primary text-sm py-2 px-4 text-green-600 hover:text-green-800"
-              >
-                {cat.nombre}
-              </button>
-            ))}
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <h1 className="text-4xl font-bold text-center text-[var(--color-secondary)] mb-6">
+          ¿Quiénes somos?
+        </h1>
+
+        <p className="text-lg text-gray-600 mb-8">
+          En <b>Blitz Hardware</b>, somos un equipo de apasionados por la tecnología y los componentes de
+          PC. Nos dedicamos a ofrecerte las mejores marcas y productos para que puedas armar el equipo de
+          tus sueños...
+        </p>
+
+        <p className="text-lg text-gray-600 mb-8">
+          Nuestra misión es ofrecer productos de calidad a precios competitivos, con un enfoque en el
+          servicio al cliente...
+        </p>
+
+        {/* Logos de las empresas colaboradoras */}
+        <div className="bg-gray-50 py-12">
+          <h2 className="text-3xl font-bold text-center text-[var(--color-secondary)] mb-8">
+            Empresas que Confían en Nosotros
+          </h2>
+          <div className="flex justify-center space-x-12">
+            <Image src="/images/nvidia.png" alt="Logo Empresa 1" width={100} height={100} className="h-16 object-contain mx-auto" />
+            <Image src="/images/hp.png" alt="Logo Empresa 2" width={100} height={100} className="h-16 object-contain mx-auto" />
+            <Image src="/images/corsair.png" alt="Logo Empresa 3" width={100} height={100} className="h-16 object-contain mx-auto" />
+            <Image src="/images/msi.png" alt="Logo Empresa 4" width={100} height={100} className="h-16 object-contain mx-auto" />
           </div>
         </div>
 
-        {/* Productos a la derecha */}
-        <div className="w-3/4">
-          <h2 className="text-3xl font-bold text-center text-[var(--color-secondary)] mb-8">
-            {categoriaSeleccionada ? `Productos en ${categoriaSeleccionada}` : "Productos Destacados"}
-          </h2>
-          <div className="flex flex-wrap justify-center gap-8">
-            {filtrarProductos(categoriaSeleccionada || "todos").map((prod) => (
-              <div key={prod.id} className="card min-w-[250px]">
-                {/* Imagen centrada */}
-                <img
-                  src={prod.imagen}
-                  alt={prod.nombre}
-                  className="rounded-t-xl w-full h-40 object-contain mx-auto mb-4"
-                />
-                <div className="p-4 text-center">
-                  <h3 className="font-semibold text-[var(--color-secondary)]">{prod.nombre}</h3>
-                  <p className="text-sm text-gray-500">{prod.descripcion}</p>
-                  <p className="text-lg font-bold text-[var(--color-primary)] mt-2">{prod.precio}</p>
-                  <Link
-                    href={`/producto/${prod.id}`}
-                    className="mt-4 inline-block btn-primary"
-                  >
-                    Ver Detalles
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="text-center mt-8">
+          <Link href="/" className="btn-primary px-6 py-3 text-white">
+            Volver al Inicio
+          </Link>
         </div>
       </div>
 
-      {/* ==== FOOTER ==== */}
+     {/* ==== FOOTER ==== */}
 <footer className="bg-[#FFD700] text-black mt-16">  {/* Fondo amarillo con texto negro */}
   {/* Links principales */}
   <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -230,10 +173,11 @@ export default function Catalogo() {
   </div>
 
   {/* Barra inferior */}
-  <div className="bg-black/30 text-center text-xs   -300 py-3">
+  <div className="bg-black/30 text-center text-xs text-white-300 py-3">
     © 2025–2025 | Desarrollado por Cristopher Garcia, Jesus Lagos e Ignacio Varas, Proyecto Capstone
   </div>
 </footer>
-    </main>
+{/* ==== /FOOTER ==== */}
+    </div>
   );
 }
