@@ -40,8 +40,7 @@ export default function Home() {
       imagen: "/images/ddr.png",
     },
   ];
-  
-  
+
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const images = [
@@ -49,7 +48,7 @@ export default function Home() {
     "/images/componentes.png",
     "/images/nvidia.png",
   ];
- const nextSlide = () => {
+  const nextSlide = () => {
     setCurrentSlide((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
@@ -72,9 +71,9 @@ export default function Home() {
       <nav className="bg-white shadow sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           {/* Reemplazamos el texto por el logo */}
-          <Link class="logo" href="/" className="text-2xl font-bold text-[var(--color-primary)]">
-            <img src="/images/blitz.png" alt="Blitz Hardware Logo" className="h-20 w-auto" />
-          </Link>
+          <Link className="logo text-2xl font-bold text-[var(--color-primary)]" href="/">
+  <img src="/images/blitz.png" alt="Blitz Hardware Logo" className="h-20 w-auto" />
+</Link>
           <div className="flex items-center space-x-6">
             <Link href="/" className="text-gray-700 hover:text-[var(--color-accent)]">
               Inicio
@@ -84,6 +83,11 @@ export default function Home() {
             </Link>
             <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-accent)]">
               <img src="/images/carrito.png" alt="Carrito Compra Logo" className="h-11 w-auto"/>
+            </Link>
+
+            {/* Enlace al Admin */}
+            <Link href="/admin" className="text-gray-700 hover:text-[var(--color-accent)]">
+              Admin
             </Link>
 
             {/* Botón login */}
@@ -121,7 +125,7 @@ export default function Home() {
               <span>
                 ¿No estás registrado?{" "}
                 <Link href="/register" className="text-blue-600 hover:underline">
-                Regístrate
+                  Regístrate
                 </Link>
               </span>
             </div>
@@ -129,34 +133,30 @@ export default function Home() {
         </div>
       )}
 
-<section>
-  {/* Carrusel */}
-  <div className="relative">
-    {/* Contenedor del carrusel con altura fija */}
-    <div className="w-full overflow-hidden rounded-lg h-96"> {/* Altura ajustada para el contenedor */}
-      {/* Imagen del carrusel */}
-      <img 
-        src={images[currentSlide]} 
-        alt="Carrusel" 
-        className="w-full h-full object-cover"  
-      />
-    </div>
-    {/* Botones de navegación */}
-    <button
-      className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black text-white p-2 rounded-full"
-      onClick={prevSlide}
-    >
-      &#10094;
-    </button>
-    <button
-      className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black text-white p-2 rounded-full"
-      onClick={nextSlide}
-    >
-      &#10095;
-    </button>
-  </div>
-</section>
-
+      {/* Carrusel */}
+      <section>
+        <div className="relative">
+          <div className="w-full overflow-hidden rounded-lg h-96">
+            <img 
+              src={images[currentSlide]} 
+              alt="Carrusel" 
+              className="w-full h-full object-cover"  
+            />
+          </div>
+          <button
+            className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black text-white p-2 rounded-full"
+            onClick={prevSlide}
+          >
+            &#10094;
+          </button>
+          <button
+            className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black text-white p-2 rounded-full"
+            onClick={nextSlide}
+          >
+            &#10095;
+          </button>
+        </div>
+      </section>
 
       {/* Productos destacados */}
       <section className="bg-gray-50 py-12">
@@ -166,7 +166,6 @@ export default function Home() {
         <div className="flex overflow-x-auto space-x-6 px-6">
           {productosDestacados.map((prod) => (
             <div key={prod.id} className="card min-w-[250px]">
-              {/* Imagen centrada */}
               <img src={prod.imagen} alt={prod.nombre} className="rounded-t-xl w-full h-40 object-contain mx-auto mb-4"/>
               <div className="p-4 text-center">
                 <h3 className="font-semibold text-[var(--color-secondary)]">{prod.nombre}</h3>
@@ -187,78 +186,66 @@ export default function Home() {
         ))}
       </section>
 
-    {/* ==== FOOTER ==== */}
-<footer className="bg-[#FFD700] text-black mt-16">  {/* Fondo amarillo con texto negro */}
-  {/* Links principales */}
-  <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
-    {/* Ayuda */}
-    <div>
-      <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Ayuda</h4> {/* Cambié border-teal-400 a border-gray-300 */}
-      <ul className="space-y-2 text-black">  {/* Cambié text-gray-200 a text-black */}
-        <li><Link href="/ayuda" className="hover:text-teal-300">Centro de ayuda</Link></li>
-        <li><Link href="/seguimiento" className="hover:text-teal-300">Seguimiento de mi compra</Link></li>
-      </ul>
-    </div>
+      {/* FOOTER */}
+      <footer className="bg-[#FFD700] text-black mt-16">
+        <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Links principales */}
+          <div>
+            <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Ayuda</h4>
+            <ul className="space-y-2 text-black">
+              <li><Link href="/ayuda" className="hover:text-teal-300">Centro de ayuda</Link></li>
+              <li><Link href="/seguimiento" className="hover:text-teal-300">Seguimiento de mi compra</Link></li>
+            </ul>
+          </div>
 
-    {/* Nosotros */}
-    <div>
-      <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Nosotros</h4> {/* Cambié border-teal-400 a border-gray-300 */}
-      <ul className="space-y-2 text-black">  {/* Cambié text-gray-200 a text-black */}
-        <li><Link href="/quienes_somos" className="hover:text-teal-300">Quiénes somos</Link></li>
-        <li><Link href="/terminos" className="hover:text-teal-300">Términos y Condiciones</Link></li>
-      </ul>
-    </div>
+          <div>
+            <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Nosotros</h4>
+            <ul className="space-y-2 text-black">
+              <li><Link href="/quienes_somos" className="hover:text-teal-300">Quiénes somos</Link></li>
+              <li><Link href="/terminos" className="hover:text-teal-300">Términos y Condiciones</Link></li>
+            </ul>
+          </div>
 
-    {/* Comunidad */}
-    <div>
-      <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Comunidad Blitz</h4> {/* Cambié border-teal-400 a border-gray-300 */}
-      <ul className="space-y-2 text-black">  {/* Cambié text-gray-200 a text-black */}
-        <li><a href="https://www.instagram.com/mr.popo_lf" target="_blank" className="hover:text-teal-300">Instagram</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <hr className="border-white/10" />
-
-  {/* Medios de pago */}
-  <div className="max-w-7xl mx-auto px-6 py-8">
-    <h5 className="text-lg font-semibold mb-6 border-l-4  border-blue-300 pl-3">Medios de pago</h5> 
-    <div className="flex flex-wrap items-center gap-6 ">
-      <span className="bg-white/5 px-4 py-2 rounded-md">
-        <img src="/images/mercado.png" alt="Mercado Pago" width={100} height={50} />
-      </span>
-    </div>
-  </div>
-
-  {/* Badges + redes + dirección/horario */}
-  <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-    {/* Badges */}
-    <div className="flex flex-wrap items-center gap-6">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded bg-white/10 grid place-items-center">🏛️</div>
-        <div className="text-sm text-black">
-          Dirección <br /> <span className="font-semibold">ChileCompra</span>
+          <div>
+            <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Comunidad Blitz</h4>
+            <ul className="space-y-2 text-black">
+              <li><a href="https://www.instagram.com/blitz.hardware?igsh=b29mcW00OGthcnM3" target="_blank" className="hover:text-teal-300">Instagram</a></li>
+            </ul>
+          </div>
         </div>
-      </div>
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded bg-white/10 grid place-items-center">🛡️</div>
-        <div className="text-sm text-black">
-          Protegido con <span className="font-semibold">seguridad</span>
+
+        <hr className="border-white/10" />
+
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <h5 className="text-lg font-semibold mb-6 border-l-4 border-blue-300 pl-3">Medios de pago</h5>
+          <div className="flex flex-wrap items-center gap-6">
+            <span className="bg-white/5 px-4 py-2 rounded-md">
+              <img src="/images/mercado.png" alt="Mercado Pago" width={100} height={50} />
+            </span>
+          </div>
         </div>
-      </div>
-    </div>
 
-  
-  </div>
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+          <div className="flex flex-wrap items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded bg-white/10 grid place-items-center">🏛️</div>
+              <div className="text-sm text-black">
+                Dirección <br /> <span className="font-semibold">ChileCompra</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded bg-white/10 grid place-items-center">🛡️</div>
+              <div className="text-sm text-black">
+                Protegido con <span className="font-semibold">seguridad</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  {/* Barra inferior */}
-  <div className="bg-black/30 text-center text-xs   -300 py-3">
-    © 2025–2025 | Desarrollado por Cristopher Garcia, Jesus Lagos e Ignacio Varas, Proyecto Capstone
-  </div>
-</footer>
-{/* ==== /FOOTER ==== */}
-    
+        <div className="bg-black/30 text-center text-xs py-3">
+          © 2025–2025 | Desarrollado por Cristopher Garcia, Jesus Lagos e Ignacio Varas, Proyecto Capstone
+        </div>
+      </footer>
     </main>
-    
   );
 }

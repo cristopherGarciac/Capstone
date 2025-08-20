@@ -126,7 +126,7 @@ export default function Seguimiento() {
     <div>
       <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Comunidad Blitz</h4>
       <ul className="space-y-2 text-black">
-        <li><a href="https://www.instagram.com/mr.popo_lf" target="_blank" className="hover:text-teal-300">Instagram</a></li>
+        <li><a href="https://www.instagram.com/blitz.hardware?igsh=b29mcW00OGthcnM3" target="_blank" className="hover:text-teal-300">Instagram</a></li>
       </ul>
     </div>
   </div>
