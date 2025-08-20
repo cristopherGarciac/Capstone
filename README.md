@@ -14,5 +14,5 @@ Proyecto Frontend de Capstone e-commerce usando Next.js, Tailwind CSS y Node.js.
 ## Cómo levantar
 ```bash
 npm install
-npm run dev
 npm install axios
+npm run dev
