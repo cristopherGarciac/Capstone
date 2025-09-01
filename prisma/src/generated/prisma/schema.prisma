@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model usuarios {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email       String        @unique
+  nombre      String?
+  apellido    String?
+  rut         String?
+  hash_pwd    String
+  telefono    String?
+  creado_en   DateTime?     @default(now()) @db.Timestamptz(6)
+  direcciones direcciones[] // Relación uno a muchos
+  pedidos     pedidos[] // Relación uno a muchos
+}
+
+model direcciones {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id String?   @db.Uuid // Este campo ahora es opcional, no es único
+  comuna     String?
+  region     String?
+  calle      String?
+  numero     String?
+  creado_en  DateTime? @default(now()) @db.Timestamptz(6)
+  usuario    usuarios? @relation(fields: [usuario_id], references: [id]) // Relación uno a muchos
+  pedidos    pedidos[] // Relación uno a muchos
+}
+
+model pagos {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pedido_id        String?  @db.Uuid
+  proveedor        String?
+  status           String?
+  monto            Decimal? @db.Decimal
+  moneda           String?
+  tx_id            String?
+  comprobante_json Json?
+  pedidos          pedidos? @relation(fields: [pedido_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pedido_items {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pedido_id   String?    @db.Uuid
+  producto_id String?    @db.Uuid
+  cantidad    Int
+  precio_unit Decimal    @db.Decimal
+  pedidos     pedidos?   @relation(fields: [pedido_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  productos   productos? @relation(fields: [producto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pedidos {
+  id                 String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id         String?        @db.Uuid
+  total              Decimal?       @db.Decimal
+  estado             String?        @default("creado")
+  fecha              DateTime?      @default(now()) @db.Timestamptz(6)
+  direccion_envio_id String?        @db.Uuid
+  pagos              pagos[]
+  pedido_items       pedido_items[]
+  direcciones        direcciones?   @relation(fields: [direccion_envio_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios           usuarios?      @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model productos {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sku          String         @unique
+  titulo       String
+  descripcion  String?
+  precio       Decimal        @db.Decimal
+  stock        Int?           @default(0)
+  categoria    String?
+  imagenes     String[]
+  creado_en    DateTime?      @default(now()) @db.Timestamptz(6)
+  pedido_items pedido_items[]
+}

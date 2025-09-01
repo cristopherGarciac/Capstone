@@ -1,7 +1,10 @@
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Register() {
+  const router = useRouter();
+
   // Estado para manejar los inputs
   const [formData, setFormData] = useState({
     nombre: "",
@@ -33,14 +36,13 @@ export default function Register() {
   };
 
   const [selectedRegion, setSelectedRegion] = useState("");
-  const [selectedComuna, setSelectedComuna] = useState("");
 
   // Función para manejar el cambio de un input
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -51,13 +53,12 @@ export default function Register() {
     setFormData((prevData) => ({
       ...prevData,
       region: region,
-      comuna: "", // Limpiamos la comuna cuando cambia la región
+      comuna: "", // limpiar comuna al cambiar de región
     }));
   };
 
   // Validaciones
   const validateForm = () => {
-    // Aquí puedes agregar validaciones más detalladas según lo que necesites
     if (formData.password !== formData.repeatPassword) {
       alert("Las contraseñas no coinciden");
       return false;
@@ -65,13 +66,33 @@ export default function Register() {
     return true;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) return;
 
-    // Aquí va la lógica para el registro (enviar a la API, etc.)
-    console.log("Formulario enviado:", formData);
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Usuario registrado correctamente");
+        // 🔥 Redirigir al inicio
+        router.push("/");
+      } else {
+        alert(data.error || "Hubo un error al registrar el usuario");
+      }
+    } catch (error) {
+      console.error("Error en el registro:", error);
+      alert("Error en el servidor");
+    }
   };
 
   return (
@@ -79,11 +100,9 @@ export default function Register() {
       {/* Navbar */}
       <nav className="bg-white shadow sticky top-0 z-50 w-full">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-          {/* Logo */}
           <Link href="/" className="logo text-2xl font-bold text-[var(--color-primary)]">
             <img src="/images/blitz.png" alt="Blitz Hardware Logo" className="h-20 w-auto" />
           </Link>
-          
         </div>
       </nav>
 
@@ -123,7 +142,6 @@ export default function Register() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
-            {/* RUT */}
             <div>
               <label htmlFor="rut" className="block text-sm font-medium">RUT</label>
               <input
@@ -133,11 +151,10 @@ export default function Register() {
                 value={formData.rut}
                 onChange={handleChange}
                 className="mt-1 p-2 w-full border border-gray-300 rounded"
-                placeholder="Ingresa RUT con formato 12345678-9"
+                placeholder="12345678-9"
                 required
               />
             </div>
-            {/* E-mail */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium">E-mail</label>
               <input
@@ -147,14 +164,13 @@ export default function Register() {
                 value={formData.email}
                 onChange={handleChange}
                 className="mt-1 p-2 w-full border border-gray-300 rounded"
-                placeholder="Ingresar correo válido"
+                placeholder="correo@ejemplo.com"
                 required
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
-            {/* Teléfono */}
             <div>
               <label htmlFor="telefono" className="block text-sm font-medium">Teléfono</label>
               <input
@@ -164,35 +180,26 @@ export default function Register() {
                 value={formData.telefono}
                 onChange={handleChange}
                 className="mt-1 p-2 w-full border border-gray-300 rounded"
-                placeholder="Ingresa teléfono con formato +569"
+                placeholder="+569..."
                 required
               />
             </div>
-            {/* Necesito comprar con factura */}
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="compraConFactura"
                 name="compraConFactura"
                 checked={formData.compraConFactura}
-                onChange={() =>
-                  setFormData((prevData) => ({
-                    ...prevData,
-                    compraConFactura: !prevData.compraConFactura,
-                  }))
-                }
+                onChange={handleChange}
                 className="mr-2"
               />
               <label htmlFor="compraConFactura" className="text-sm">Necesito comprar con factura</label>
             </div>
           </div>
 
-          {/* Dirección de envío */}
+          {/* Dirección */}
+          <h3 className="text-lg font-semibold mb-4">Dirección de Envío</h3>
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-4">Dirección de Envío</h3>
-            <p className="text-sm mb-4">Ingresa los datos ahora y ahorra tiempo en tu próxima compra</p>
-            
-            {/* Región */}
             <label htmlFor="region" className="block text-sm font-medium">Región</label>
             <select
               id="region"
@@ -209,7 +216,6 @@ export default function Register() {
             </select>
           </div>
 
-          {/* Comuna */}
           <div className="mb-6">
             <label htmlFor="comuna" className="block text-sm font-medium">Comuna</label>
             <select
@@ -221,7 +227,7 @@ export default function Register() {
               disabled={!selectedRegion}
               required
             >
-              <option value="">Debes seleccionar una comuna</option>
+              <option value="">Selecciona una comuna</option>
               {selectedRegion &&
                 comunas[selectedRegion]?.map((comuna) => (
                   <option key={comuna} value={comuna}>{comuna}</option>
@@ -230,7 +236,6 @@ export default function Register() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
-            {/* Calle */}
             <div>
               <label htmlFor="calle" className="block text-sm font-medium">Calle</label>
               <input
@@ -243,7 +248,6 @@ export default function Register() {
                 required
               />
             </div>
-            {/* Número */}
             <div>
               <label htmlFor="numero" className="block text-sm font-medium">Número</label>
               <input
@@ -269,11 +273,9 @@ export default function Register() {
                 value={formData.password}
                 onChange={handleChange}
                 className="mt-1 p-2 w-full border border-gray-300 rounded"
-                placeholder="Mínimo 8 caracteres"
                 required
               />
             </div>
-            {/* Repite la Contraseña */}
             <div>
               <label htmlFor="repeatPassword" className="block text-sm font-medium">Repite contraseña</label>
               <input
