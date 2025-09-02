@@ -10,9 +10,13 @@ Proyecto Frontend de Capstone e-commerce usando Next.js, Tailwind CSS y Node.js.
 - `public/` → Imágenes y assets
 - `styles/` → Estilos globales o módulos CSS
 - `package.json` → Dependencias y scripts
+- crear un archivo .env 
 
 ## Cómo levantar
 ```bash
 npm install
 npm install axios
+npx prisma generate
+npm install bcryptjs
+npm install jsonwebtoken
 npm run dev
