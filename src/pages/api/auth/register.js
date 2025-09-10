@@ -1,5 +1,6 @@
 import { PrismaClient } from '../../../../prisma/src/generated/prisma'; 
 import bcrypt from 'bcryptjs';
+import nodemailer from "nodemailer";
 
 const prisma = new PrismaClient();
 
@@ -53,6 +54,36 @@ export default async function handler(req, res) {
       // 4. Preparar respuesta (direcciones es un array)
       const direccion = user.direcciones.length > 0 ? user.direcciones[0] : null;
 
+      // --------------------------
+      // 5. Enviar correo de bienvenida
+      // --------------------------
+      // Configura tu transporter con tu App Password
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: "c57521116@gmail.com",          // reemplaza con tu correo
+          pass: "zsemaojsmvnvhfoa"             // reemplaza con tu App Password (sin espacios)
+        },
+      });
+
+      // Contenido del correo
+      const mailOptions = {
+        from: '"Blitz Hardware" <tu-correo@gmail.com>', // remitente
+        to: user.email,                                 // destinatario
+        subject: "Registro exitoso en Blitz Hardware",
+        text: `Hola ${user.nombre},\n\n¡Tu registro se completó exitosamente en Blitz Hardware!\n\nBienvenido(a) a nuestra comunidad.\n\nSaludos,\nEquipo Blitz Hardware`,
+      };
+
+      // Enviar correo (no bloquea la respuesta)
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error("Error enviando correo:", error);
+        } else {
+          console.log("Correo enviado:", info.response);
+        }
+      });
+
+      // 6. Responder con los datos del usuario
       res.status(201).json({
         id: user.id,
         email: user.email,

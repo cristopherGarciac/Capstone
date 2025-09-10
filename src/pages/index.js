@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import Link from "next/link";
 
 export default function Home() {
@@ -9,8 +9,24 @@ export default function Home() {
     email: "",
     password: "",
   });
+// para mantener el cambio que se haga en admin al e-commercce
+const [logo, setLogo] = useState("/images/blitz.png"); // Logo predeterminado
+const [nombrePagina, setNombrePagina] = useState("Mi E-commerce"); // Nombre predeterminado de la página
+const [colorHeader, setColorHeader] = useState("#ffffff"); // valor por defecto (blanco)
+const [colorFooter, setColorFooter] = useState("#ffffff"); // Footer por defecto
 
-  // Estado de error o mensajes
+  useEffect(() => {
+    const savedConfig = localStorage.getItem("config");
+    if (savedConfig) {
+      const config = JSON.parse(savedConfig);
+      setLogo(config.logo || "/images/blitz.png"); // Usar logo guardado si existe
+      setNombrePagina(config.nombrePagina || "Mi E-commerce"); // Usar nombre guardado si existe
+      setColorHeader(config.colorHeader || "#ffffff"); // recuperamos el color guardado
+      setColorFooter(config.colorFooter || "#ffffff"); // recuperamos el color guardado
+    }
+  }, []);
+
+      // Estado de error o mensajes
   const [loginError, setLoginError] = useState("");
 
   // Estado del usuario logueado
@@ -21,6 +37,7 @@ export default function Home() {
     { texto: "Marcas Exclusivas", destaque: false },
   ];
 
+ 
   const categorias = [
     { nombre: "Procesadores", slug: "procesadores" },
     { nombre: "Placas Madre", slug: "placas-madre" },
@@ -118,13 +135,19 @@ export default function Home() {
       </div>
 
       {/* Navbar */}
+      <nav
+        className="shadow sticky top-0 z-50"
+        style={{ backgroundColor: colorHeader }}> 
+      
       <nav className="bg-white shadow sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           {/* Logo */}
           <Link className="logo text-2xl font-bold text-[var(--color-primary)]" href="/">
-            <img src="/images/blitz.png" alt="Blitz Hardware Logo" className="h-20 w-auto" />
+            <img src={logo} alt="Blitz Hardware Logo" className="h-20 w-auto" />
           </Link>
+
           <div className="flex items-center space-x-6">
+            <span className="text-2xl font-semibold">{nombrePagina}</span>          
             <Link href="/" className="text-gray-700 hover:text-[var(--color-accent)]">
               Inicio
             </Link>
@@ -157,7 +180,7 @@ export default function Home() {
           </div>
         </div>
       </nav>
-
+     </nav>  
       {/* Modal de login */}
       {loginOpen && (
         <div className="fixed inset-0 bg-black flex justify-center items-start pt-24 z-50" style={{ backgroundColor: "rgba(0,0,0,0.3)" }}>
@@ -259,6 +282,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
+      <footer style={{ backgroundColor: colorFooter }} className="text-black mt-16"></footer>
       <footer className="bg-[#FFD700] text-black mt-16">
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Links principales */}

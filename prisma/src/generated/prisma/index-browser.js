@@ -20,12 +20,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 6.14.0
- * Query Engine version: 717184b7b35ea05dfa71a3236b7af656013e1e49
+ * Prisma Client JS version: 6.15.0
+ * Query Engine version: 85179d7826409ee107a6ba334b5e305ae3fba9fb
  */
 Prisma.prismaVersion = {
-  client: "6.14.0",
-  engine: "717184b7b35ea05dfa71a3236b7af656013e1e49"
+  client: "6.15.0",
+  engine: "85179d7826409ee107a6ba334b5e305ae3fba9fb"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -124,11 +124,11 @@ exports.Prisma.UsuariosScalarFieldEnum = {
   id: 'id',
   email: 'email',
   nombre: 'nombre',
-  apellido: 'apellido',
-  rut: 'rut',
   hash_pwd: 'hash_pwd',
   telefono: 'telefono',
-  creado_en: 'creado_en'
+  creado_en: 'creado_en',
+  apellido: 'apellido',
+  rut: 'rut'
 };
 
 exports.Prisma.DireccionesScalarFieldEnum = {
@@ -181,6 +181,17 @@ exports.Prisma.ProductosScalarFieldEnum = {
   creado_en: 'creado_en'
 };
 
+exports.Prisma.ComunasScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre',
+  region_id: 'region_id'
+};
+
+exports.Prisma.RegionesScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -214,7 +225,9 @@ exports.Prisma.ModelName = {
   pagos: 'pagos',
   pedido_items: 'pedido_items',
   pedidos: 'pedidos',
-  productos: 'productos'
+  productos: 'productos',
+  comunas: 'comunas',
+  regiones: 'regiones'
 };
 
 /**

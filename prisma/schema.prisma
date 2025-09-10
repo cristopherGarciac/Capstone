@@ -4,8 +4,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -13,25 +14,25 @@ model usuarios {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email       String        @unique
   nombre      String?
-  apellido    String?       
-  rut         String?       
   hash_pwd    String
   telefono    String?
   creado_en   DateTime?     @default(now()) @db.Timestamptz(6)
-  direcciones direcciones[] // Relación uno a muchos
-  pedidos     pedidos[] // Relación uno a muchos
+  apellido    String?
+  rut         String?
+  direcciones direcciones[]
+  pedidos     pedidos[]
 }
 
 model direcciones {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  usuario_id String?   @db.Uuid // Este campo ahora es opcional, no es único
+  usuario_id String?   @db.Uuid
   comuna     String?
   region     String?
   calle      String?
   numero     String?
   creado_en  DateTime? @default(now()) @db.Timestamptz(6)
-  usuario    usuarios? @relation(fields: [usuario_id], references: [id]) // Relación uno a muchos
-  pedidos    pedidos[] // Relación uno a muchos
+  usuario    usuarios? @relation(fields: [usuario_id], references: [id])
+  pedidos    pedidos[]
 }
 
 model pagos {
@@ -63,7 +64,7 @@ model pedidos {
   estado             String?        @default("creado")
   fecha              DateTime?      @default(now()) @db.Timestamptz(6)
   direccion_envio_id String?        @db.Uuid
-  pagos              pagos[] 
+  pagos              pagos[]
   pedido_items       pedido_items[]
   direcciones        direcciones?   @relation(fields: [direccion_envio_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   usuarios           usuarios?      @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -82,4 +83,15 @@ model productos {
   pedido_items pedido_items[]
 }
 
+model comunas {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  region_id Int?
+  regiones  regiones? @relation(fields: [region_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
 
+model regiones {
+  id      Int       @id @default(autoincrement())
+  nombre  String    @unique
+  comunas comunas[]
+}

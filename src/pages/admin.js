@@ -2,53 +2,32 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export default function Admin() {
-  const [section, setSection] = useState('productos'); // sección actual del panel
+  const [section, setSection] = useState('productos');
 
   const admin = {
     nombre: 'Admin Cristopher',
-    avatar: '/images/admin-avatar.png', // ruta de la imagen del administrador
+    avatar: '/images/admin-avatar.png',
   };
 
-  // ----- Productos -----
-  const [productos, setProductos] = useState([
-    {
-      id: 1,
-      nombre: 'Procesador Intel i7',
-      precio: '$250.000',
-      stock: 5,
-      descripcion: '11va generación, 3.8GHz',
-      imagen: '/images/i7.png',
-    },
-    {
-      id: 2,
-      nombre: 'Tarjeta Gráfica RTX 3060',
-      precio: '$399.000',
-      stock: 3,
-      descripcion: '12GB GDDR6, ideal para gaming',
-      imagen: '/images/3060.png',
-    },
-    {
-      id: 3,
-      nombre: 'Memoria RAM Corsair 16GB',
-      precio: '$75.000',
-      stock: 10,
-      descripcion: 'DDR4 3200MHz',
-      imagen: '/images/ddr.png',
-    },
-  ]);
+  // ---------- Estado ----------
+  const [productos, setProductos] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [detalleProducto, setDetalleProducto] = useState(null); // para editar
+  const [confirmDelete, setConfirmDelete] = useState(null); // {id, titulo}
 
-  const [detalleProducto, setDetalleProducto] = useState(null);
-
-  // ----- Nuevo Producto para modal -----
+  // Form de nuevo producto (modal)
   const [nuevoProducto, setNuevoProducto] = useState({
-    nombre: '',
+    sku: '',
+    titulo: '',
     precio: '',
     stock: 0,
+    categoria: '',
     descripcion: '',
-    imagen: '',
+    imagenUrl: '', // se guardará como imagenes[0]
   });
 
-  // ----- Configuración -----
+  // ---------- Config localStorage (tal como lo tenías) ----------
   const [configTemp, setConfigTemp] = useState({
     nombrePagina: 'Mi E-commerce',
     colorHeader: '#afbbcfff',
@@ -56,7 +35,6 @@ export default function Admin() {
     logo: '/images/blitz.png',
   });
   const [config, setConfig] = useState(configTemp);
-  const [logoFile, setLogoFile] = useState(null);
 
   useEffect(() => {
     const configLS = JSON.parse(localStorage.getItem('config'));
@@ -71,13 +49,10 @@ export default function Admin() {
   };
 
   const handleLogoUpload = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = () => {
-        setConfigTemp({ ...configTemp, logo: reader.result });
-        setLogoFile(reader.result);
-      };
+      reader.onload = () => setConfigTemp({ ...configTemp, logo: reader.result });
       reader.readAsDataURL(file);
     }
   };
@@ -93,95 +68,257 @@ export default function Admin() {
     document.documentElement.style.setProperty('--color-footer', configTemp.colorFooter);
   }, [configTemp.colorHeader, configTemp.colorFooter]);
 
-  // ----- Render secciones -----
+  // ---------- CRUD Productos ----------
+  async function cargarProductos() {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/productos?skip=0&take=100');
+      if (!res.ok) throw new Error('No se pudo obtener productos');
+      const data = await res.json(); // {items, total}
+      setProductos(data.items || []);
+      setTotal(data.total || 0);
+    } catch (e) {
+      console.error(e);
+      alert('Error al cargar productos');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (section === 'productos') cargarProductos();
+  }, [section]);
+
+  async function crearProducto(e) {
+    e.preventDefault();
+    try {
+      const body = {
+        sku: nuevoProducto.sku.trim(),
+        titulo: nuevoProducto.titulo.trim(),
+        descripcion: nuevoProducto.descripcion.trim(),
+        precio: Number(nuevoProducto.precio),
+        stock: Number(nuevoProducto.stock) || 0,
+        categoria: nuevoProducto.categoria.trim() || null,
+        imagenes: nuevoProducto.imagenUrl ? [nuevoProducto.imagenUrl] : [],
+      };
+
+      if (!body.sku || !body.titulo || isNaN(body.precio)) {
+        alert('SKU, Título y Precio (numérico) son obligatorios');
+        return;
+      }
+
+      const res = await fetch('/api/productos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Error al crear');
+      }
+
+      // reset
+      setDetalleProducto(null);
+      setNuevoProducto({
+        sku: '',
+        titulo: '',
+        precio: '',
+        stock: 0,
+        categoria: '',
+        descripcion: '',
+        imagenUrl: '',
+      });
+
+      await cargarProductos();
+    } catch (e) {
+      console.error(e);
+      alert(e.message);
+    }
+  }
+
+  async function guardarEdicion() {
+    try {
+      const id = detalleProducto.id;
+      const body = {
+        sku: detalleProducto.sku,
+        titulo: detalleProducto.titulo,
+        descripcion: detalleProducto.descripcion,
+        categoria: detalleProducto.categoria,
+        precio:
+          detalleProducto.precio !== '' && detalleProducto.precio != null
+            ? Number(detalleProducto.precio)
+            : undefined,
+        stock:
+          detalleProducto.stock !== '' && detalleProducto.stock != null
+            ? Number(detalleProducto.stock)
+            : undefined,
+        imagenes: detalleProducto.imagenes || [],
+      };
+
+      const res = await fetch(`/api/productos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Error al actualizar');
+      }
+
+      setDetalleProducto(null);
+      await cargarProductos();
+    } catch (e) {
+      console.error(e);
+      alert(e.message);
+    }
+  }
+
+  async function borrarProductoConfirmado() {
+    try {
+      const id = confirmDelete.id;
+      const res = await fetch(`/api/productos/${id}`, { method: 'DELETE' });
+      if (res.status !== 204) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'No se pudo borrar');
+      }
+      setConfirmDelete(null);
+      await cargarProductos();
+    } catch (e) {
+      console.error(e);
+      alert(e.message);
+    }
+  }
+
+  // Helpers UI
+  const primeraImagen = (p) =>
+    (Array.isArray(p.imagenes) && p.imagenes[0]) || '/images/default-product.png';
+
+  const precioCLP = (v) =>
+    typeof v === 'number'
+      ? Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(v)
+      : v;
+
+  // ---------- Render ----------
   const renderSection = () => {
     if (section === 'productos') {
       return (
         <div className="relative">
-          <h2 className="text-2xl mb-6 font-bold">Productos</h2>
+          <h2 className="text-2xl mb-6 font-bold">
+            Productos {loading ? '(cargando...)' : `(${total})`}
+          </h2>
 
-          {/* Botón Agregar Producto */}
-          <button
-            onClick={() => setDetalleProducto({ modalAgregar: true })}
-            className="mb-6 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-          >
-            Agregar Producto
-          </button>
+          {/* Botones de cabecera */}
+          <div className="flex items-center gap-3 mb-6">
+            <button
+              onClick={() => setDetalleProducto({ modalAgregar: true })}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            >
+              Agregar Producto
+            </button>
+            <button
+              onClick={cargarProductos}
+              className="px-3 py-2 border rounded hover:bg-gray-100"
+            >
+              Refrescar
+            </button>
+          </div>
 
+          {/* Lista */}
           <div className="flex flex-col gap-4">
             {productos.map((producto) => (
               <div
                 key={producto.id}
                 className="flex items-center justify-between bg-white p-4 rounded-lg shadow hover:shadow-lg transition"
               >
-                {/* Imagen */}
-                <img
-                  src={producto.imagen || '/images/default-product.png'}
-                  alt={producto.nombre}
-                  className="w-24 h-24 object-cover rounded"
-                />
-
-                {/* Información del producto */}
-                <div className="flex-1 mx-4">
-                  <h3 className="text-lg font-semibold">{producto.nombre}</h3>
-                  <p className="text-gray-600">Stock: {producto.stock}</p>
-                  <p className="text-gray-800 font-medium">{producto.precio}</p>
-                  <p className="text-gray-500 text-sm mt-1">{producto.descripcion}</p>
+                <div className="flex items-center gap-4">
+                  <img
+                    src={primeraImagen(producto)}
+                    alt={producto.titulo}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold">{producto.titulo}</h3>
+                    <p className="text-gray-600 text-sm">SKU: {producto.sku}</p>
+                    {producto.categoria && (
+                      <p className="text-gray-600 text-sm">Categoría: {producto.categoria}</p>
+                    )}
+                    <p className="text-gray-600 text-sm">Stock: {producto.stock ?? 0}</p>
+                    <p className="text-gray-800 font-medium">{precioCLP(producto.precio)}</p>
+                    <p className="text-gray-500 text-sm mt-1 line-clamp-2">
+                      {producto.descripcion}
+                    </p>
+                  </div>
                 </div>
 
-                {/* Botón Editar */}
-                <button
-                  onClick={() => setDetalleProducto(producto)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-                >
-                  Editar
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() =>
+                      setDetalleProducto({
+                        ...producto,
+                        precio: producto.precio ?? '',
+                        stock: producto.stock ?? '',
+                        imagenes: producto.imagenes ?? [],
+                      })
+                    }
+                    className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() =>
+                      setConfirmDelete({ id: producto.id, titulo: producto.titulo })
+                    }
+                    className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Borrar
+                  </button>
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Modal de agregar producto */}
+          {/* Modal Agregar */}
           {detalleProducto?.modalAgregar && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg w-96 relative">
                 <h3 className="text-xl font-bold mb-4">Agregar Nuevo Producto</h3>
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const nuevoId = productos.length
-                      ? Math.max(...productos.map((p) => p.id)) + 1
-                      : 1;
-                    setProductos([...productos, { ...nuevoProducto, id: nuevoId }]);
-                    setDetalleProducto(null);
-                    // Reiniciar formulario
-                    setNuevoProducto({
-                      nombre: '',
-                      precio: '',
-                      stock: 0,
-                      descripcion: '',
-                      imagen: '',
-                    });
-                  }}
-                  className="space-y-4"
-                >
+                <form onSubmit={crearProducto} className="space-y-3">
                   <input
                     type="text"
-                    value={nuevoProducto.nombre}
-                    onChange={(e) =>
-                      setNuevoProducto({ ...nuevoProducto, nombre: e.target.value })
-                    }
-                    placeholder="Nombre"
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={nuevoProducto.sku}
+                    onChange={(e) => setNuevoProducto({ ...nuevoProducto, sku: e.target.value })}
+                    placeholder="SKU"
+                    className="w-full p-2 border rounded"
                     required
                   />
                   <input
                     type="text"
+                    value={nuevoProducto.titulo}
+                    onChange={(e) =>
+                      setNuevoProducto({ ...nuevoProducto, titulo: e.target.value })
+                    }
+                    placeholder="Título"
+                    className="w-full p-2 border rounded"
+                    required
+                  />
+                  <input
+                    type="text"
+                    value={nuevoProducto.categoria}
+                    onChange={(e) =>
+                      setNuevoProducto({ ...nuevoProducto, categoria: e.target.value })
+                    }
+                    placeholder="Categoría (opcional)"
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
                     value={nuevoProducto.precio}
                     onChange={(e) =>
                       setNuevoProducto({ ...nuevoProducto, precio: e.target.value })
                     }
-                    placeholder="Precio"
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    placeholder="Precio (numérico)"
+                    className="w-full p-2 border rounded"
                     required
                   />
                   <input
@@ -191,7 +328,7 @@ export default function Admin() {
                       setNuevoProducto({ ...nuevoProducto, stock: Number(e.target.value) })
                     }
                     placeholder="Stock"
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-full p-2 border rounded"
                     required
                   />
                   <textarea
@@ -200,24 +337,35 @@ export default function Admin() {
                       setNuevoProducto({ ...nuevoProducto, descripcion: e.target.value })
                     }
                     placeholder="Descripción"
-                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-full p-2 border rounded"
                     required
                   />
+
+                  {/* Imagen: dataURL o URL */}
                   <input
                     type="file"
                     onChange={(e) => {
-                      const file = e.target.files[0];
+                      const file = e.target.files?.[0];
                       if (file) {
                         const reader = new FileReader();
                         reader.onload = () =>
-                          setNuevoProducto({ ...nuevoProducto, imagen: reader.result });
+                          setNuevoProducto({ ...nuevoProducto, imagenUrl: reader.result });
                         reader.readAsDataURL(file);
                       }
                     }}
-                    className="mb-4"
+                    className="w-full"
+                  />
+                  <input
+                    type="url"
+                    value={nuevoProducto.imagenUrl}
+                    onChange={(e) =>
+                      setNuevoProducto({ ...nuevoProducto, imagenUrl: e.target.value })
+                    }
+                    placeholder="O pega una URL de imagen"
+                    className="w-full p-2 border rounded"
                   />
 
-                  <div className="flex justify-end gap-2">
+                  <div className="flex justify-end gap-2 pt-2">
                     <button
                       type="button"
                       onClick={() => setDetalleProducto(null)}
@@ -233,7 +381,7 @@ export default function Admin() {
                     </button>
                   </div>
                 </form>
-                {/* Botón cerrar modal */}
+
                 <button
                   onClick={() => setDetalleProducto(null)}
                   className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg font-bold"
@@ -244,90 +392,156 @@ export default function Admin() {
             </div>
           )}
 
-          {/* Modal de edición existente */}
+          {/* Modal Editar */}
           {detalleProducto && !detalleProducto.modalAgregar && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
               <div className="bg-white p-6 rounded-lg w-96 relative">
                 <h3 className="text-xl font-bold mb-4">Editar Producto</h3>
 
-                <input
-                  type="text"
-                  value={detalleProducto.nombre}
-                  onChange={(e) =>
-                    setDetalleProducto({ ...detalleProducto, nombre: e.target.value })
-                  }
-                  placeholder="Nombre"
-                  className="w-full mb-2 p-2 border rounded"
-                />
-                <input
-                  type="text"
-                  value={detalleProducto.precio}
-                onChange={(e) =>
-                  setDetalleProducto({ ...detalleProducto, precio: e.target.value })
-                }
-                placeholder="Precio"
-                className="w-full mb-2 p-2 border rounded"
-              />
-              <input
-                type="number"
-                value={detalleProducto.stock}
-                onChange={(e) =>
-                  setDetalleProducto({ ...detalleProducto, stock: Number(e.target.value) })
-                }
-                placeholder="Stock"
-                className="w-full mb-2 p-2 border rounded"
-              />
-              <textarea
-                value={detalleProducto.descripcion}
-                onChange={(e) =>
-                  setDetalleProducto({ ...detalleProducto, descripcion: e.target.value })
-                }
-                placeholder="Descripción"
-                className="w-full mb-2 p-2 border rounded"
-              />
-              <input
-                type="file"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = () => {
-                      setDetalleProducto({ ...detalleProducto, imagen: reader.result });
-                    };
-                    reader.readAsDataURL(file);
-                  }
-                }}
-                className="mb-4"
-              />
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    value={detalleProducto.sku || ''}
+                    onChange={(e) =>
+                      setDetalleProducto({ ...detalleProducto, sku: e.target.value })
+                    }
+                    placeholder="SKU"
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    value={detalleProducto.titulo || ''}
+                    onChange={(e) =>
+                      setDetalleProducto({ ...detalleProducto, titulo: e.target.value })
+                    }
+                    placeholder="Título"
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="text"
+                    value={detalleProducto.categoria || ''}
+                    onChange={(e) =>
+                      setDetalleProducto({ ...detalleProducto, categoria: e.target.value })
+                    }
+                    placeholder="Categoría"
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={detalleProducto.precio === '' ? '' : detalleProducto.precio}
+                    onChange={(e) =>
+                      setDetalleProducto({ ...detalleProducto, precio: e.target.value })
+                    }
+                    placeholder="Precio (numérico)"
+                    className="w-full p-2 border rounded"
+                  />
+                  <input
+                    type="number"
+                    value={detalleProducto.stock === '' ? '' : detalleProducto.stock}
+                    onChange={(e) =>
+                      setDetalleProducto({ ...detalleProducto, stock: e.target.value })
+                    }
+                    placeholder="Stock"
+                    className="w-full p-2 border rounded"
+                  />
+                  <textarea
+                    value={detalleProducto.descripcion || ''}
+                    onChange={(e) =>
+                      setDetalleProducto({ ...detalleProducto, descripcion: e.target.value })
+                    }
+                    placeholder="Descripción"
+                    className="w-full p-2 border rounded"
+                  />
 
-              <div className="flex justify-end gap-2">
+                  {/* Imagen principal: edita imagenes[0] */}
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                          const imgs = Array.isArray(detalleProducto.imagenes)
+                            ? [...detalleProducto.imagenes]
+                            : [];
+                          imgs[0] = reader.result;
+                          setDetalleProducto({ ...detalleProducto, imagenes: imgs });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="w-full"
+                  />
+                  <input
+                    type="url"
+                    value={(detalleProducto.imagenes && detalleProducto.imagenes[0]) || ''}
+                    onChange={(e) => {
+                      const imgs = Array.isArray(detalleProducto.imagenes)
+                        ? [...detalleProducto.imagenes]
+                        : [];
+                      imgs[0] = e.target.value;
+                      setDetalleProducto({ ...detalleProducto, imagenes: imgs });
+                    }}
+                    placeholder="URL de imagen principal"
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <button
+                    onClick={() => setDetalleProducto(null)}
+                    className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={guardarEdicion}
+                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                    Guardar
+                  </button>
+                </div>
+
                 <button
                   onClick={() => setDetalleProducto(null)}
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-lg font-bold"
                 >
-                  Cancelar
+                  ✕
                 </button>
-                <button
-                  onClick={() => {
-                    setProductos(
-                      productos.map((p) =>
-                        p.id === detalleProducto.id ? detalleProducto : p
-                      )
-                    );
-                    setDetalleProducto(null);
-                  }}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                >
-                  Guardar
-                </button>
-                  </div>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Borrar */}
+          {confirmDelete && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg w-96">
+                <h3 className="text-lg font-semibold mb-2">Eliminar producto</h3>
+                <p className="text-sm text-gray-700">
+                  ¿Seguro que deseas eliminar <b>{confirmDelete.titulo}</b>? Esta acción no se puede
+                  deshacer.
+                </p>
+                <div className="flex justify-end gap-2 mt-4">
+                  <button
+                    onClick={() => setConfirmDelete(null)}
+                    className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={borrarProductoConfirmado}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Borrar
+                  </button>
                 </div>
               </div>
-            )}
-          </div>
-        );
-      }
-
+            </div>
+          )}
+        </div>
+      );
+    }
 
     if (section === 'configuracion') {
       return (
@@ -341,33 +555,27 @@ export default function Admin() {
     return <p>Selecciona una sección desde la barra lateral.</p>;
   };
 
+  // ---------- Layout ----------
   return (
     <div className="flex min-h-screen">
       {/* Panel lateral */}
       <div className="w-60 bg-gray-800 text-white flex flex-col p-4 gap-2">
         <h1 className="text-xl font-bold mb-4 text-center">Admin Panel</h1>
-
-        {/* Botones de secciones */}
         <button className="py-2 border-b border-gray-700" onClick={() => setSection('productos')}>
           Productos
         </button>
-        
         <Link href="confi" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">
           Configuración
         </Link>
-
         <Link href="usuarios" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">
           Usuarios
         </Link>
-
         <Link href="pedidos" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">
           Pedidos
         </Link>
-        
         <Link href="report" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">
           Reportes
         </Link>
-
         <Link href="/" className="mt-auto py-2 px-4 bg-gray-600 rounded text-center hover:bg-gray-500">
           Volver al inicio
         </Link>
@@ -375,11 +583,9 @@ export default function Admin() {
 
       {/* Contenido principal */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
         <header className="flex items-center justify-between bg-gray-100 border-b p-4 shadow-sm">
           <h2 className="text-xl font-bold">{section.charAt(0).toUpperCase() + section.slice(1)}</h2>
           <div className="flex items-center gap-3">
-            {/* Aquí se pueden agregar íconos, notificaciones o botones */}
             <span className="text-gray-700 font-medium">{admin.nombre}</span>
             <img
               src={admin.avatar}
@@ -388,10 +594,8 @@ export default function Admin() {
             />
           </div>
         </header>
-
-        {/* Contenido debajo del header */}
         <main className="flex-1 p-6 bg-gray-50">{renderSection()}</main>
       </div>
     </div>
-  )
+  );
 }

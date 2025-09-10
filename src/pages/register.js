@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 export default function Register() {
   const router = useRouter();
 
-  // Estado para manejar los inputs
+  // Estado del formulario
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -13,8 +13,8 @@ export default function Register() {
     email: "",
     telefono: "",
     compraConFactura: false,
-    region: "",
-    comuna: "",
+    region_id: "",
+    comuna_id: "",
     calle: "",
     numero: "",
     depto: "",
@@ -25,47 +25,92 @@ export default function Register() {
     repeatPassword: "",
   });
 
-  // Listado de regiones (puedes agregar más opciones aquí)
-  const regiones = ["Metropolitana", "Valparaíso", "Maule"];
+  // Regiones y comunas
+  const [region, setRegion] = useState([]);
+  const [selectedRegion, setSelectedRegion] = useState(null);
 
-  // Comunas dependiendo de la región seleccionada
-  const comunas = {
-    Metropolitana: ["Santiago", "Las Condes", "Providencia"],
-    Valparaíso: ["Valparaíso", "Viña del Mar", "Quillota"],
-    Maule: ["Talca", "Curicó", "Linares"],
-  };
-
-  const [selectedRegion, setSelectedRegion] = useState("");
-
-  // Función para manejar el cambio de un input
+  // Función para manejar inputs genéricos
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  // Función para manejar la selección de la región
+  // ✅ Manejar cambio de región
   const handleRegionChange = (e) => {
-    const region = e.target.value;
-    setSelectedRegion(region);
-    setFormData((prevData) => ({
-      ...prevData,
-      region: region,
-      comuna: "", // limpiar comuna al cambiar de región
+    const regionId = e.target.value;
+    setSelectedRegion(regionId);
+    setFormData((prev) => ({
+      ...prev,
+      region_id: regionId,
+      comuna_id: "", // reset comuna al cambiar de región
     }));
   };
 
-  // Validaciones
+  // Cargar regiones y comunas desde la API
+useEffect(() => {
+  async function fetchRegion() {
+    try {
+      const res = await fetch("/api/regionesComunas");
+      const data = await res.json();
+
+      if (!Array.isArray(data)) {
+        console.error("Respuesta de regiones inválida:", data);
+        return;
+      }
+
+      setRegion(data);
+    } catch (err) {
+      console.error("Error al obtener regiones:", err);
+    }
+  }
+
+  fetchRegion();
+}, []);
+const formatRut = (rut) => {
+  // Eliminar caracteres que no sean números o K
+  rut = rut.replace(/[^0-9kK]/g, "").toUpperCase();
+
+  // Separar cuerpo y DV
+  let cuerpo = rut.slice(0, -1);
+  let dv = rut.slice(-1);
+
+  // Agregar puntos al cuerpo
+  let cuerpoFormateado = "";
+  while (cuerpo.length > 3) {
+    cuerpoFormateado = "." + cuerpo.slice(-3) + cuerpoFormateado;
+    cuerpo = cuerpo.slice(0, -3);
+  }
+  cuerpoFormateado = cuerpo + cuerpoFormateado;
+
+  // Unir con guion si hay DV
+  return dv ? `${cuerpoFormateado}-${dv}` : cuerpoFormateado;
+};
+
+// validacion de rut
+
+const [errors, setErrors] = useState({});
+  // Validación simple
   const validateForm = () => {
+    let newErrors = {};
     if (formData.password !== formData.repeatPassword) {
       alert("Las contraseñas no coinciden");
       return false;
     }
-    return true;
+     if (!/^\d{9}$/.test(formData.telefono)) {
+      newErrors.telefono = "El teléfono debe tener exactamente 9 dígitos";
+    }
+    
+    if (!validarRut(formData.rut)) {
+      newErrors.rut = "El RUT ingresado no es válido";
+    }
+      setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -74,9 +119,7 @@ export default function Register() {
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
@@ -84,7 +127,6 @@ export default function Register() {
 
       if (response.ok) {
         alert("Usuario registrado correctamente");
-        // 🔥 Redirigir al inicio
         router.push("/");
       } else {
         alert(data.error || "Hubo un error al registrar el usuario");
@@ -108,13 +150,17 @@ export default function Register() {
 
       {/* Sección de Registro */}
       <section className="max-w-7xl mx-auto p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-center text-[var(--color-secondary)] mb-8">Registro</h1>
+        <h1 className="text-3xl font-bold text-center text-[var(--color-secondary)] mb-8">
+          Registro
+        </h1>
 
         <form onSubmit={handleSubmit}>
           {/* Titular de la cuenta */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="nombre" className="block text-sm font-medium">Nombre</label>
+              <label htmlFor="nombre" className="block text-sm font-medium">
+                Nombre
+              </label>
               <input
                 type="text"
                 id="nombre"
@@ -122,12 +168,13 @@ export default function Register() {
                 value={formData.nombre}
                 onChange={handleChange}
                 className="mt-1 p-2 w-full border border-gray-300 rounded"
-                placeholder="Ingresa un nombre válido"
                 required
               />
             </div>
             <div>
-              <label htmlFor="apellido" className="block text-sm font-medium">Apellido</label>
+              <label htmlFor="apellido" className="block text-sm font-medium">
+                Apellido
+              </label>
               <input
                 type="text"
                 id="apellido"
@@ -135,7 +182,6 @@ export default function Register() {
                 value={formData.apellido}
                 onChange={handleChange}
                 className="mt-1 p-2 w-full border border-gray-300 rounded"
-                placeholder="Ingresa un apellido válido"
                 required
               />
             </div>
@@ -143,20 +189,29 @@ export default function Register() {
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="rut" className="block text-sm font-medium">RUT</label>
-              <input
-                type="text"
-                id="rut"
-                name="rut"
-                value={formData.rut}
-                onChange={handleChange}
-                className="mt-1 p-2 w-full border border-gray-300 rounded"
-                placeholder="12345678-9"
-                required
-              />
+               <label htmlFor="rut" className="block text-sm font-medium">
+    RUT
+  </label>
+  <input
+    type="text"
+    id="rut"
+    name="rut"
+    value={formData.rut}
+    onChange={(e) =>
+      setFormData((prev) => ({
+        ...prev,
+        rut: formatRut(e.target.value),
+      }))
+    }
+    className="mt-1 p-2 w-full border border-gray-300 rounded"
+    required
+  />
+  {errors.rut && <p className="text-red-500 text-sm">{errors.rut}</p>}
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium">E-mail</label>
+              <label htmlFor="email" className="block text-sm font-medium">
+                E-mail
+              </label>
               <input
                 type="email"
                 id="email"
@@ -164,7 +219,6 @@ export default function Register() {
                 value={formData.email}
                 onChange={handleChange}
                 className="mt-1 p-2 w-full border border-gray-300 rounded"
-                placeholder="correo@ejemplo.com"
                 required
               />
             </div>
@@ -172,7 +226,9 @@ export default function Register() {
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="telefono" className="block text-sm font-medium">Teléfono</label>
+              <label htmlFor="telefono" className="block text-sm font-medium">
+                Teléfono
+              </label>
               <input
                 type="text"
                 id="telefono"
@@ -180,7 +236,6 @@ export default function Register() {
                 value={formData.telefono}
                 onChange={handleChange}
                 className="mt-1 p-2 w-full border border-gray-300 rounded"
-                placeholder="+569..."
                 required
               />
             </div>
@@ -193,35 +248,43 @@ export default function Register() {
                 onChange={handleChange}
                 className="mr-2"
               />
-              <label htmlFor="compraConFactura" className="text-sm">Necesito comprar con factura</label>
+              <label htmlFor="compraConFactura" className="text-sm">
+                Necesito comprar con factura
+              </label>
             </div>
           </div>
 
           {/* Dirección */}
           <h3 className="text-lg font-semibold mb-4">Dirección de Envío</h3>
           <div className="mb-6">
-            <label htmlFor="region" className="block text-sm font-medium">Región</label>
+            <label htmlFor="region" className="block text-sm font-medium">
+              Región
+            </label>
             <select
               id="region"
-              name="region"
-              value={formData.region}
+              name="region_id"
+              value={formData.region_id}
               onChange={handleRegionChange}
               className="mt-1 p-2 w-full border border-gray-300 rounded"
               required
             >
               <option value="">Selecciona una región</option>
-              {regiones.map((region) => (
-                <option key={region} value={region}>{region}</option>
+              {region.map((region) => (
+                <option key={region.id} value={region.id}>
+                  {region.nombre}
+                </option>
               ))}
             </select>
           </div>
 
           <div className="mb-6">
-            <label htmlFor="comuna" className="block text-sm font-medium">Comuna</label>
+            <label htmlFor="comuna" className="block text-sm font-medium">
+              Comuna
+            </label>
             <select
               id="comuna"
-              name="comuna"
-              value={formData.comuna}
+              name="comuna_id"
+              value={formData.comuna_id}
               onChange={handleChange}
               className="mt-1 p-2 w-full border border-gray-300 rounded"
               disabled={!selectedRegion}
@@ -229,15 +292,21 @@ export default function Register() {
             >
               <option value="">Selecciona una comuna</option>
               {selectedRegion &&
-                comunas[selectedRegion]?.map((comuna) => (
-                  <option key={comuna} value={comuna}>{comuna}</option>
-                ))}
+  region
+    .find((r) => r.id.toString() === selectedRegion) // ← usar toString()
+    ?.comunas.map((comuna) => (
+      <option key={comuna.id} value={comuna.id}>
+        {comuna.nombre}
+      </option>
+    ))}
             </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="calle" className="block text-sm font-medium">Calle</label>
+              <label htmlFor="calle" className="block text-sm font-medium">
+                Calle
+              </label>
               <input
                 type="text"
                 id="calle"
@@ -249,7 +318,9 @@ export default function Register() {
               />
             </div>
             <div>
-              <label htmlFor="numero" className="block text-sm font-medium">Número</label>
+              <label htmlFor="numero" className="block text-sm font-medium">
+                Número
+              </label>
               <input
                 type="text"
                 id="numero"
@@ -265,7 +336,9 @@ export default function Register() {
           {/* Contraseña */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="password" className="block text-sm font-medium">Contraseña</label>
+              <label htmlFor="password" className="block text-sm font-medium">
+                Contraseña
+              </label>
               <input
                 type="password"
                 id="password"
@@ -277,7 +350,9 @@ export default function Register() {
               />
             </div>
             <div>
-              <label htmlFor="repeatPassword" className="block text-sm font-medium">Repite contraseña</label>
+              <label htmlFor="repeatPassword" className="block text-sm font-medium">
+                Repite contraseña
+              </label>
               <input
                 type="password"
                 id="repeatPassword"
@@ -290,8 +365,11 @@ export default function Register() {
             </div>
           </div>
 
-          <button type="submit" className="btn-primary w-full">Registrar</button>
+          <button type="submit" className="btn-primary w-full">
+            Registrar
+          </button>
         </form>
+
       </section>
     </main>
   );
