@@ -90,6 +90,31 @@ const formatRut = (rut) => {
 };
 
 // validacion de rut
+const validarRut = (rut) => {
+  // Elimina puntos y guion
+  rut = rut.replace(/\./g, "").replace("-", "").toUpperCase();
+
+  // Separar cuerpo y dígito verificador
+  const cuerpo = rut.slice(0, -1);
+  const dv = rut.slice(-1);
+
+  if (cuerpo.length < 7) {
+    return false; // RUT muy corto
+  }
+  // Calcular DV esperado
+  let suma = 0;
+  let multiplo = 2;
+
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+    suma += parseInt(cuerpo.charAt(i), 10) * multiplo;
+    multiplo = multiplo < 7 ? multiplo + 1 : 2;
+  }
+
+  const dvEsperado = 11 - (suma % 11);
+  let dvFinal = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+
+  return dvFinal === dv;
+};
 
 const [errors, setErrors] = useState({});
   // Validación simple

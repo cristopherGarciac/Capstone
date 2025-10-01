@@ -564,7 +564,7 @@ export default function Admin() {
         <button className="py-2 border-b border-gray-700" onClick={() => setSection('productos')}>
           Productos
         </button>
-        <Link href="confi" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">
+        <Link href="config" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">
           Configuración
         </Link>
         <Link href="usuarios" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">

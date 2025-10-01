@@ -20,6 +20,8 @@ export default function Carrito() {
   const [cartCount, setCartCount] = useState(0);
 
   const IVA = 0.19;
+// modal de pago
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   // helpers
   const precioCLP = (v) =>
@@ -38,6 +40,78 @@ export default function Carrito() {
       setCartCount(0);
     }
   };
+// Mercado Pago
+const handlePayMP = async () => {
+  try {
+    const itemsMP = items.map(it => ({
+      title: it.titulo,
+      unit_price: Number(it.precio),
+      quantity: Number(it.qty),
+    }));
+
+    const resp = await fetch("/api/mercadopago/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: itemsMP }),
+    });
+
+    const data = await resp.json();
+    if (resp.ok && data.init_point) {
+      window.location.href = data.init_point;
+    } else {
+      alert(data.error || "Error al iniciar pago con Mercado Pago");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Error de conexión con Mercado Pago");
+  }
+};
+
+//webpay
+const handlePay = async () => {
+  try {
+    // Construir URL absoluta de manera segura
+    const origin =
+      typeof window !== "undefined"
+        ? `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ""}`
+        : "http://localhost:3000"; // fallback por si se ejecuta del lado del servidor
+
+    const returnUrl = `${origin}/api/webpay/commit`;
+
+    const resp = await fetch("/api/webpay/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: Math.round(total),
+        sessionId: "sesion-usuario-123",
+        returnUrl,
+      }),
+    });
+
+    const data = await resp.json();
+
+    if (resp.ok && data.url && data.token) {
+      // Crear form dinámicamente para redirigir a Webpay
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = data.url;
+
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = "token_ws";
+      input.value = data.token;
+
+      form.appendChild(input);
+      document.body.appendChild(form);
+      form.submit();
+    } else {
+      alert(data.error || "Error al iniciar el pago");
+    }
+  } catch (error) {
+    console.error("Error iniciando pago:", error);
+    alert("Error de conexión con Webpay");
+  }
+};
 
   // init
   useEffect(() => {
@@ -123,7 +197,7 @@ export default function Carrito() {
     setLoginData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault();   
     setLoginError('');
     try {
       const resp = await fetch('/api/auth/login', {
@@ -296,7 +370,8 @@ export default function Carrito() {
               </Link>
 
               {items.length > 0 && (
-                <button className="bg-purple-700 hover:bg-purple-800 text-white text-sm font-semibold px-4 py-2 rounded">
+                <button  onClick={()=>  setShowPaymentModal(true)}
+                    className="bg-purple-700 hover:bg-purple-800 text-white text-sm font-semibold px-4 py-2 rounded">
                   Pagar ahora
                 </button>
               )}
@@ -325,11 +400,46 @@ export default function Carrito() {
                 Tengo un código promocional
               </button>
 
-              <button className="mt-3 w-full bg-purple-700 hover:bg-purple-800 text-white font-semibold px-4 py-2 rounded">
-                Pagar ahora
-              </button>
+              <button  onClick={()=>  setShowPaymentModal(true)}
+                    className="bg-purple-700 hover:bg-purple-800 text-white text-sm font-semibold px-4 py-2 rounded">
+                  Pagar ahora
+                </button>
             </div>
           </aside>
+          {showPaymentModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-lg shadow-lg p-6 w-80 text-center">
+      <h2 className="text-lg font-bold mb-4">Elige tu método de pago</h2>
+      <div className="flex flex-col gap-3">
+        <button
+          onClick={() => {
+            setShowPaymentModal(false);
+            handlePay(); // Webpay
+          }}
+          className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
+        >
+          💳 Pagar con Webpay
+        </button>
+        <button
+          onClick={() => {
+            setShowPaymentModal(false);
+            handlePayMP(); // Mercado Pago
+          }}
+          className="bg-green-600 hover:bg-green-700 text-white py-2 rounded"
+        >
+          🛒 Pagar con Mercado Pago
+        </button>
+      </div>
+      <button
+        onClick={() => setShowPaymentModal(false)}
+        className="mt-4 text-gray-500 hover:underline text-sm"
+      >
+        Cancelar
+      </button>
+    </div>
+  </div>
+)}
+
         </div>
       </main>
 

@@ -11,7 +11,7 @@ Proyecto Frontend de Capstone e-commerce usando Next.js, Tailwind CSS y Node.js.
 - `styles/` → Estilos globales o módulos CSS
 - `package.json` → Dependencias y scripts
 - crear un archivo .env en la carpeta del proyecto 
-- el archivo .env deve contner lo siguiente
+- el archivo .env debe contener lo siguiente
 ### conexion a la base de datos `
 DATABASE_URL="postgresql://postgres.dnlzxjlhyllwfzbybrfy:capstone2025jci@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true&connection_limit=1"
 DIRECT_URL="postgresql://postgres.dnlzxjlhyllwfzbybrfy:capstone2025jci@aws-1-us-east-2.pooler.supabase.com:5432/postgres"
@@ -29,4 +29,6 @@ npx npm i --save-dev prisma@latest
 npm install bcryptjs
 npm install jsonwebtoken
 npm install nodemailer
+npm install transbank-sdk
+npm install mercadopago
 npm run dev

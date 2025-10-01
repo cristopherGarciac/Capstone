@@ -34,7 +34,7 @@ const [colorFooter, setColorFooter] = useState("#ffffff"); // Footer por defecto
 
   const promociones = [
     { texto: "Despacho a Todo Chile", destaque: false },
-    { texto: "Marcas Exclusivas", destaque: false },
+    { texto: "Marcas Populares", destaque: false },
   ];
 
  
