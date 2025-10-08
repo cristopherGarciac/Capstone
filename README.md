@@ -19,7 +19,8 @@ DIRECT_URL="postgresql://postgres.dnlzxjlhyllwfzbybrfy:capstone2025jci@aws-1-us-
 ## autenticacion de correo
 EMAIL_SERVER=smtp://tu-correo@gmail.com:app-password@smtp.gmail.com:587
 EMAIL_FROM=tu-correo@gmail.com`
-
+## mercado pago
+## MP_ACCESS_TOKEN=APP_USR-4556044148129708-100115-adc2caa51d1194dffa129a2ebf51f1e0-2900000140
 
 ## Cómo levantar
 ```bash
