@@ -27,6 +27,14 @@ export default function Catalogo2() {
       setNombrePagina(config.nombrePagina || "Mi E-commerce");
       setColorHeader(config.colorHeader || "#ffffff");
       setColorFooter(config.colorFooter || "#ffffff");
+
+      // ⬇️ Aplica variables de botón si existen
+      const r = document.documentElement.style;
+      if (config.btnBg) r.setProperty("--btn-bg", config.btnBg);
+      if (config.btnText) r.setProperty("--btn-text", config.btnText);
+      if (config.btnBorder) r.setProperty("--btn-border", config.btnBorder);
+      if (config.btnHoverBg) r.setProperty("--btn-hover-bg", config.btnHoverBg);
+      if (config.btnHoverText) r.setProperty("--btn-hover-text", config.btnHoverText);
     }
   }, []);
 
@@ -151,6 +159,34 @@ export default function Catalogo2() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* 🎨 Estilos globales para botones con variables configurables */}
+      <style jsx global>{`
+        .btn-primary {
+          background: var(--btn-bg, #7e22ce);
+          color: var(--btn-text, #ffffff);
+          border: 1px solid var(--btn-border, #7e22ce);
+          transition: background 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+        .btn-primary:hover {
+          background: var(--btn-hover-bg, #6b21a8);
+          color: var(--btn-hover-text, #ffffff);
+          border-color: var(--btn-hover-bg, #6b21a8);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        .btn-outline {
+          background: transparent;
+          color: var(--btn-bg, #7e22ce);
+          border: 1px solid var(--btn-border, #7e22ce);
+          transition: background 0.2s, color 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+        .btn-outline:hover {
+          background: var(--btn-hover-bg, #6b21a8);
+          color: var(--btn-hover-text, #ffffff);
+          border-color: var(--btn-hover-bg, #6b21a8);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+      `}</style>
+
       {/* Navbar */}
       <nav
         className="shadow sticky top-0 z-50"
@@ -261,7 +297,7 @@ export default function Catalogo2() {
                 className="border p-2 rounded"
                 required
               />
-              <button type="submit" className="btn-primary w-full">
+              <button type="submit" className="btn-primary w-full py-2 rounded">
                 Iniciar Sesión
               </button>
             </form>
@@ -339,7 +375,7 @@ export default function Catalogo2() {
 
           <button
             onClick={cargar}
-            className="px-4 py-2 border rounded hover:bg-gray-100"
+            className="btn-outline px-4 py-2 rounded"
             title="Recargar desde el servidor"
           >
             Refrescar
@@ -368,7 +404,7 @@ export default function Catalogo2() {
                 </div>
               )}
 
-              {/* Sticker esquina (si traes algo como p.etiqueta = 'PREVENTA') */}
+              {/* Sticker esquina */}
               {p.etiqueta && (
                 <div className="absolute -right-2 -top-2 rotate-12">
                   <span className="bg-purple-600 text-white text-[11px] font-bold px-2 py-1 rounded">
@@ -386,7 +422,7 @@ export default function Catalogo2() {
                 />
               </div>
 
-              {/* Meta (colección / categoría / marca) */}
+              {/* Meta */}
               <div className="mt-3 text-[11px] tracking-wide text-purple-600 font-semibold uppercase">
                 {p.marca ? ` / ${p.marca}` : p.categoria ? ` / ${p.categoria}` : ""}
               </div>
@@ -422,10 +458,7 @@ export default function Catalogo2() {
               {/* Botón */}
               <Link
                 href={`/detalles?id=${p.id}`}
-                className="mt-3 inline-block text-center px-3 py-1.5 
-                           border border-purple-500 text-purple-600 
-                           font-semibold text-sm rounded 
-                           hover:bg-purple-50 transition"
+                className="mt-3 inline-block text-center btn-outline px-3 py-1.5 rounded font-semibold text-sm"
               >
                 Ver detalle
               </Link>
