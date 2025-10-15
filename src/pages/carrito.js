@@ -1,5 +1,6 @@
 // src/pages/carrito.js
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState,useContext } from 'react';
+import { UserContext } from "../context/UserContext";
 import Link from 'next/link';
 
 export default function Carrito() {
@@ -13,7 +14,11 @@ export default function Carrito() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [loginError, setLoginError] = useState('');
-  const [user, setUser] = useState(null);
+const { user, setUser } = useContext(UserContext);
+
+  //----------- config fondo-----------
+  const [colorFondo, setColorFondo] = useState("#ffffff");
+  const [fondo, setFondo] = useState({ colorFondo: "#ffffff", fondoImagen: "" });
 
   // ----------- carrito -----------
   const [items, setItems] = useState([]);           // [{id, titulo, precio, qty, imagen, ...}]
@@ -123,6 +128,11 @@ const handlePay = async () => {
       setNombrePagina(cfg.nombrePagina || 'Mi E-commerce');
       setColorHeader(cfg.colorHeader || '#ffffff');
       setColorFooter(cfg.colorFooter || '#ffffff');
+      setColorFondo(cfg.colorFondo || "#ffffff");
+      setFondo({
+        colorFondo: cfg.colorFondo || "#ffffff",
+        fondoImagen: cfg.fondoImagen || ""
+      })
     }
     // Carrito
     loadCart();
@@ -218,7 +228,17 @@ const handlePay = async () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div 
+      className="min-h-screen"
+      style={{
+        backgroundColor: fondo.fondoImagen ? undefined : fondo.colorFondo,
+        backgroundImage: fondo.fondoImagen ? `url(${fondo.fondoImagen})` : undefined,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center"
+      }}
+    >
+
       {/* Navbar */}
       <nav className="shadow sticky top-0 z-50" style={{ backgroundColor: colorHeader }}>
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">

@@ -62,8 +62,10 @@ model pedidos {
   usuario_id         String?        @db.Uuid
   total              Decimal?       @db.Decimal
   estado             String?        @default("creado")
-  fecha              DateTime?      @default(now()) @db.Timestamptz(6)
+  fecha              DateTime       @unique @db.Date
   direccion_envio_id String?        @db.Uuid
+  Retiro_tienda      String
+  trackingnumber     String?        @unique @db.VarChar(50)
   pagos              pagos[]
   pedido_items       pedido_items[]
   direcciones        direcciones?   @relation(fields: [direccion_envio_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -84,14 +86,23 @@ model productos {
 }
 
 model comunas {
-  id        Int       @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   nombre    String
   region_id Int?
-  regiones  regiones? @relation(fields: [region_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model regiones {
-  id      Int       @id @default(autoincrement())
-  nombre  String    @unique
-  comunas comunas[]
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+}
+
+model Comuna {
+  id        Int    @id @default(autoincrement())
+  nombre    String
+  region_id Int
+}
+
+model Region {
+  id     Int    @id @default(autoincrement())
+  nombre String
 }

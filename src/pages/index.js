@@ -1,17 +1,23 @@
-import { useState, useEffect } from "react";
-import Link from "next/link";
+import { useState, useEffect,useContext } from "react";
+import { UserContext } from "../context/UserContext";
+import Link from "next/link"; 
 
 export default function Home() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [user, setUser] = useState(null);
+const { user, setUser, logout } = useContext(UserContext);
 
   // Config global (logo, nombre, colores)
   const [logo, setLogo] = useState("/images/blitz.png");
   const [nombrePagina, setNombrePagina] = useState("Mi E-commerce");
   const [colorHeader, setColorHeader] = useState("#ffffff");
   const [colorFooter, setColorFooter] = useState("#ffffff");
+
+// 🟢 NUEVO: color de fondo de la página
+  const [colorFondo, setColorFondo] = useState("#ffffff");
+  const [fondo, setFondo] = useState({ colorFondo: '#ffffff', fondoImagen: '' });
+
 
   // Carrusel (personalizable desde Config)
   const [images, setImages] = useState([
@@ -31,6 +37,12 @@ export default function Home() {
     setNombrePagina(config.nombrePagina || "Mi E-commerce");
     setColorHeader(config.colorHeader || "#ffffff");
     setColorFooter(config.colorFooter || "#ffffff");
+    setColorFondo(config.colorFondo || "#ffffff"); // 🟢 NUEVO: Cargar el color de fondo si existe
+    setFondo(prev => ({
+    ...prev,
+    colorFondo: config.colorFondo || "#ffffff",
+    fondoImagen: config.fondoImagen || "" // <--- nuevo
+    }));
 
     if (Array.isArray(config.carrusel) && config.carrusel.length > 0) {
       setImages(config.carrusel);
@@ -58,19 +70,22 @@ export default function Home() {
     setLoginData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleLogin = async (e) => {
+    const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError("");
+
     try {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
       });
+
       const data = await response.json();
+
       if (response.ok) {
-        setUser(data);
-        setLoginOpen(false);
+          setUser(data); // Actualiza contexto y localStorage automáticamente
+  setLoginOpen(false);
       } else {
         setLoginError(data.error || "Credenciales incorrectas");
       }
@@ -111,7 +126,17 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen bg-[var(--color-bg)]">
+    // 🟢 NUEVO: Aplicar colorFondo desde config
+    <main 
+      className="min-h-screen"
+      style={{
+        backgroundColor: fondo.fondoImagen ? undefined : fondo.colorFondo,
+        backgroundImage: fondo.fondoImagen ? `url(${fondo.fondoImagen})` : undefined,
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center'
+      }}>
+
       {/* Barra superior */}
       <div className="bg-[var(--color-secondary)] text-white text-center py-2 text-sm">
         {promociones.map((p, i) => (
@@ -137,19 +162,54 @@ export default function Home() {
             </Link>
             <Link href="/admin" className="text-gray-700 hover:text-[var(--color-accent)]">Admin</Link>
 
-            {user ? (
-              <span className="text-gray-700 flex items-center">Hola, {user.nombre}</span>
-            ) : (
-              <button
-                onClick={() => setLoginOpen(true)}
-                className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z" />
-                </svg>
-                Iniciar sesión
-              </button>
-            )}
+           {user ? (
+  <div className="flex items-center space-x-3">
+    <span className="text-gray-700 flex items-center">
+      Hola, {user.nombre}
+    </span>
+    <button
+      onClick={logout}
+      className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-5 w-5 mr-1"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
+        />
+      </svg>
+      Cerrar sesión
+    </button>
+  </div>
+) : (
+  <button
+    onClick={() => setLoginOpen(true)}
+    className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-5 w-5 mr-1"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z"
+      />
+    </svg>
+    Iniciar sesión
+  </button>
+)}
           </div>
         </div>
       </nav>

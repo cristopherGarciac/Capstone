@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useContext} from "react";
+import { UserContext } from "../context/UserContext";
 import Link from "next/link";
 
 export default function Catalogo2() {
@@ -11,7 +12,12 @@ export default function Catalogo2() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
-  const [user, setUser] = useState(null);
+const { user, setUser } = useContext(UserContext);
+
+  // --------- config fondo -----------
+  const [colorFondo, setColorFondo] = useState("#ffffff");
+  const [fondo, setFondo] = useState({ colorFondo: "#ffffff", fondoImagen: "" });
+
 
   // ---------- config navbar/footer ----------
   const [logo, setLogo] = useState("/images/blitz.png");
@@ -27,6 +33,11 @@ export default function Catalogo2() {
       setNombrePagina(config.nombrePagina || "Mi E-commerce");
       setColorHeader(config.colorHeader || "#ffffff");
       setColorFooter(config.colorFooter || "#ffffff");
+      setColorFondo(config.colorFondo || "#ffffff");
+      setFondo({
+        colorFondo: config.colorFondo || "#ffffff",
+        fondoImagen: config.fondoImagen || ""
+      });
 
       // ⬇️ Aplica variables de botón si existen
       const r = document.documentElement.style;
@@ -158,7 +169,17 @@ export default function Catalogo2() {
   }, [rawItems, qDebounced, categoria, sort]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+      <div 
+      className="min-h-screen"
+      style={{
+        backgroundColor: fondo.fondoImagen ? undefined : fondo.colorFondo,
+        backgroundImage: fondo.fondoImagen ? `url(${fondo.fondoImagen})` : undefined,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center"
+      }}
+    >
+
       {/* 🎨 Estilos globales para botones con variables configurables */}
       <style jsx global>{`
         .btn-primary {

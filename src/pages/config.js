@@ -7,6 +7,7 @@ export default function Configuracion() {
     avatar: '/images/admin-avatar.png',
   };
 
+  // 🧠 Estado temporal de configuración
   const [configTemp, setConfigTemp] = useState({
     nombrePagina: 'Mi E-commerce',
     colorHeader: '#afbbcfff',
@@ -26,18 +27,24 @@ export default function Configuracion() {
       "/images/componentes.png",
       "/images/nvidia.png"
     ],
+
+    // 🌈 NUEVO: color de fondo general
+    colorFondo: '#ffffff',
+    fondoImagen: "",
   });
 
-  // Cargar configuración guardada
+  // 🧩 Cargar configuración guardada desde localStorage
   useEffect(() => {
     const configLS = JSON.parse(localStorage.getItem('config'));
     if (configLS) setConfigTemp(prev => ({ ...prev, ...configLS }));
   }, []);
 
+  // 🧩 Manejo de cambios en inputs
   const handleInputChange = (e) => {
     setConfigTemp({ ...configTemp, [e.target.name]: e.target.value });
   };
 
+  // 🖼️ Cargar logo desde archivo
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -46,12 +53,30 @@ export default function Configuracion() {
     reader.readAsDataURL(file);
   };
 
+  // 🖼️ Subir imagen de fondo
+  const handleFondoUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setConfigTemp(prev => ({ ...prev, fondoImagen: reader.result }));
+    reader.readAsDataURL(file);
+  };
+
+  // 💾 Guardar configuración en localStorage
   const aplicarCambios = () => {
     localStorage.setItem('config', JSON.stringify(configTemp));
     alert('Configuración guardada ✅');
   };
 
-  // Aplica colores dinámicamente (incluye botones)
+  // ♻️ Restablecer configuración por defecto
+  const resetConfig = () => {
+    if (confirm("¿Seguro que deseas restablecer la configuración a los valores por defecto?")) {
+      localStorage.removeItem('config');
+      window.location.reload();
+    }
+  };
+
+  // 🎨 Aplicar colores dinámicamente (incluye color de fondo)
   useEffect(() => {
     const r = document.documentElement.style;
     r.setProperty('--color-header', configTemp.colorHeader);
@@ -61,15 +86,18 @@ export default function Configuracion() {
     r.setProperty('--btn-border', configTemp.btnBorder);
     r.setProperty('--btn-hover-bg', configTemp.btnHoverBg);
     r.setProperty('--btn-hover-text', configTemp.btnHoverText);
-  }, [
-    configTemp.colorHeader,
-    configTemp.colorFooter,
-    configTemp.btnBg,
-    configTemp.btnText,
-    configTemp.btnBorder,
-    configTemp.btnHoverBg,
-    configTemp.btnHoverText,
-  ]);
+
+    // 🌈 Aplicar el color de fondo general
+    if (configTemp.fondoImagen) {
+      document.body.style.backgroundImage = `url(${configTemp.fondoImagen})`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundRepeat = 'no-repeat';
+      document.body.style.backgroundPosition = 'center';
+    } else {
+      document.body.style.backgroundImage = '';
+      document.body.style.backgroundColor = configTemp.colorFondo;
+    }
+  }, [configTemp]);
 
   return (
     <div className="flex min-h-screen">
@@ -124,7 +152,7 @@ export default function Configuracion() {
           <h2 className="text-2xl mb-6 font-bold">Configuración General de la Página</h2>
 
           <div className="flex flex-col gap-4 max-w-md">
-            {/* Nombre */}
+            {/* 🏷️ Nombre */}
             <div>
               <label className="block font-medium mb-1">Nombre de la página</label>
               <input
@@ -136,7 +164,7 @@ export default function Configuracion() {
               />
             </div>
 
-            {/* Colores Header/Footer */}
+            {/* 🎨 Colores Header/Footer/Fondo */}
             <div>
               <label className="block font-medium mb-1">Color de Barra</label>
               <input
@@ -157,11 +185,34 @@ export default function Configuracion() {
                 className="w-20 h-10 border rounded cursor-pointer"
               />
             </div>
+            <div>
+              <label className="block font-medium mb-1">Color de Fondo de la Página</label>
+              <input
+                type="color"
+                name="colorFondo"
+                value={configTemp.colorFondo}
+                onChange={handleInputChange}
+                className="w-20 h-10 border rounded cursor-pointer"
+              />
+            </div>
+            <div>
+              <label className="block font-medium mb-1">Imagen de Fondo</label>
+              <label className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600">
+                Seleccionar Imagen
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handleFondoUpload} 
+                  className="hidden" />
+              </label>
+              {configTemp.fondoImagen && (
+                <img src={configTemp.fondoImagen} alt="Fondo" className="w-40 h-40 object-cover mt-2 border rounded" />
+              )}
+            </div>
 
-            {/* 🎨 Colores de Botones */}
+            {/* 🟢 Colores de Botones */}
             <div className="mt-4">
               <h3 className="font-semibold mb-2">Colores de Botones</h3>
-
               <div className="grid grid-cols-2 gap-3">
                 <label className="text-sm">Fondo</label>
                 <input type="color" name="btnBg" value={configTemp.btnBg} onChange={handleInputChange} className="w-20 h-10 border rounded cursor-pointer" />
@@ -180,7 +231,7 @@ export default function Configuracion() {
               </div>
             </div>
 
-            {/* Logo */}
+            {/* 🖼️ Logo */}
             <div>
               <label className="block font-medium mb-2">Logo de la página</label>
               <label className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600">
@@ -193,7 +244,6 @@ export default function Configuracion() {
             {/* 🖼️ Carrusel */}
             <div className="mt-6">
               <h3 className="font-semibold mb-2">Imágenes del Carrusel</h3>
-
               <label className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600">
                 Agregar imagen
                 <input
@@ -240,13 +290,22 @@ export default function Configuracion() {
               </div>
             </div>
 
-            {/* Botón guardar */}
-            <button
-              onClick={aplicarCambios}
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mt-6"
-            >
-              Aplicar Cambios
-            </button>
+            {/* 🔘 Botones de acción */}
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={aplicarCambios}
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Aplicar Cambios
+              </button>
+
+              <button
+                onClick={resetConfig}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Restablecer Valores
+              </button>
+            </div>
           </div>
         </main>
       </div>
