@@ -1,10 +1,10 @@
 import { useState } from "react";
 import Link from "next/link";
-import axios from 'axios';
+import axios from "axios";
 
 export default function CentroDeAyuda() {
   const [loginOpen, setLoginOpen] = useState(false);
-  const [userMessage, setUserMessage] = useState('');
+  const [userMessage, setUserMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -16,32 +16,30 @@ export default function CentroDeAyuda() {
   const handleSendMessage = async () => {
     if (!userMessage.trim()) return;
 
-    // Mostrar el mensaje del usuario en el chat
-    setChatHistory([...chatHistory, { sender: 'user', message: userMessage }]);
+    const userMsg = { sender: "user", message: userMessage };
+    setChatHistory((prev) => [...prev, userMsg]);
     setLoading(true);
 
     try {
-      // Enviar el mensaje al backend del chatbot
-      const response = await axios.post('/api/chatbot', { message: userMessage });
+      const response = await axios.post("/api/chatbot", { message: userMessage });
+      const botMsg = { sender: "chatbot", message: response.data.response };
 
-      // Agregar la respuesta del chatbot al chat
-      setChatHistory([
-        ...chatHistory,
-        { sender: 'user', message: userMessage },
-        { sender: 'chatbot', message: response.data.response }
-      ]);
+      setChatHistory((prev) => [...prev, botMsg]);
     } catch (error) {
-      console.error('Error al enviar el mensaje al chatbot', error);
+      console.error("Error al enviar el mensaje al chatbot:", error);
+      setChatHistory((prev) => [
+        ...prev,
+        { sender: "chatbot", message: "Lo siento, ocurrió un error al procesar tu mensaje." },
+      ]);
     }
 
-    // Limpiar el campo de texto
-    setUserMessage('');
+    setUserMessage("");
     setLoading(false);
   };
 
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
-      {/* Barra superior */}
+      {/* ==== BARRA SUPERIOR ==== */}
       <div className="bg-[var(--color-secondary)] text-white text-center py-2 text-sm">
         {promociones.map((p, i) => (
           <span key={i} className={`mx-4 ${p.destaque ? "font-semibold" : ""}`}>
@@ -50,7 +48,7 @@ export default function CentroDeAyuda() {
         ))}
       </div>
 
-      {/* Navbar */}
+      {/* ==== NAVBAR ==== */}
       <nav className="bg-white shadow sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           {/* Logo */}
@@ -58,14 +56,10 @@ export default function CentroDeAyuda() {
             <img src="/images/blitz.png" alt="Blitz Hardware Logo" className="h-20 w-auto" />
           </Link>
           <div className="flex items-center space-x-6">
-            <Link href="/" className="text-gray-700 hover:text-[var(--color-accent)]">
-              Inicio
-            </Link>
-            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-accent)]">
-              Catálogo
-            </Link>
+            <Link href="/" className="text-gray-700 hover:text-[var(--color-accent)]">Inicio</Link>
+            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-accent)]">Catálogo</Link>
             <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-accent)]">
-              <img src="/images/carrito.png" alt="Carrito Compra Logo" className="h-11 w-auto"/>
+              <img src="/images/carrito.png" alt="Carrito Compra Logo" className="h-11 w-auto" />
             </Link>
 
             {/* Botón login */}
@@ -82,9 +76,9 @@ export default function CentroDeAyuda() {
         </div>
       </nav>
 
-      {/* Modal de login */}
+      {/* ==== MODAL LOGIN ==== */}
       {loginOpen && (
-        <div className="fixed inset-0 bg-black flex justify-center items-start pt-24 z-50" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
+        <div className="fixed inset-0 bg-black flex justify-center items-start pt-24 z-50" style={{ backgroundColor: "rgba(0,0,0,0.3)" }}>
           <div className="bg-white rounded-xl shadow-lg w-96 p-6 relative">
             <button
               onClick={() => setLoginOpen(false)}
@@ -94,8 +88,8 @@ export default function CentroDeAyuda() {
             </button>
             <h2 className="text-2xl font-bold text-[var(--color-secondary)] mb-4 text-center">Iniciar Sesión</h2>
             <form className="flex flex-col gap-4">
-              <input type="email" placeholder="Correo electrónico" className="border p-2 rounded"/>
-              <input type="password" placeholder="Contraseña" className="border p-2 rounded"/>
+              <input type="email" placeholder="Correo electrónico" className="border p-2 rounded" />
+              <input type="password" placeholder="Contraseña" className="border p-2 rounded" />
               <button type="submit" className="btn-primary w-full">Iniciar Sesión</button>
             </form>
             <div className="flex flex-col items-center text-sm mt-4 gap-2">
@@ -111,24 +105,22 @@ export default function CentroDeAyuda() {
         </div>
       )}
 
-      {/* Centro de Ayuda - Chatbot */}
+      {/* ==== CENTRO DE AYUDA ==== */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold text-center text-[var(--color-secondary)] mb-6">
           Centro de Ayuda (Chat-bot)
         </h1>
 
-        {/* Imagen del bot */}
         <div className="text-center mb-4">
           <img src="/images/bitzi.png" alt="Bot" className="w-32 mx-auto" />
         </div>
 
-        {/* Chatbot */}
+        {/* ==== CHAT ==== */}
         <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-[var(--color-primary)]">
           <div className="overflow-y-auto max-h-96 mb-4">
-            {/* Mostrar el historial del chat */}
             {chatHistory.map((msg, index) => (
-              <div key={index} className={`mb-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
-                <div className={`${msg.sender === 'user' ? 'bg-blue-100' : 'bg-gray-100'} p-3 rounded-lg inline-block max-w-xs`}>
+              <div key={index} className={`mb-2 ${msg.sender === "user" ? "text-right" : "text-left"}`}>
+                <div className={`${msg.sender === "user" ? "bg-blue-100" : "bg-gray-100"} p-3 rounded-lg inline-block max-w-xs`}>
                   <p className="font-medium">{msg.message}</p>
                 </div>
               </div>
@@ -146,12 +138,13 @@ export default function CentroDeAyuda() {
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
               className="border border-yellow-300 p-3 rounded-l-lg w-full text-sm text-gray"
-               placeholder="Escribe tu mensaje..."
+              placeholder="Escribe tu mensaje..."
+              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
             />
-
             <button
               onClick={handleSendMessage}
               className="bg-[var(--color-primary)] text-white p-3 rounded-r-lg"
+              disabled={loading}
             >
               Enviar
             </button>
@@ -169,7 +162,6 @@ export default function CentroDeAyuda() {
               <li><Link href="/seguimiento" className="hover:text-teal-300">Seguimiento de mi compra</Link></li>
             </ul>
           </div>
-
           <div>
             <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Nosotros</h4>
             <ul className="space-y-2 text-black">
@@ -177,7 +169,6 @@ export default function CentroDeAyuda() {
               <li><Link href="/terminos" className="hover:text-teal-300">Términos y Condiciones</Link></li>
             </ul>
           </div>
-
           <div>
             <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Comunidad Blitz</h4>
             <ul className="space-y-2 text-black">
@@ -189,8 +180,8 @@ export default function CentroDeAyuda() {
         <hr className="border-white/10" />
 
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <h5 className="text-lg font-semibold mb-6 border-l-4  border-blue-300 pl-3">Medios de pago</h5>
-          <div className="flex flex-wrap items-center gap-6 ">
+          <h5 className="text-lg font-semibold mb-6 border-l-4 border-blue-300 pl-3">Medios de pago</h5>
+          <div className="flex flex-wrap items-center gap-6">
             <span className="bg-white/5 px-4 py-2 rounded-md">
               <img src="/images/mercado.png" alt="Mercado Pago" width={100} height={50} />
             </span>

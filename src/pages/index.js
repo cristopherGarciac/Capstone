@@ -1,70 +1,214 @@
-import { useState, useEffect,useContext } from "react";
+import { useEffect, useMemo, useState,useContext } from "react";
+import Link from "next/link";
 import { UserContext } from "../context/UserContext";
-import Link from "next/link"; 
+
+// Helpers
+const slugify = (s = "") =>
+  s
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+
+// Botones de categorías
+function categoryBtnClasses(estilo, borde) {
+  const shape =
+    borde === "pill" ? "rounded-full" : borde === "square" ? "rounded-none" : "rounded-lg";
+  if (estilo === "outline") {
+    return `inline-block ${shape} border px-4 py-2 text-sm 
+            border-[var(--color-primary)] text-[var(--color-primary)] 
+            hover:bg-[var(--color-primary)] hover:text-white transition`;
+  }
+  if (estilo === "ghost") {
+    return `inline-block ${shape} px-4 py-2 text-sm 
+            text-[var(--color-primary)] hover:bg-black/5 transition`;
+  }
+  return `inline-block ${shape} px-4 py-2 text-sm 
+          bg-[var(--color-primary)] text-[var(--colorTextoBtnSolid)] 
+          hover:opacity-90 transition`;
+}
+
+// ——— helpers de productos (compatibles con Catálogo)
+const precioCLP = (v) =>
+  typeof v === "number"
+    ? Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(v)
+    : v;
+const img0 = (p) => (Array.isArray(p.imagenes) && p.imagenes[0]) || p.imagen || "/images/default-product.png";
 
 export default function Home() {
+  // —— UI/Auth
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [loginError, setLoginError] = useState("");
-const { user, setUser, logout } = useContext(UserContext);
+  const { user, setUser, logout } = useContext(UserContext);
 
-  // Config global (logo, nombre, colores)
+  // —— Config derivada del localStorage
   const [logo, setLogo] = useState("/images/blitz.png");
   const [nombrePagina, setNombrePagina] = useState("Mi E-commerce");
   const [colorHeader, setColorHeader] = useState("#ffffff");
   const [colorFooter, setColorFooter] = useState("#ffffff");
 
-// 🟢 NUEVO: color de fondo de la página
-  const [colorFondo, setColorFondo] = useState("#ffffff");
-  const [fondo, setFondo] = useState({ colorFondo: '#ffffff', fondoImagen: '' });
-
-
-  // Carrusel (personalizable desde Config)
+  // Carrusel
   const [images, setImages] = useState([
     "/images/blitzHardware banner.png",
     "/images/componentes.png",
     "/images/nvidia.png",
   ]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [delayMs, setDelayMs] = useState(5000);
 
-  // Cargar Config guardada
+  // HERO / destacados
+  const [heroTitulo, setHeroTitulo] = useState("Productos Destacados");
+  const [heroSubtitulo, setHeroSubtitulo] = useState("Lo mejor para tu setup");
+
+  // Categorías
+  const [categorias, setCategorias] = useState([
+    "Procesadores",
+    "Placas Madre",
+    "Tarjetas Gráficas",
+    "RAM",
+    "Almacenamiento (SSD/HDD)",
+  ]);
+  const [btnEstilo, setBtnEstilo] = useState("solid");
+  const [btnBorde, setBtnBorde] = useState("rounded");
+
+  // Destacados
+  const [featuredIdsArr, setFeaturedIdsArr] = useState([]); // <- leemos featuredSelectedIds (array)
+  const [productosDestacados, setProductosDestacados] = useState([]);
+
+  // —— Cargar configuración guardada
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const saved = localStorage.getItem("config");
     if (!saved) return;
-    const config = JSON.parse(saved);
 
-    setLogo(config.logo || "/images/blitz.png");
-    setNombrePagina(config.nombrePagina || "Mi E-commerce");
-    setColorHeader(config.colorHeader || "#ffffff");
-    setColorFooter(config.colorFooter || "#ffffff");
-    setColorFondo(config.colorFondo || "#ffffff"); // 🟢 NUEVO: Cargar el color de fondo si existe
-    setFondo(prev => ({
-    ...prev,
-    colorFondo: config.colorFondo || "#ffffff",
-    fondoImagen: config.fondoImagen || "" // <--- nuevo
-    }));
+    try {
+      const cfg = JSON.parse(saved);
 
-    if (Array.isArray(config.carrusel) && config.carrusel.length > 0) {
-      setImages(config.carrusel);
-      setCurrentSlide(0);
+      setLogo(cfg.logo || "/images/blitz.png");
+      setNombrePagina(cfg.nombrePagina || "Mi E-commerce");
+      setColorHeader(cfg.colorHeader || "#ffffff");
+      setColorFooter(cfg.colorFooter || "#ffffff");
+
+      // Carrusel
+      if (Array.isArray(cfg.carrusel) && cfg.carrusel.length) {
+        setImages(cfg.carrusel);
+        setCurrentSlide(0);
+      }
+      setAutoPlay(cfg.carruselAuto !== false);
+      const ms = Number(cfg.carruselDelaySec) > 0 ? Number(cfg.carruselDelaySec) * 1000 : 5000;
+      setDelayMs(ms);
+
+      // HERO
+      if (cfg.heroTitulo) setHeroTitulo(cfg.heroTitulo);
+      if (cfg.heroSubtitulo) setHeroSubtitulo(cfg.heroSubtitulo);
+
+      // Categorías y botones
+      if (Array.isArray(cfg.categorias) && cfg.categorias.length) setCategorias(cfg.categorias);
+      if (cfg.btnEstilo) setBtnEstilo(cfg.btnEstilo);
+      if (cfg.btnBorde) setBtnBorde(cfg.btnBorde);
+
+      // Featured (nuevo)
+      if (Array.isArray(cfg.featuredSelectedIds)) {
+        setFeaturedIdsArr(cfg.featuredSelectedIds.filter(Boolean));
+      } else if (typeof cfg.featuredProductIds === "string") {
+        // migración legacy si quedara
+        const arr = cfg.featuredProductIds.split(",").map((s) => s.trim()).filter(Boolean);
+        setFeaturedIdsArr(arr);
+      }
+    } catch (e) {
+      console.error("Config inválida:", e);
     }
   }, []);
 
-  // Opcional: autoplay si deseas (usa 5000ms por defecto si existe config.carruselAuto !== false)
+  // —— Autoplay del carrusel
   useEffect(() => {
-    const saved = localStorage.getItem("config");
-    const cfg = saved ? JSON.parse(saved) : {};
-    const enabled = cfg.carruselAuto !== false; // si lo quieres desactivar en el futuro, guarda carruselAuto: false
-    const delayMs = Number(cfg.carruselDelaySec || 0) > 0 ? Number(cfg.carruselDelaySec) * 1000 : 0;
+    if (!autoPlay || !images.length || !delayMs) return;
+    const t = setInterval(() => setCurrentSlide((prev) => (prev + 1) % images.length), delayMs);
+    return () => clearInterval(t);
+  }, [autoPlay, images, delayMs]);
 
-    if (!enabled) return;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (images.length ? (prev + 1) % images.length : 0));
-    }, delayMs || 5000);
-    return () => clearInterval(interval);
-  }, [images]);
+  // —— Cargar Productos Destacados desde BD según featuredSelectedIds
+  useEffect(() => {
+    const loadFeatured = async () => {
+      if (!featuredIdsArr.length) {
+        setProductosDestacados([]); // si no seleccionaste, no mostramos fallback para que sea 100% real
+        return;
+      }
 
-  // Login handlers
+      const idsParam = encodeURIComponent(featuredIdsArr.join(","));
+
+      // 1) Intento con soporte de IDs en backend
+      try {
+        const res = await fetch(`/api/productos?ids=${idsParam}`);
+        if (!res.ok) throw new Error("no-ids-mode");
+        const data = await res.json();
+        const list = Array.isArray(data.items) ? data.items : data;
+
+        const norm = (list || []).map((p) => ({
+          id: p.id ?? p.uuid ?? p._id,
+          nombre: p.titulo ?? p.nombre ?? "Producto",
+          descripcion: p.descripcion ?? "",
+          precio: typeof p.precio === "number" ? precioCLP(p.precio) : p.precio ?? "$0",
+          imagen: img0(p),
+        }));
+
+        // Mantener el orden como en featuredIdsArr
+        const byId = new Map(norm.map((p) => [String(p.id), p]));
+        const ordered = featuredIdsArr.map((id) => byId.get(String(id))).filter(Boolean);
+        setProductosDestacados(ordered);
+        return;
+      } catch (e) {
+        // sigue al fallback abajo
+      }
+
+      // 2) Fallback: cargo todo y filtro en cliente
+      try {
+        const resAll = await fetch(`/api/productos?skip=0&take=500`);
+        if (!resAll.ok) throw new Error("No se pudo cargar productos");
+        const dataAll = await resAll.json();
+        const listAll = Array.isArray(dataAll.items) ? dataAll.items : dataAll;
+
+        const mapAll = new Map(
+          (listAll || []).map((p) => [String(p.id ?? p.uuid ?? p._id), p])
+        );
+
+        const ordered = featuredIdsArr
+          .map((id) => mapAll.get(String(id)))
+          .filter(Boolean)
+          .map((p) => ({
+            id: p.id ?? p.uuid ?? p._id,
+            nombre: p.titulo ?? p.nombre ?? "Producto",
+            descripcion: p.descripcion ?? "",
+            precio: typeof p.precio === "number" ? precioCLP(p.precio) : p.precio ?? "$0",
+            imagen: img0(p),
+          }));
+
+        setProductosDestacados(ordered);
+      } catch (err) {
+        console.warn("No se pudieron resolver destacados:", err?.message);
+        setProductosDestacados([]);
+      }
+    };
+
+    loadFeatured();
+  }, [featuredIdsArr]);
+
+  // Integrar chat de N8N
+  useEffect(() => {
+    import('@n8n/chat/style.css');  // Importa el CSS necesario para N8N Chat
+    import('@n8n/chat').then(({ createChat }) => {
+      createChat({
+        webhookUrl: 'https://blitzecommerce.app.n8n.cloud/webhook/c29af5d5-e7da-4f6e-a6be-194671bf2ac2/chat', // Reemplaza con tu URL del webhook de N8N
+      });
+    });
+  }, []);
+
+  // —— Login handlers
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
     setLoginData((prev) => ({ ...prev, [name]: value }));
@@ -95,48 +239,28 @@ const { user, setUser, logout } = useContext(UserContext);
     }
   };
 
-  // Carrusel controls
-  const nextSlide = () => {
-    if (!images.length) return;
-    setCurrentSlide((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
 
-  const prevSlide = () => {
-    if (!images.length) return;
-    setCurrentSlide((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
+  // —— Carrusel controls
+  const nextSlide = () => images.length && setCurrentSlide((p) => (p + 1) % images.length);
+  const prevSlide = () => images.length && setCurrentSlide((p) => (p - 1 + images.length) % images.length);
 
-  const promociones = [
-    { texto: "Despacho a Todo Chile", destaque: false },
-    { texto: "Marcas Populares", destaque: false },
-  ];
+  // —— Promos fijas
+  const promociones = useMemo(
+    () => [
+      { texto: "Despacho a Todo Chile", destaque: false },
+      { texto: "Marcas Populares", destaque: false },
+    ],
+    []
+  );
 
-  const categorias = [
-    { nombre: "Procesadores", slug: "procesadores" },
-    { nombre: "Placas Madre", slug: "placas-madre" },
-    { nombre: "Tarjetas Gráficas", slug: "tarjetas-graficas" },
-    { nombre: "RAM", slug: "ram" },
-    { nombre: "Almacenamiento (SSD/HDD)", slug: "almacenamiento" },
-  ];
-
-  const productosDestacados = [
-    { id: 1, nombre: "Procesador Intel i7", descripcion: "11va generación, 3.8GHz", precio: "$250.000", imagen: "/images/i7.png" },
-    { id: 2, nombre: "Tarjeta Gráfica RTX 3060", descripcion: "12GB GDDR6", precio: "$399.000", imagen: "/images/3060.png" },
-    { id: 3, nombre: "Memoria RAM Corsair 16GB", descripcion: "DDR4 3200MHz", precio: "$75.000", imagen: "/images/ddr.png" },
-  ];
+  // Slugs categorías
+  const categoriasObjs = useMemo(
+    () => categorias.map((nombre) => ({ nombre, slug: slugify(nombre) })),
+    [categorias]
+  );
 
   return (
-    // 🟢 NUEVO: Aplicar colorFondo desde config
-    <main 
-      className="min-h-screen"
-      style={{
-        backgroundColor: fondo.fondoImagen ? undefined : fondo.colorFondo,
-        backgroundImage: fondo.fondoImagen ? `url(${fondo.fondoImagen})` : undefined,
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center'
-      }}>
-
+    <main className="min-h-screen">
       {/* Barra superior */}
       <div className="bg-[var(--color-secondary)] text-white text-center py-2 text-sm">
         {promociones.map((p, i) => (
@@ -146,7 +270,7 @@ const { user, setUser, logout } = useContext(UserContext);
         ))}
       </div>
 
-      {/* Navbar (usa colorHeader desde Config) */}
+      {/* Navbar */}
       <nav className="shadow sticky top-0 z-50" style={{ backgroundColor: colorHeader }}>
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
           <Link className="logo text-2xl font-bold text-[var(--color-primary)]" href="/">
@@ -155,14 +279,14 @@ const { user, setUser, logout } = useContext(UserContext);
 
           <div className="flex items-center space-x-6">
             <span className="text-2xl font-semibold">{nombrePagina}</span>
-            <Link href="/" className="text-gray-700 hover:text-[var(--color-accent)]">Inicio</Link>
-            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-accent)]">Catálogo</Link>
-            <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-accent)]">
-              <img src="/images/carrito.png" alt="Carrito Compra Logo" className="h-11 w-auto" />
+            <Link href="/" className="text-gray-700 hover:text-[var(--color-primary)]">Inicio</Link>
+            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-primary)]">Catálogo</Link>
+            <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-primary)]">
+              <img src="/images/carrito.png" alt="Carrito" className="h-11 w-auto" />
             </Link>
-            <Link href="/admin" className="text-gray-700 hover:text-[var(--color-accent)]">Admin</Link>
+            <Link href="/admin" className="text-gray-700 hover:text-[var(--color-primary)]">Admin</Link>
 
-           {user ? (
+            {user ? (
   <div className="flex items-center space-x-3">
     <span className="text-gray-700 flex items-center">
       Hola, {user.nombre}
@@ -188,28 +312,31 @@ const { user, setUser, logout } = useContext(UserContext);
       Cerrar sesión
     </button>
   </div>
-) : (
-  <button
-    onClick={() => setLoginOpen(true)}
-    className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-5 w-5 mr-1"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z"
-      />
-    </svg>
-    Iniciar sesión
-  </button>
-)}
+
+            ) : (
+              
+             <button
+                  onClick={() => setLoginOpen(true)}
+                  className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z"
+                    />
+                  </svg>
+                  Iniciar sesión
+                </button>
+
+            )}
           </div>
         </div>
       </nav>
@@ -239,106 +366,138 @@ const { user, setUser, logout } = useContext(UserContext);
         </div>
       )}
 
-      {/* Carrusel (lee imágenes desde config.carrusel) */}
-      <section className="px-4 py-6">
-        <div className="relative max-w-7xl mx-auto">
-          <div className="w-full overflow-hidden rounded-lg h-96 bg-gray-100">
-            {images.length > 0 ? (
-              <img src={images[currentSlide]} alt={`Slide ${currentSlide + 1}`} className="w-full h-full object-cover" />
 
+      {/* Carrusel responsivo full-bleed */}
+      <section className="w-full">
+        <div className="relative w-full overflow-hidden">
+          {/* contenedor con aspecto: 21:9 en móviles, 16:9 en sm+, 5:2 en md+ */}
+          <div className="relative w-full aspect-[21/9] sm:aspect-video md:aspect-[5/2]">
+            {images.length > 0 ? (
+              <img
+                src={images[currentSlide]}
+                alt={`Slide ${currentSlide + 1}`}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
             ) : (
-              <div className="w-full overflow-hidden rounded-lg h-96 bg-gray-100">Sin imágenes</div>
+              <div className="absolute inset-0 grid place-items-center text-gray-500 bg-gray-100">
+                Sin imágenes
+              </div>
             )}
           </div>
 
           {/* Controles */}
-          <button
-            aria-label="Anterior"
-            className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full"
-            onClick={prevSlide}
-          >
-            &#10094;
-          </button>
-          <button
-            aria-label="Siguiente"
-            className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full"
-            onClick={nextSlide}
-          >
-            &#10095;
-          </button>
-
-          {/* Dots */}
-          <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
-            {images.map((_, i) => (
+          {images.length > 1 && (
+            <>
               <button
-                key={i}
-                aria-label={`Ir al slide ${i + 1}`}
-                onClick={() => setCurrentSlide(i)}
-                className={`w-2.5 h-2.5 rounded-full ${i === currentSlide ? "bg-white" : "bg-white/50"} border border-black/10`}
-              />
+                aria-label="Anterior"
+                className="absolute top-1/2 left-4 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full"
+                onClick={prevSlide}
+              >
+                &#10094;
+              </button>
+              <button
+                aria-label="Siguiente"
+                className="absolute top-1/2 right-4 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full"
+                onClick={nextSlide}
+              >
+                &#10095;
+              </button>
+              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    aria-label={`Ir al slide ${i + 1}`}
+                    onClick={() => setCurrentSlide(i)}
+                    className={`w-2.5 h-2.5 rounded-full ${i === currentSlide ? "bg-white" : "bg-white/50"} border border-black/10`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* Productos destacados (centrados y ordenados) */}
+      <section className="py-12 bg-transparent">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-[var(--color-secondary)]">{heroTitulo}</h2>
+            {heroSubtitulo && <p className="text-gray-600 mt-1">{heroSubtitulo}</p>}
+          </div>
+
+          {/* Flex wrap + justify-center: 1 se centra; 2 quedan lado a lado y centrados; 3+ llenan filas */}
+          <div className="flex flex-wrap justify-center gap-6">
+            {productosDestacados.length === 0 && (
+              <p className="text-gray-500">No hay productos destacados seleccionados.</p>
+            )}
+
+            {productosDestacados.map((prod) => (
+              <div
+                key={prod.id}
+                className="card w-[260px] bg-white/90 backdrop-blur rounded-2xl border border-black/10 shadow-sm hover:shadow-md transition"
+              >
+                <img
+                  src={prod.imagen}
+                  alt={prod.nombre}
+                  className="rounded-t-2xl w-full h-40 object-contain mx-auto"
+                />
+                <div className="p-4 text-center">
+                  <h3 className="font-semibold text-[var(--color-secondary)]">{prod.nombre}</h3>
+                  {prod.descripcion && (
+                    <p className="text-sm text-gray-500 line-clamp-2">{prod.descripcion}</p>
+                  )}
+                  {prod.precio && (
+                    <p className="text-lg font-bold text-[var(--color-primary)] mt-2">
+                      {prod.precio}
+                    </p>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Productos destacados */}
-      <section className="bg-gray-50 py-12">
-        <h2 className="text-3xl font-bold text-center text-[var(--color-secondary)] mb-8">
-          Productos Destacados
-        </h2>
-        <div className="flex overflow-x-auto space-x-6 px-6">
-          {productosDestacados.map((prod) => (
-            <div key={prod.id} className="card min-w-[250px]">
-              <img src={prod.imagen} alt={prod.nombre} className="rounded-t-xl w-full h-40 object-contain mx-auto mb-4" />
-              <div className="p-4 text-center">
-                <h3 className="font-semibold text-[var(--color-secondary)]">{prod.nombre}</h3>
-                <p className="text-sm text-gray-500">{prod.descripcion}</p>
-                <p className="text-lg font-bold text-[var(--color-primary)] mt-2">{prod.precio}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Categorías */}
       <section className="max-w-6xl mx-auto py-12 grid grid-cols-2 md:grid-cols-5 gap-6 px-4">
-        {categorias.map((cat) => (
+        {categoriasObjs.map((cat) => (
           <Link key={cat.slug} href={`/catalogo?categoria=${cat.slug}`} className="card text-center p-4">
-            <h3 className="font-semibold text-[var(--color-secondary)]">{cat.nombre}</h3>
+            <span className={categoryBtnClasses(btnEstilo, btnBorde)}>{cat.nombre}</span>
           </Link>
         ))}
       </section>
 
-      {/* Footer (usa colorFooter desde Config) */}
+      {/* Footer */}
       <footer style={{ backgroundColor: colorFooter }} className="text-black mt-16">
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Ayuda</h4>
             <ul className="space-y-2 text-black">
-              <li><Link href="/ayuda" className="hover:text-teal-300">Centro de ayuda</Link></li>
-              <li><Link href="/seguimiento" className="hover:text-teal-300">Seguimiento de mi compra</Link></li>
+              <li><Link href="/ayuda" className="hover:text-teal-700">Centro de ayuda</Link></li>
+              <li><Link href="/seguimiento" className="hover:text-teal-700">Seguimiento de mi compra</Link></li>
             </ul>
           </div>
-
           <div>
             <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Nosotros</h4>
             <ul className="space-y-2 text-black">
-              <li><Link href="/quienes_somos" className="hover:text-teal-300">Quiénes somos</Link></li>
-              <li><Link href="/terminos" className="hover:text-teal-300">Términos y Condiciones</Link></li>
+              <li><Link href="/quienes_somos" className="hover:text-teal-700">Quiénes somos</Link></li>
+              <li><Link href="/terminos" className="hover:text-teal-700">Términos y Condiciones</Link></li>
             </ul>
           </div>
-
           <div>
             <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Comunidad Blitz</h4>
             <ul className="space-y-2 text-black">
-              <li><a href="https://www.instagram.com/blitz.hardware?igsh=b29mcW00OGthcnM3" target="_blank" className="hover:text-teal-300">Instagram</a></li>
+              <li>
+                <a href="https://www.instagram.com/blitz.hardware?igsh=b29mcW00OGthcnM3" target="_blank" rel="noreferrer" className="hover:text-teal-700">
+                  Instagram
+                </a>
+              </li>
             </ul>
           </div>
         </div>
 
-        <hr className="border-white/10" />
-
-        <div className="bg-black/30 text-center text-xs py-3">
+        <hr className="border-black/10" />
+        <div className="bg-black/5 text-center text-xs py-3">
           © 2025–2025 | Desarrollado por Cristopher Garcia, Jesus Lagos e Ignacio Varas, Proyecto Capstone
         </div>
       </footer>
