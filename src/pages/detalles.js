@@ -376,8 +376,8 @@ export default function Detalles() {
 
               <div className="mt-5 flex items-center gap-3">
                 <div className="text-2xl font-bold text-gray-900">{precioCLP(prod.precio)}</div>
-                <span className="text-[11px] font-semibold bg-red-500 text-white px-2 py-1 rounded">
-                  IVA INCLUIDO
+                <span className="text-[11px] font-semibold bg-green-500 text-white px-2 py-1 rounded">
+                  IVA NO INCLUIDO
                 </span>
               </div>
 

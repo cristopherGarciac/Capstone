@@ -151,20 +151,20 @@ const handlePay = async () => {
     };
   }, []);
 
-  // totales
-  const { total, subtotal, impuestos } = useMemo(() => {
-    const totalBruto = items.reduce(
-      (sum, it) => sum + Number(it.precio || 0) * Number(it.qty || 0),
-      0
-    );
-    // tomamos precio con IVA incluido, calculamos neto aprox:
-    const neto = Math.round(totalBruto / (1 + IVA));
-    return {
-      total: totalBruto,
-      subtotal: neto,
-      impuestos: totalBruto - neto,
-    };
-  }, [items]);
+  // totales con el iva separado 
+  const { subtotal, impuestos, total } = useMemo(() => {
+  // Subtotal sin IVA
+  const subtotal = items.reduce(
+    (sum, it) => sum + Number(it.precio || 0) * Number(it.qty || 0),
+    0
+  );
+
+  // Calcular IVA y total con IVA
+  const impuestos = Math.round(subtotal * IVA);
+  const total = subtotal + impuestos;
+
+  return { subtotal, impuestos, total };
+}, [items]);
 
   // acciones carrito
   const persist = (next) => {
