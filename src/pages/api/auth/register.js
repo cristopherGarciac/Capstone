@@ -1,7 +1,7 @@
 import prisma from "../../../../lib/prisma";
 import bcrypt from 'bcryptjs';
 import nodemailer from "nodemailer";
-// -------------------------------
+// -------------------------------  
 // ⭐ FUNCION PARA GEOCODIFICAR
 // -------------------------------
 async function getCoords(region, comuna, calle, numero) {
