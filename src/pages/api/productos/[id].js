@@ -1,5 +1,5 @@
 // src/pages/api/productos/[id].js
-import { PrismaClient, Prisma } from '../../../../prisma/src/generated/prisma';
+import prisma from "../../../../lib/prisma";
 
 // Cliente Prisma (lazy, para evitar múltiples conexiones en dev)
 let prisma;

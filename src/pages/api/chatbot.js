@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         {
           role: "system",
           content:
-            "Eres Bitzi, el asistente de soporte de Blitz Hardware, un e-commerce chileno especializado en productos tecnológicos. Responde de forma amable, breve y útil.",
+            "Eres Bitzi, el asistente de soporte  de Blitz Hardware, un e-commerce chileno especializado en productos tecnológicos. Responde de forma amable, breve y útil.",
         },
         { role: "user", content: message },
       ],

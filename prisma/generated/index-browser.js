@@ -185,15 +185,15 @@ exports.Prisma.ProductosScalarFieldEnum = {
   creado_en: 'creado_en'
 };
 
+exports.Prisma.RegionesScalarFieldEnum = {
+  id: 'id',
+  nombre: 'nombre'
+};
+
 exports.Prisma.ComunasScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre',
   region_id: 'region_id'
-};
-
-exports.Prisma.RegionesScalarFieldEnum = {
-  id: 'id',
-  nombre: 'nombre'
 };
 
 exports.Prisma.CuponesScalarFieldEnum = {
@@ -239,8 +239,8 @@ exports.Prisma.ModelName = {
   pedido_items: 'pedido_items',
   pedidos: 'pedidos',
   productos: 'productos',
-  comunas: 'comunas',
   regiones: 'regiones',
+  comunas: 'comunas',
   cupones: 'cupones'
 };
 

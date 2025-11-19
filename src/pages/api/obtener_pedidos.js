@@ -1,4 +1,4 @@
-import { prisma } from "../../generated/prisma";
+import prisma from "../../../lib/prisma";
 
 export default async function handler(req, res) {
   const { codigo, email } = req.query;

@@ -141,16 +141,17 @@ const [errors, setErrors] = useState({});
 
   if (!validateForm()) return;
 
-  const regionNombre = region.find(r => r.id.toString() === formData.region_id)?.nombre || "";
+  const region_id = region.find(r => r.id.toString() === formData.region_id)?.nombre || "";
   const comunaNombre = region
     .find(r => r.id.toString() === formData.region_id)
     ?.comunas.find(c => c.id.toString() === formData.comuna_id)?.nombre || "";
 
   const payload = {
     ...formData,
-    region: regionNombre,
-    comuna: comunaNombre,
-  };
+    region_id: Number(formData.region_id),
+    comuna_id: Number(formData.comuna_id),
+};
+
 
   try {
     const response = await fetch("/api/auth/register", {

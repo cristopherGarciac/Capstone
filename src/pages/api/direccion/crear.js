@@ -1,5 +1,5 @@
-import { PrismaClient } from '../../../../prisma/src/generated/prisma';
-const prisma = new PrismaClient();
+import prisma from "../../../../lib/prisma";
+
 
 // --- FUNCIÓN PARA OBTENER LAT & LNG ---
 async function obtenerCoordenadas(calle, numero, comuna, region) {

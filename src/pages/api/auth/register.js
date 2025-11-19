@@ -1,9 +1,6 @@
-import { PrismaClient } from '../../../../prisma/src/generated/prisma'; 
+import prisma from "../../../../lib/prisma";
 import bcrypt from 'bcryptjs';
 import nodemailer from "nodemailer";
-
-const prisma = new PrismaClient();
-
 // -------------------------------
 // ⭐ FUNCION PARA GEOCODIFICAR
 // -------------------------------

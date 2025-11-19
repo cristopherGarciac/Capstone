@@ -1,6 +1,5 @@
-import { PrismaClient, Prisma } from '../../../../prisma/src/generated/prisma';
+import prisma from "../../../../lib/prisma";
 
-const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {

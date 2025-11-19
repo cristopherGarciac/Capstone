@@ -1,7 +1,6 @@
-import { PrismaClient } from '../../../../prisma/src/generated/prisma'; 
+import prisma from "../../../../lib/prisma";
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {

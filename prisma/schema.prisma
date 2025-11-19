@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./src/generated/prisma"
+  output   = "./generated"
 }
 
 datasource db {
@@ -8,7 +8,6 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-
 model usuarios {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email       String        @unique
@@ -86,16 +85,19 @@ model productos {
   pedido_items pedido_items[]
 }
 
-model comunas {
-  id        Int    @id @default(autoincrement())
-  nombre    String
-  region_id Int?
+model regiones {
+  id      Int       @id @default(autoincrement())
+  nombre  String    @unique
+  comunas comunas[] @relation("RegionComuna")
 }
 
-model regiones {
-  id     Int    @id @default(autoincrement())
-  nombre String @unique
+model comunas {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  region_id Int?
+  region    regiones? @relation("RegionComuna", fields: [region_id], references: [id])
 }
+
 
 model cupones {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
