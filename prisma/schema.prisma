@@ -9,7 +9,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model usuarios {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   email       String        @unique
@@ -31,6 +30,8 @@ model direcciones {
   calle      String?
   numero     String?
   creado_en  DateTime? @default(now()) @db.Timestamptz(6)
+  lat        Float?
+  lng        Float?
   usuario    usuarios? @relation(fields: [usuario_id], references: [id])
   pedidos    pedidos[]
 }
@@ -96,13 +97,11 @@ model regiones {
   nombre String @unique
 }
 
-model Comuna {
-  id        Int    @id @default(autoincrement())
-  nombre    String
-  region_id Int
-}
-
-model Region {
-  id     Int    @id @default(autoincrement())
-  nombre String
+model cupones {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codigo     String    @unique
+  descuento  Int
+  activo     Boolean?  @default(true)
+  creado_en  DateTime? @default(now()) @db.Timestamptz(6)
+  expiracion DateTime? @db.Date
 }

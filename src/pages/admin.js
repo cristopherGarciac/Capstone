@@ -573,8 +573,8 @@ export default function Admin() {
         <Link href="pedidos" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">
           Pedidos
         </Link>
-        <Link href="report" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">
-          Reportes
+        <Link href="mapausuarios" className="py-2 border-b border-gray-700 hover:bg-gray-700 text-center">
+          MapaUsuarios
         </Link>
         <Link href="/" className="mt-auto py-2 px-4 bg-gray-600 rounded text-center hover:bg-gray-500">
           Volver al inicio

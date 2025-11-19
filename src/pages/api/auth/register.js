@@ -4,106 +4,139 @@ import nodemailer from "nodemailer";
 
 const prisma = new PrismaClient();
 
-export default async function handler(req, res) {
-  if (req.method === 'POST') {
-    const { nombre, apellido, rut, email, telefono, password, region, comuna, calle, numero } = req.body;
+// -------------------------------
+// ⭐ FUNCION PARA GEOCODIFICAR
+// -------------------------------
+async function getCoords(region, comuna, calle, numero) {
+  const address = `${calle} ${numero}, ${comuna}, ${region}, Chile`;
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
 
-    // Validar datos obligatorios
-    if (!email || !password || !nombre || !apellido || !rut) {
-      return res.status(400).json({
-        error: 'Faltan datos requeridos: Email, Contraseña, Nombre, Apellido y RUT son obligatorios',
-      });
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data || data.length === 0) {
+      console.warn("No se encontraron coordenadas para:", address);
+      return { lat: null, lng: null };
     }
 
-    try {
-      // 1. Verificar si ya existe un usuario con ese email
-      const existingUser = await prisma.usuarios.findUnique({
-        where: { email },
-      });
+    return {
+      lat: parseFloat(data[0].lat),
+      lng: parseFloat(data[0].lon)
+    };
+  } catch (err) {
+    console.error("Error geocoding:", err);
+    return { lat: null, lng: null };
+  }
+}
 
-      if (existingUser) {
-        return res.status(400).json({ error: 'El email ya está registrado' });
-      }
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Método no permitido' });
+  }
 
-      // 2. Hashear contraseña
-      const hashedPassword = await bcrypt.hash(password, 10);
+  const { 
+    nombre, apellido, rut, email, telefono, password, 
+    region_id, comuna_id, calle, numero 
+  } = req.body;
 
-      // 3. Crear usuario con dirección asociada
-      const user = await prisma.usuarios.create({
-        data: {
-          email,
-          nombre,
-          apellido,
-          rut,
-          telefono,
-          hash_pwd: hashedPassword,
-          direcciones: {
-            create: {
-              region,
-              comuna,
-              calle,
-              numero,
-            },
+  // Campos obligatorios
+  if (!email || !password || !nombre || !apellido || !rut) {
+    return res.status(400).json({
+      error: 'Email, Contraseña, Nombre, Apellido y RUT son obligatorios',
+    });
+  }
+
+  try {
+    // Verificar si el email ya existe
+    const existingUser = await prisma.usuarios.findUnique({ where: { email } });
+
+    if (existingUser) {
+      return res.status(400).json({ error: 'El email ya está registrado' });
+    }
+
+    // Hashear contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // --------------------------------------
+    // ⭐ OBTENER NOMBRE DE REGION Y COMUNA
+    // --------------------------------------
+    const regionObj = await prisma.regiones.findUnique({
+      where: { id: Number(region_id) }
+    });
+
+    const comunaObj = await prisma.comunas.findUnique({
+      where: { id: Number(comuna_id) }
+    });
+
+    const regionNombre = regionObj?.nombre || "";
+    const comunaNombre = comunaObj?.nombre || "";
+
+    // --------------------------------------
+    // ⭐ OBTENER COORDENADAS
+    // --------------------------------------
+    const { lat, lng } = await getCoords(regionNombre, comunaNombre, calle, numero);
+
+    // --------------------------------------
+    // ⭐ CREAR USUARIO + DIRECCIÓN
+    // --------------------------------------
+    const user = await prisma.usuarios.create({
+      data: {
+        email,
+        nombre,
+        apellido,
+        rut,
+        telefono,
+        hash_pwd: hashedPassword,
+        direcciones: {
+          create: {
+            region: regionNombre,
+            comuna: comunaNombre,
+            calle,
+            numero,
+            lat,
+            lng,
           },
         },
-        include: {
-          direcciones: true, 
-        },
-      });
+      },
+      include: { direcciones: true },
+    });
 
-      // 4. Preparar respuesta (direcciones es un array)
-      const direccion = user.direcciones.length > 0 ? user.direcciones[0] : null;
+    // Seleccionar la dirección creada
+    const direccion = user.direcciones.length ? user.direcciones[0] : null;
 
-      // --------------------------
-      // 5. Enviar correo de bienvenida
-      // --------------------------
-      // Configura tu transporter con tu App Password
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: "c57521116@gmail.com",          // reemplaza con tu correo
-          pass: "zsemaojsmvnvhfoa"             // reemplaza con tu App Password (sin espacios)
-        },
-      });
+    // --------------------------------------
+    // 🚀 ENVIAR CORREO
+    // --------------------------------------
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "c57521116@gmail.com",
+        pass: "zsemaojsmvnvhfoa"
+      },
+    });
 
-      // Contenido del correo
-      const mailOptions = {
-        from: '"Blitz Hardware" <tu-correo@gmail.com>', // remitente
-        to: user.email,                                 // destinatario
-        subject: "Registro exitoso en Blitz Hardware",
-        text: `Hola ${user.nombre},\n\n¡Tu registro se completó exitosamente en Blitz Hardware!\n\nBienvenido(a) a nuestra comunidad.\n\nSaludos,\nEquipo Blitz Hardware`,
-      };
+    transporter.sendMail({
+      from: '"Blitz Hardware" <c57521116@gmail.com>',
+      to: user.email,
+      subject: "Registro exitoso - Blitz Hardware",
+      text: `Hola ${user.nombre}, tu registro se completó exitosamente.`,
+    });
 
-      // Enviar correo (no bloquea la respuesta)
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.error("Error enviando correo:", error);
-        } else {
-          console.log("Correo enviado:", info.response);
-        }
-      });
+    // --------------------------------------
+    // RESPUESTA
+    // --------------------------------------
+    res.status(201).json({
+      id: user.id,
+      email: user.email,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      telefono: user.telefono,
+      direccion
+    });
 
-      // 6. Responder con los datos del usuario
-      res.status(201).json({
-        id: user.id,
-        email: user.email,
-        nombre: user.nombre,
-        apellido: user.apellido,
-        telefono: user.telefono,
-        direccion: direccion
-          ? {
-              region: direccion.region,
-              comuna: direccion.comuna,
-              calle: direccion.calle,
-              numero: direccion.numero,
-            }
-          : null,
-      });
-    } catch (error) {
-      console.error('Error al crear usuario:', error);
-      res.status(500).json({ error: 'Error al crear el usuario' });
-    }
-  } else {
-    res.status(405).json({ error: 'Método no permitido' });
+  } catch (error) {
+    console.error('Error al crear usuario:', error);
+    res.status(500).json({ error: 'Error al crear el usuario' });
   }
 }

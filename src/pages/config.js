@@ -123,6 +123,48 @@ export default function Configuracion() {
     }
   };
 
+// -------------------- CUPONES --------------------
+const [cupones, setCupones] = useState([]);
+const [nuevoCupon, setNuevoCupon] = useState({
+  codigo: "",
+  descuento: "",
+  expiracion: ""
+});
+const crearCupon = async () => {
+  if (!nuevoCupon.codigo || !nuevoCupon.descuento || !nuevoCupon.expiracion) {
+    return alert("Completa todos los campos");
+  }
+
+  const res = await fetch("/api/cupones", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(nuevoCupon)
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    setCupones([...cupones, data]);
+    setNuevoCupon({ codigo: "", descuento: "", expiracion: "" });
+  } else {
+    alert(data.error);
+  }
+};
+const eliminarCupon = async (codigo) => {
+  const res = await fetch("/api/cupones/delete", {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ codigo })
+  });
+
+  if (res.ok) {
+    setCupones(cupones.filter(c => c.codigo !== codigo));
+  } else {
+    alert("Error eliminando cupón");
+  }
+};
+
+
   // ====== APPLY CSS VARS + BG ======
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -283,8 +325,8 @@ export default function Configuracion() {
         <Link href="/pedidos" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">
           Pedidos
         </Link>
-        <Link href="/report" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">
-          Reportes
+        <Link href="/mapausuarios" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">
+           MapaUsuarios
         </Link>
         <Link href="/" className="mt-auto py-2 px-4 bg-gray-600 rounded text-center hover:bg-gray-500">
           Volver al inicio
@@ -589,6 +631,61 @@ export default function Configuracion() {
               </div>
             </div>
             
+<div className="bg-white p-4 rounded shadow mt-6">
+  <h2 className="text-xl font-bold mb-3">Crear cupón de descuento</h2>
+
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <input
+      type="text"
+      placeholder="Código del cupón"
+      value={nuevoCupon.codigo}
+      onChange={(e) => setNuevoCupon({ ...nuevoCupon, codigo: e.target.value })}
+      className="border p-2 rounded"
+    />
+
+    <input
+      type="number"
+      placeholder="Descuento %"
+      value={nuevoCupon.descuento}
+      onChange={(e) => setNuevoCupon({ ...nuevoCupon, descuento: e.target.value })}
+      className="border p-2 rounded"
+    />
+
+    <input
+      type="date"
+      value={nuevoCupon.expiracion}
+      onChange={(e) => setNuevoCupon({ ...nuevoCupon, expiracion: e.target.value })}
+      className="border p-2 rounded"
+    />
+  </div>
+
+  <button
+    onClick={crearCupon}
+    className="mt-3 bg-purple-600 text-white px-3 py-2 rounded"
+  >
+    Crear cupón
+  </button>
+
+  <hr className="my-4" />
+
+  <h3 className="font-semibold mb-2">Cupones creados</h3>
+  <ul>
+    {cupones.map(c => (
+      <li key={c.codigo} className="flex justify-between py-1">
+        <span>
+          <strong>{c.codigo}</strong> — {c.descuento}% (expira {c.expiracion})
+        </span>
+
+        <button
+          className="text-red-500"
+          onClick={() => eliminarCupon(c.codigo)}
+        >
+          Eliminar
+        </button>
+      </li>
+    ))}
+  </ul>
+</div>
 
             {/* Acciones */}
             <div className="flex gap-3">
@@ -600,6 +697,7 @@ export default function Configuracion() {
               </button>
             </div>
           </div>
+          
         </main>
       </div>
     </div>

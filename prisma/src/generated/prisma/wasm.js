@@ -138,7 +138,9 @@ exports.Prisma.DireccionesScalarFieldEnum = {
   region: 'region',
   calle: 'calle',
   numero: 'numero',
-  creado_en: 'creado_en'
+  creado_en: 'creado_en',
+  lat: 'lat',
+  lng: 'lng'
 };
 
 exports.Prisma.PagosScalarFieldEnum = {
@@ -166,7 +168,9 @@ exports.Prisma.PedidosScalarFieldEnum = {
   total: 'total',
   estado: 'estado',
   fecha: 'fecha',
-  direccion_envio_id: 'direccion_envio_id'
+  direccion_envio_id: 'direccion_envio_id',
+  Retiro_tienda: 'Retiro_tienda',
+  trackingnumber: 'trackingnumber'
 };
 
 exports.Prisma.ProductosScalarFieldEnum = {
@@ -190,6 +194,15 @@ exports.Prisma.ComunasScalarFieldEnum = {
 exports.Prisma.RegionesScalarFieldEnum = {
   id: 'id',
   nombre: 'nombre'
+};
+
+exports.Prisma.CuponesScalarFieldEnum = {
+  id: 'id',
+  codigo: 'codigo',
+  descuento: 'descuento',
+  activo: 'activo',
+  creado_en: 'creado_en',
+  expiracion: 'expiracion'
 };
 
 exports.Prisma.SortOrder = {
@@ -227,7 +240,8 @@ exports.Prisma.ModelName = {
   pedidos: 'pedidos',
   productos: 'productos',
   comunas: 'comunas',
-  regiones: 'regiones'
+  regiones: 'regiones',
+  cupones: 'cupones'
 };
 
 /**

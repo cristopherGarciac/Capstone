@@ -137,30 +137,41 @@ const [errors, setErrors] = useState({});
 
   // Submit
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validateForm()) return;
+  if (!validateForm()) return;
 
-    try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+  const regionNombre = region.find(r => r.id.toString() === formData.region_id)?.nombre || "";
+  const comunaNombre = region
+    .find(r => r.id.toString() === formData.region_id)
+    ?.comunas.find(c => c.id.toString() === formData.comuna_id)?.nombre || "";
 
-      const data = await response.json();
-
-      if (response.ok) {
-        alert("Usuario registrado correctamente");
-        router.push("/");
-      } else {
-        alert(data.error || "Hubo un error al registrar el usuario");
-      }
-    } catch (error) {
-      console.error("Error en el registro:", error);
-      alert("Error en el servidor");
-    }
+  const payload = {
+    ...formData,
+    region: regionNombre,
+    comuna: comunaNombre,
   };
+
+  try {
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      alert("Usuario registrado correctamente");
+      router.push("/");
+    } else {
+      alert(data.error || "Hubo un error al registrar el usuario");
+    }
+  } catch (error) {
+    console.error("Error en el registro:", error);
+    alert("Error en el servidor");
+  }
+};
 
   return (
     <main className="min-h-screen bg-gray-100">
