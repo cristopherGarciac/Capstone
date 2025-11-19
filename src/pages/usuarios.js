@@ -87,7 +87,7 @@ export default function Usuarios() {
         <Link href="/pedidos" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">Pedidos</Link>
         <Link href="/mapausuarios" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">MapaUsuarios</Link>
         <Link href="/" className="mt-auto py-2 px-4 bg-gray-600 rounded text-center hover:bg-gray-500">Volver al inicio</Link>
-      </div>
+      </div>  
 
       {/* Contenido */}
       <div className="flex-1 flex flex-col">
