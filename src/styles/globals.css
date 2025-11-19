@@ -90,3 +90,65 @@ body {
 .carousel-button.right {
   right: 10px;
 }
+
+/* ----------- MI CUENTA THEMES ----------- */
+
+.theme-claro {
+  --bgMain: #f3f4f6;
+  --cardBg: #ffffff;
+  --text: #1f2937;
+  --textSoft: #4b5563;
+  --primary: #2563eb;
+}
+
+.theme-oscuro {
+  --bgMain: #111827;
+  --cardBg: #1f2937;
+  --text: #f3f4f6;
+  --textSoft: #9ca3af;
+  --primary: #3b82f6;
+}
+
+.theme-azul {
+  --bgMain: #e0f2fe;
+  --cardBg: #ffffff;
+  --text: #0c4a6e;
+  --textSoft: #0369a1;
+  --primary: #0284c7;
+}
+
+.theme-gamer {
+  --bgMain: #0f0f0f;
+  --cardBg: #1a1a1a;
+  --text: #00ff8c;
+  --textSoft: #00cc6d;
+  --primary: #00ff8c;
+}
+
+.theme-pro {
+  --bgMain: #eef1f5;
+  --cardBg: #ffffff;
+  --text: #1e293b;
+  --textSoft: #475569;
+  --primary: #334155;
+}
+
+/* Aplicar los colores */
+.mi-cuenta-page {
+  background: var(--bgMain);
+  color: var(--text);
+}
+
+.mi-cuenta-card {
+  background: var(--cardBg);
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}

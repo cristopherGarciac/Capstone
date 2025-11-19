@@ -11,8 +11,11 @@ export default async function handler(req, res) {
     }
 
     try {
-      // Buscar usuario
-      const user = await prisma.usuarios.findUnique({ where: { email } });
+      // Buscar usuario e incluir direcciones
+      const user = await prisma.usuarios.findUnique({
+        where: { email },
+        include: { direcciones: true },
+      });
 
       if (!user) {
         return res.status(401).json({ error: 'Usuario no encontrado' });
@@ -25,14 +28,28 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: 'Contraseña incorrecta' });
       }
 
-      // Si llega aquí, login exitoso
+      // Tomar primera dirección (si existe)
+      const direccion = user.direcciones.length > 0 ? user.direcciones[0] : null;
+
+      // Respuesta
       res.status(200).json({
         id: user.id,
         email: user.email,
         nombre: user.nombre,
         apellido: user.apellido,
+        rut: user.rut,
+        telefono: user.telefono,
+        direccion: direccion
+          ? {
+              region: direccion.region,
+              comuna: direccion.comuna,
+              calle: direccion.calle,
+              numero: direccion.numero,
+            }
+          : null,
         mensaje: 'Inicio de sesión exitoso',
       });
+
     } catch (error) {
       console.error('Error en login:', error);
       res.status(500).json({ error: 'Error al iniciar sesión' });
@@ -41,3 +58,4 @@ export default async function handler(req, res) {
     res.status(405).json({ error: 'Método no permitido' });
   }
 }
+

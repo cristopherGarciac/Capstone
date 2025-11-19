@@ -1,12 +1,11 @@
 // src/context/UserContext.js
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
-  // Cargar usuario de localStorage al iniciar
   useEffect(() => {
     const stored = localStorage.getItem("user");
     if (stored) {
@@ -18,16 +17,14 @@ export const UserProvider = ({ children }) => {
     }
   }, []);
 
-  // Sincronizar cambios con localStorage
   useEffect(() => {
     if (user) localStorage.setItem("user", JSON.stringify(user));
     else localStorage.removeItem("user");
   }, [user]);
 
-  // Función de logout
   const logout = () => {
-    setUser(null); // limpia el contexto
-    localStorage.removeItem("user"); // limpia localStorage
+    setUser(null);
+    localStorage.removeItem("user");
   };
 
   return (
@@ -36,3 +33,6 @@ export const UserProvider = ({ children }) => {
     </UserContext.Provider>
   );
 };
+
+// 🔥 ESTE ES EL HOOK QUE TE FALTA
+export const useUser = () => useContext(UserContext);

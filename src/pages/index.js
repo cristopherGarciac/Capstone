@@ -198,15 +198,7 @@ export default function Home() {
     loadFeatured();
   }, [featuredIdsArr]);
 
-  // Integrar chat de N8N
-  useEffect(() => {
-    import('@n8n/chat/style.css');  // Importa el CSS necesario para N8N Chat
-    import('@n8n/chat').then(({ createChat }) => {
-      createChat({
-        webhookUrl: 'https://blitzecommerce.app.n8n.cloud/webhook/c29af5d5-e7da-4f6e-a6be-194671bf2ac2/chat', // Reemplaza con tu URL del webhook de N8N
-      });
-    });
-  }, []);
+  
 
   // —— Login handlers
   const handleLoginChange = (e) => {
@@ -288,9 +280,13 @@ export default function Home() {
 
             {user ? (
   <div className="flex items-center space-x-3">
-    <span className="text-gray-700 flex items-center">
-      Hola, {user.nombre}
-    </span>
+    <Link 
+  href="/mi_cuenta" 
+  className="text-gray-700 hover:text-[var(--color-primary)] flex items-center cursor-pointer"
+>
+  Hola, {user.nombre}
+</Link>
+
     <button
       onClick={logout}
       className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
