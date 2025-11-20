@@ -13,12 +13,12 @@ Proyecto Frontend de Capstone e-commerce usando Next.js, Tailwind CSS y Node.js.
 - crear un archivo .env en la carpeta del proyecto 
 - el archivo .env debe contener lo siguiente
 ### conexion a la base de datos `
-DATABASE_URL="postgresql://postgres.dnlzxjlhyllwfzbybrfy:m435faA23kfa2af9k@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true&connection_limit=1"
-DIRECT_URL="postgresql://postgres.dnlzxjlhyllwfzbybrfy:m435faA23kfa2af9k@aws-1-us-east-2.pooler.supabase.com:5432/postgres"
+## DATABASE_URL="postgresql://postgres.dnlzxjlhyllwfzbybrfy:m435faA23kfa2af9k@aws-1-us-east-2.pooler.supabase.com:5432/postgres?pgbouncer=true&connection_limit=1"
+## DIRECT_URL="postgresql://postgres.dnlzxjlhyllwfzbybrfy:m435faA23kfa2af9k@aws-1-us-east-2.pooler.supabase.com:5432/postgres"
 
 ## autenticacion de correo
-EMAIL_SERVER=smtp://tu-correo@gmail.com:app-password@smtp.gmail.com:587
-EMAIL_FROM=tu-correo@gmail.com`
+## EMAIL_SERVER=smtp://tu-correo@gmail.com:app-password@smtp.gmail.com:587
+## EMAIL_FROM=tu-correo@gmail.com`
 ## mercado pago
 ## MP_ACCESS_TOKEN=APP_USR-4556044148129708-100115-adc2caa51d1194dffa129a2ebf51f1e0-2900000140
 
