@@ -1,9 +1,9 @@
 import { useUser } from "../context/UserContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useThemeCuenta } from "../hooks/useThemeCuenta";
 
 /* ============================================================
-   MI CUENTA CON SISTEMA DE TEMAS
+   MI CUENTA CON SISTEMA DE TEMAS + FOTO DE PERFIL
 ============================================================ */
 export default function MiCuenta() {
   const { user, setUser, logout } = useUser();
@@ -20,11 +20,56 @@ export default function MiCuenta() {
     pro: "Profesional",
   };
 
+  // Para subir imagen
+  const fileInputRef = useRef(null);
+ const [previewImg, setPreviewImg] = useState(
+  user.foto ? user.foto : "/images/default-user.jpg"
+);
+
   if (!user) return <p className="p-6">Cargando...</p>;
+
+ const handleImageChange = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+
+  // 1. Crear URL para vista previa
+  const imgURL = URL.createObjectURL(file);
+  setPreviewImg(imgURL);
+
+  // 2. Convertir imagen a base64 para guardarla en BD
+  const reader = new FileReader();
+  reader.onloadend = async () => {
+    const base64 = reader.result; // 👈 FOTO BASE64 COMPLETA
+
+    try {
+      // 3. Guardar imagen en backend
+      const res = await fetch("/api/usuarios/foto", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: user.id, foto: base64 }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      // 4. Guardar en contexto + localStorage
+      setUser((prev) => ({
+        ...prev,
+        foto: base64,
+      }));
+
+    } catch (error) {
+      console.error("Error guardando foto:", error);
+    }
+  };
+
+  reader.readAsDataURL(file);
+};
+
 
   return (
     <div className="mi-cuenta-page min-h-screen py-10 px-4 transition-all">
-      
+
       {/* Título */}
       <h1 className="text-3xl font-bold text-center mb-10">
         Mi Cuenta
@@ -55,14 +100,55 @@ export default function MiCuenta() {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
 
-        {/* SIDEBAR */}
+        {/* =========================
+            SIDEBAR
+        ========================== */}
         <aside className="mi-cuenta-card shadow rounded-xl p-6 space-y-4">
+
+          {/* FOTO DE PERFIL */}
+          <div className="flex flex-col items-center mb-4">
+            <img
+              src={previewImg}
+              alt="Foto de perfil"
+              className="w-28 h-28 rounded-full object-cover border shadow-md"
+            />
+
+            <button
+              className="mt-3 text-sm text-blue-500 underline"
+              onClick={() => fileInputRef.current.click()}
+            >
+              Cambiar imagen
+            </button>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
+
           <p className="font-semibold">Resumen</p>
 
-          <button className="block text-left text-[var(--textSoft)] hover:text-[var(--text)]">Mis pedidos</button>
-          <button className="block text-left text-[var(--textSoft)] hover:text-[var(--text)]">Métodos de pago</button>
+          <button className="block text-left text-[var(--textSoft)] hover:text-[var(--text)]">
+            Mis pedidos
+          </button>
+
+          <button className="block text-left text-[var(--textSoft)] hover:text-[var(--text)]">
+            Métodos de pago
+          </button>
 
           <hr className="my-4" />
+          {/* Botón para volver al inicio */}
+          <div className="text-center mb-8">
+            <a
+              href="/"
+              className="inline-block px-5 py-2 rounded-lg font-medium bg-[var(--primary)] text-white shadow hover:opacity-90 transition"
+            >
+              ← Volver al inicio
+            </a>
+          </div>
 
           <button
             onClick={logout}
@@ -72,7 +158,9 @@ export default function MiCuenta() {
           </button>
         </aside>
 
-        {/* INFORMACIÓN DE CONTACTO */}
+        {/* =========================
+            INFORMACIÓN DE CONTACTO
+        ========================== */}
         <section className="mi-cuenta-card shadow rounded-xl p-6 md:col-span-2">
           <h2 className="text-lg font-semibold mb-4">Información de contacto</h2>
 
@@ -91,7 +179,9 @@ export default function MiCuenta() {
           </button>
         </section>
 
-        {/* DIRECCIÓN */}
+        {/* =========================
+            DIRECCIÓN
+        ========================== */}
         <section className="mi-cuenta-card shadow rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Dirección de envío predeterminada</h2>
 
@@ -102,7 +192,9 @@ export default function MiCuenta() {
               <p><strong>Región:</strong> {user.direccion.region}</p>
             </>
           ) : (
-            <p className="text-[var(--textSoft)] text-sm">Aún no tienes dirección guardada.</p>
+            <p className="text-[var(--textSoft)] text-sm">
+              Aún no tienes dirección guardada.
+            </p>
           )}
 
           <button
@@ -114,17 +206,26 @@ export default function MiCuenta() {
         </section>
       </div>
 
-      {/* MODAL EDITAR CONTACTO */}
+      {/* =========================
+          MODALES
+      ========================== */}
       {showEditContacto && (
         <Modal onClose={() => setShowEditContacto(false)}>
-          <EditarContactoForm user={user} setUser={setUser} close={() => setShowEditContacto(false)} />
+          <EditarContactoForm
+            user={user}
+            setUser={setUser}
+            close={() => setShowEditContacto(false)}
+          />
         </Modal>
       )}
 
-      {/* MODAL EDITAR DIRECCIÓN */}
       {showEditDireccion && (
         <Modal onClose={() => setShowEditDireccion(false)}>
-          <EditarDireccionForm user={user} setUser={setUser} close={() => setShowEditDireccion(false)} />
+          <EditarDireccionForm
+            user={user}
+            setUser={setUser}
+            close={() => setShowEditDireccion(false)}
+          />
         </Modal>
       )}
     </div>
@@ -151,7 +252,7 @@ function Modal({ children, onClose }) {
 }
 
 /* ============================================================
-   FORMULARIO DE CONTACTO (TÚ MISMO, SIN CAMBIAR)
+   FORMULARIO CONTACTO (TU VERSIÓN ORIGINAL)
 ============================================================ */
 function EditarContactoForm({ user, setUser, close }) {
   const [nombre, setNombre] = useState(user.nombre || "");
@@ -201,22 +302,40 @@ function EditarContactoForm({ user, setUser, close }) {
 
       <div>
         <label className="block mb-1 text-sm font-medium">Nombre</label>
-        <input className="w-full border rounded-lg px-3 py-2" value={nombre} onChange={e=>setNombre(e.target.value)} />
+        <input
+          className="w-full border rounded-lg px-3 py-2"
+          value={nombre}
+          onChange={e => setNombre(e.target.value)}
+        />
       </div>
 
       <div>
         <label className="block mb-1 text-sm font-medium">Teléfono</label>
-        <input className="w-full border rounded-lg px-3 py-2" value={telefono} onChange={e=>setTelefono(e.target.value)} />
+        <input
+          className="w-full border rounded-lg px-3 py-2"
+          value={telefono}
+          onChange={e => setTelefono(e.target.value)}
+        />
       </div>
 
       <div>
         <label className="block mb-1 text-sm font-medium">RUT</label>
-        <input className="w-full border rounded-lg px-3 py-2" value={rut} onChange={e=>setRut(e.target.value)} />
+        <input
+          className="w-full border rounded-lg px-3 py-2"
+          value={rut}
+          onChange={e => setRut(e.target.value)}
+        />
       </div>
 
       <div className="flex justify-end gap-3">
-        <button type="button" onClick={close} className="px-4 py-2 border rounded-lg">Cancelar</button>
-        <button type="submit" className="px-5 py-2 btn-primary rounded-lg" disabled={loading}>
+        <button type="button" onClick={close} className="px-4 py-2 border rounded-lg">
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-5 py-2 btn-primary rounded-lg"
+        >
           {loading ? "Guardando..." : "Guardar cambios"}
         </button>
       </div>
@@ -225,7 +344,7 @@ function EditarContactoForm({ user, setUser, close }) {
 }
 
 /* ============================================================
-   FORMULARIO DE DIRECCIÓN (TÚ MISMO, SIN CAMBIAR)
+   FORMULARIO DIRECCIÓN (TU VERSIÓN ORIGINAL)
 ============================================================ */
 function EditarDireccionForm({ user, setUser, close }) {
   const [regiones, setRegiones] = useState([]);
@@ -304,7 +423,7 @@ function EditarDireccionForm({ user, setUser, close }) {
       }));
 
       setOk("Dirección actualizada correctamente.");
-      
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -355,19 +474,36 @@ function EditarDireccionForm({ user, setUser, close }) {
 
       <div className="grid grid-cols-3 gap-3">
         <div className="col-span-2">
-          <label className="block text-sm mb-1 font-medium">Calle</label>
-          <input className="w-full border rounded-lg px-3 py-2" required value={calle} onChange={e=>setCalle(e.target.value)} />
+          <label className="block mb-1 text-sm font-medium">Calle</label>
+          <input
+            className="w-full border rounded-lg px-3 py-2"
+            required
+            value={calle}
+            onChange={e => setCalle(e.target.value)}
+          />
         </div>
 
         <div>
-          <label className="block text-sm mb-1 font-medium">Número</label>
-          <input className="w-full border rounded-lg px-3 py-2" required value={numero} onChange={e=>setNumero(e.target.value)} />
+          <label className="block mb-1 text-sm font-medium">Número</label>
+          <input
+            className="w-full border rounded-lg px-3 py-2"
+            required
+            value={numero}
+            onChange={e => setNumero(e.target.value)}
+          />
         </div>
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={close} className="px-4 py-2 border rounded-lg">Cancelar</button>
-        <button type="submit" disabled={loading} className="px-5 py-2 btn-primary rounded-lg">
+        <button type="button" onClick={close} className="px-4 py-2 border rounded-lg">
+          Cancelar
+        </button>
+
+        <button
+          type="submit" 
+          disabled={loading}
+          className="px-5 py-2 btn-primary rounded-lg"
+        >
           {loading ? "Guardando..." : "Guardar dirección"}
         </button>
       </div>

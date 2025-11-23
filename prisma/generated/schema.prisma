@@ -18,6 +18,8 @@ model usuarios {
   creado_en   DateTime?     @default(now()) @db.Timestamptz(6)
   apellido    String?
   rut         String?
+  themecuenta String?       @default("claro")
+  fotoperfil  String?
   direcciones direcciones[]
   pedidos     pedidos[]
 }
@@ -87,16 +89,14 @@ model productos {
 }
 
 model regiones {
-  id      Int       @id @default(autoincrement())
-  nombre  String    @unique
-  comunas comunas[] @relation("RegionComuna")
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
 }
 
 model comunas {
-  id        Int       @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   nombre    String
   region_id Int?
-  region    regiones? @relation("RegionComuna", fields: [region_id], references: [id])
 }
 
 model cupones {

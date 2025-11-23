@@ -6,6 +6,7 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
+  // Cargar desde localStorage al iniciar
   useEffect(() => {
     const stored = localStorage.getItem("user");
     if (stored) {
@@ -17,11 +18,16 @@ export const UserProvider = ({ children }) => {
     }
   }, []);
 
+  // Guardar en localStorage cada vez que cambie
   useEffect(() => {
-    if (user) localStorage.setItem("user", JSON.stringify(user));
-    else localStorage.removeItem("user");
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
   }, [user]);
 
+  // Cerrar sesión
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
@@ -34,5 +40,5 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-// 🔥 ESTE ES EL HOOK QUE TE FALTA
+// Hook para usar el contexto
 export const useUser = () => useContext(UserContext);

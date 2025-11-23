@@ -8,8 +8,8 @@ export default async function handler(req, res) {
 
   const { id, nombre, apellido, email, telefono, rut } = req.body;
 
-  if (!id || !email) {
-    return res.status(400).json({ error: "ID y email son obligatorios" });
+  if (!id) {
+    return res.status(400).json({ error: "ID es obligatorio" });
   }
 
   try {
