@@ -1778,6 +1778,8 @@ export namespace Prisma {
     themecuenta: string | null
     fotoperfil: string | null
     rol: string | null
+    resetToken: string | null
+    resetTokenExpiry: Date | null
   }
 
   export type UsuariosMaxAggregateOutputType = {
@@ -1792,6 +1794,8 @@ export namespace Prisma {
     themecuenta: string | null
     fotoperfil: string | null
     rol: string | null
+    resetToken: string | null
+    resetTokenExpiry: Date | null
   }
 
   export type UsuariosCountAggregateOutputType = {
@@ -1806,6 +1810,8 @@ export namespace Prisma {
     themecuenta: number
     fotoperfil: number
     rol: number
+    resetToken: number
+    resetTokenExpiry: number
     _all: number
   }
 
@@ -1822,6 +1828,8 @@ export namespace Prisma {
     themecuenta?: true
     fotoperfil?: true
     rol?: true
+    resetToken?: true
+    resetTokenExpiry?: true
   }
 
   export type UsuariosMaxAggregateInputType = {
@@ -1836,6 +1844,8 @@ export namespace Prisma {
     themecuenta?: true
     fotoperfil?: true
     rol?: true
+    resetToken?: true
+    resetTokenExpiry?: true
   }
 
   export type UsuariosCountAggregateInputType = {
@@ -1850,6 +1860,8 @@ export namespace Prisma {
     themecuenta?: true
     fotoperfil?: true
     rol?: true
+    resetToken?: true
+    resetTokenExpiry?: true
     _all?: true
   }
 
@@ -1937,6 +1949,8 @@ export namespace Prisma {
     themecuenta: string | null
     fotoperfil: string | null
     rol: string | null
+    resetToken: string | null
+    resetTokenExpiry: Date | null
     _count: UsuariosCountAggregateOutputType | null
     _min: UsuariosMinAggregateOutputType | null
     _max: UsuariosMaxAggregateOutputType | null
@@ -1968,6 +1982,8 @@ export namespace Prisma {
     themecuenta?: boolean
     fotoperfil?: boolean
     rol?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
     direcciones?: boolean | usuarios$direccionesArgs<ExtArgs>
     pedidos?: boolean | usuarios$pedidosArgs<ExtArgs>
     _count?: boolean | UsuariosCountOutputTypeDefaultArgs<ExtArgs>
@@ -1985,6 +2001,8 @@ export namespace Prisma {
     themecuenta?: boolean
     fotoperfil?: boolean
     rol?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
   }, ExtArgs["result"]["usuarios"]>
 
   export type usuariosSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1999,6 +2017,8 @@ export namespace Prisma {
     themecuenta?: boolean
     fotoperfil?: boolean
     rol?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
   }, ExtArgs["result"]["usuarios"]>
 
   export type usuariosSelectScalar = {
@@ -2013,9 +2033,11 @@ export namespace Prisma {
     themecuenta?: boolean
     fotoperfil?: boolean
     rol?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
   }
 
-  export type usuariosOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "nombre" | "hash_pwd" | "telefono" | "creado_en" | "apellido" | "rut" | "themecuenta" | "fotoperfil" | "rol", ExtArgs["result"]["usuarios"]>
+  export type usuariosOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "nombre" | "hash_pwd" | "telefono" | "creado_en" | "apellido" | "rut" | "themecuenta" | "fotoperfil" | "rol" | "resetToken" | "resetTokenExpiry", ExtArgs["result"]["usuarios"]>
   export type usuariosInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     direcciones?: boolean | usuarios$direccionesArgs<ExtArgs>
     pedidos?: boolean | usuarios$pedidosArgs<ExtArgs>
@@ -2042,6 +2064,8 @@ export namespace Prisma {
       themecuenta: string | null
       fotoperfil: string | null
       rol: string | null
+      resetToken: string | null
+      resetTokenExpiry: Date | null
     }, ExtArgs["result"]["usuarios"]>
     composites: {}
   }
@@ -2478,6 +2502,8 @@ export namespace Prisma {
     readonly themecuenta: FieldRef<"usuarios", 'String'>
     readonly fotoperfil: FieldRef<"usuarios", 'String'>
     readonly rol: FieldRef<"usuarios", 'String'>
+    readonly resetToken: FieldRef<"usuarios", 'String'>
+    readonly resetTokenExpiry: FieldRef<"usuarios", 'DateTime'>
   }
     
 
@@ -10033,7 +10059,7 @@ export namespace Prisma {
   export type ComunasGroupByOutputType = {
     id: number
     nombre: string
-    region_id: number
+    region_id: number | null
     _count: ComunasCountAggregateOutputType | null
     _avg: ComunasAvgAggregateOutputType | null
     _sum: ComunasSumAggregateOutputType | null
@@ -10059,21 +10085,21 @@ export namespace Prisma {
     id?: boolean
     nombre?: boolean
     region_id?: boolean
-    region?: boolean | regionesDefaultArgs<ExtArgs>
+    region?: boolean | comunas$regionArgs<ExtArgs>
   }, ExtArgs["result"]["comunas"]>
 
   export type comunasSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     nombre?: boolean
     region_id?: boolean
-    region?: boolean | regionesDefaultArgs<ExtArgs>
+    region?: boolean | comunas$regionArgs<ExtArgs>
   }, ExtArgs["result"]["comunas"]>
 
   export type comunasSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     nombre?: boolean
     region_id?: boolean
-    region?: boolean | regionesDefaultArgs<ExtArgs>
+    region?: boolean | comunas$regionArgs<ExtArgs>
   }, ExtArgs["result"]["comunas"]>
 
   export type comunasSelectScalar = {
@@ -10084,24 +10110,24 @@ export namespace Prisma {
 
   export type comunasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "region_id", ExtArgs["result"]["comunas"]>
   export type comunasInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    region?: boolean | regionesDefaultArgs<ExtArgs>
+    region?: boolean | comunas$regionArgs<ExtArgs>
   }
   export type comunasIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    region?: boolean | regionesDefaultArgs<ExtArgs>
+    region?: boolean | comunas$regionArgs<ExtArgs>
   }
   export type comunasIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    region?: boolean | regionesDefaultArgs<ExtArgs>
+    region?: boolean | comunas$regionArgs<ExtArgs>
   }
 
   export type $comunasPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "comunas"
     objects: {
-      region: Prisma.$regionesPayload<ExtArgs>
+      region: Prisma.$regionesPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       nombre: string
-      region_id: number
+      region_id: number | null
     }, ExtArgs["result"]["comunas"]>
     composites: {}
   }
@@ -10496,7 +10522,7 @@ export namespace Prisma {
    */
   export interface Prisma__comunasClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    region<T extends regionesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, regionesDefaultArgs<ExtArgs>>): Prisma__regionesClient<$Result.GetResult<Prisma.$regionesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    region<T extends comunas$regionArgs<ExtArgs> = {}>(args?: Subset<T, comunas$regionArgs<ExtArgs>>): Prisma__regionesClient<$Result.GetResult<Prisma.$regionesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10922,6 +10948,25 @@ export namespace Prisma {
      * Limit how many comunas to delete.
      */
     limit?: number
+  }
+
+  /**
+   * comunas.region
+   */
+  export type comunas$regionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the regiones
+     */
+    select?: regionesSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the regiones
+     */
+    omit?: regionesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
+    where?: regionesWhereInput
   }
 
   /**
@@ -12010,7 +12055,9 @@ export namespace Prisma {
     rut: 'rut',
     themecuenta: 'themecuenta',
     fotoperfil: 'fotoperfil',
-    rol: 'rol'
+    rol: 'rol',
+    resetToken: 'resetToken',
+    resetTokenExpiry: 'resetTokenExpiry'
   };
 
   export type UsuariosScalarFieldEnum = (typeof UsuariosScalarFieldEnum)[keyof typeof UsuariosScalarFieldEnum]
@@ -12269,6 +12316,8 @@ export namespace Prisma {
     themecuenta?: StringNullableFilter<"usuarios"> | string | null
     fotoperfil?: StringNullableFilter<"usuarios"> | string | null
     rol?: StringNullableFilter<"usuarios"> | string | null
+    resetToken?: StringNullableFilter<"usuarios"> | string | null
+    resetTokenExpiry?: DateTimeNullableFilter<"usuarios"> | Date | string | null
     direcciones?: DireccionesListRelationFilter
     pedidos?: PedidosListRelationFilter
   }
@@ -12285,6 +12334,8 @@ export namespace Prisma {
     themecuenta?: SortOrderInput | SortOrder
     fotoperfil?: SortOrderInput | SortOrder
     rol?: SortOrderInput | SortOrder
+    resetToken?: SortOrderInput | SortOrder
+    resetTokenExpiry?: SortOrderInput | SortOrder
     direcciones?: direccionesOrderByRelationAggregateInput
     pedidos?: pedidosOrderByRelationAggregateInput
   }
@@ -12304,6 +12355,8 @@ export namespace Prisma {
     themecuenta?: StringNullableFilter<"usuarios"> | string | null
     fotoperfil?: StringNullableFilter<"usuarios"> | string | null
     rol?: StringNullableFilter<"usuarios"> | string | null
+    resetToken?: StringNullableFilter<"usuarios"> | string | null
+    resetTokenExpiry?: DateTimeNullableFilter<"usuarios"> | Date | string | null
     direcciones?: DireccionesListRelationFilter
     pedidos?: PedidosListRelationFilter
   }, "id" | "email">
@@ -12320,6 +12373,8 @@ export namespace Prisma {
     themecuenta?: SortOrderInput | SortOrder
     fotoperfil?: SortOrderInput | SortOrder
     rol?: SortOrderInput | SortOrder
+    resetToken?: SortOrderInput | SortOrder
+    resetTokenExpiry?: SortOrderInput | SortOrder
     _count?: usuariosCountOrderByAggregateInput
     _max?: usuariosMaxOrderByAggregateInput
     _min?: usuariosMinOrderByAggregateInput
@@ -12340,6 +12395,8 @@ export namespace Prisma {
     themecuenta?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
     fotoperfil?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
     rol?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
+    resetToken?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
+    resetTokenExpiry?: DateTimeNullableWithAggregatesFilter<"usuarios"> | Date | string | null
   }
 
   export type direccionesWhereInput = {
@@ -12760,14 +12817,14 @@ export namespace Prisma {
     NOT?: comunasWhereInput | comunasWhereInput[]
     id?: IntFilter<"comunas"> | number
     nombre?: StringFilter<"comunas"> | string
-    region_id?: IntFilter<"comunas"> | number
-    region?: XOR<RegionesScalarRelationFilter, regionesWhereInput>
+    region_id?: IntNullableFilter<"comunas"> | number | null
+    region?: XOR<RegionesNullableScalarRelationFilter, regionesWhereInput> | null
   }
 
   export type comunasOrderByWithRelationInput = {
     id?: SortOrder
     nombre?: SortOrder
-    region_id?: SortOrder
+    region_id?: SortOrderInput | SortOrder
     region?: regionesOrderByWithRelationInput
   }
 
@@ -12777,14 +12834,14 @@ export namespace Prisma {
     OR?: comunasWhereInput[]
     NOT?: comunasWhereInput | comunasWhereInput[]
     nombre?: StringFilter<"comunas"> | string
-    region_id?: IntFilter<"comunas"> | number
-    region?: XOR<RegionesScalarRelationFilter, regionesWhereInput>
+    region_id?: IntNullableFilter<"comunas"> | number | null
+    region?: XOR<RegionesNullableScalarRelationFilter, regionesWhereInput> | null
   }, "id">
 
   export type comunasOrderByWithAggregationInput = {
     id?: SortOrder
     nombre?: SortOrder
-    region_id?: SortOrder
+    region_id?: SortOrderInput | SortOrder
     _count?: comunasCountOrderByAggregateInput
     _avg?: comunasAvgOrderByAggregateInput
     _max?: comunasMaxOrderByAggregateInput
@@ -12798,7 +12855,7 @@ export namespace Prisma {
     NOT?: comunasScalarWhereWithAggregatesInput | comunasScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"comunas"> | number
     nombre?: StringWithAggregatesFilter<"comunas"> | string
-    region_id?: IntWithAggregatesFilter<"comunas"> | number
+    region_id?: IntNullableWithAggregatesFilter<"comunas"> | number | null
   }
 
   export type cuponesWhereInput = {
@@ -12872,6 +12929,8 @@ export namespace Prisma {
     themecuenta?: string | null
     fotoperfil?: string | null
     rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     direcciones?: direccionesCreateNestedManyWithoutUsuarioInput
     pedidos?: pedidosCreateNestedManyWithoutUsuariosInput
   }
@@ -12888,6 +12947,8 @@ export namespace Prisma {
     themecuenta?: string | null
     fotoperfil?: string | null
     rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     direcciones?: direccionesUncheckedCreateNestedManyWithoutUsuarioInput
     pedidos?: pedidosUncheckedCreateNestedManyWithoutUsuariosInput
   }
@@ -12904,6 +12965,8 @@ export namespace Prisma {
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
     rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     direcciones?: direccionesUpdateManyWithoutUsuarioNestedInput
     pedidos?: pedidosUpdateManyWithoutUsuariosNestedInput
   }
@@ -12920,6 +12983,8 @@ export namespace Prisma {
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
     rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     direcciones?: direccionesUncheckedUpdateManyWithoutUsuarioNestedInput
     pedidos?: pedidosUncheckedUpdateManyWithoutUsuariosNestedInput
   }
@@ -12936,6 +13001,8 @@ export namespace Prisma {
     themecuenta?: string | null
     fotoperfil?: string | null
     rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
   }
 
   export type usuariosUpdateManyMutationInput = {
@@ -12950,6 +13017,8 @@ export namespace Prisma {
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
     rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type usuariosUncheckedUpdateManyInput = {
@@ -12964,6 +13033,8 @@ export namespace Prisma {
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
     rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type direccionesCreateInput = {
@@ -13392,30 +13463,30 @@ export namespace Prisma {
 
   export type comunasCreateInput = {
     nombre: string
-    region: regionesCreateNestedOneWithoutComunasInput
+    region?: regionesCreateNestedOneWithoutComunasInput
   }
 
   export type comunasUncheckedCreateInput = {
     id?: number
     nombre: string
-    region_id: number
+    region_id?: number | null
   }
 
   export type comunasUpdateInput = {
     nombre?: StringFieldUpdateOperationsInput | string
-    region?: regionesUpdateOneRequiredWithoutComunasNestedInput
+    region?: regionesUpdateOneWithoutComunasNestedInput
   }
 
   export type comunasUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
-    region_id?: IntFieldUpdateOperationsInput | number
+    region_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type comunasCreateManyInput = {
     id?: number
     nombre: string
-    region_id: number
+    region_id?: number | null
   }
 
   export type comunasUpdateManyMutationInput = {
@@ -13425,7 +13496,7 @@ export namespace Prisma {
   export type comunasUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
-    region_id?: IntFieldUpdateOperationsInput | number
+    region_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type cuponesCreateInput = {
@@ -13581,6 +13652,8 @@ export namespace Prisma {
     themecuenta?: SortOrder
     fotoperfil?: SortOrder
     rol?: SortOrder
+    resetToken?: SortOrder
+    resetTokenExpiry?: SortOrder
   }
 
   export type usuariosMaxOrderByAggregateInput = {
@@ -13595,6 +13668,8 @@ export namespace Prisma {
     themecuenta?: SortOrder
     fotoperfil?: SortOrder
     rol?: SortOrder
+    resetToken?: SortOrder
+    resetTokenExpiry?: SortOrder
   }
 
   export type usuariosMinOrderByAggregateInput = {
@@ -13609,6 +13684,8 @@ export namespace Prisma {
     themecuenta?: SortOrder
     fotoperfil?: SortOrder
     rol?: SortOrder
+    resetToken?: SortOrder
+    resetTokenExpiry?: SortOrder
   }
 
   export type UuidWithAggregatesFilter<$PrismaModel = never> = {
@@ -14197,9 +14274,9 @@ export namespace Prisma {
     id?: SortOrder
   }
 
-  export type RegionesScalarRelationFilter = {
-    is?: regionesWhereInput
-    isNot?: regionesWhereInput
+  export type RegionesNullableScalarRelationFilter = {
+    is?: regionesWhereInput | null
+    isNot?: regionesWhereInput | null
   }
 
   export type comunasCountOrderByAggregateInput = {
@@ -14739,10 +14816,12 @@ export namespace Prisma {
     connect?: regionesWhereUniqueInput
   }
 
-  export type regionesUpdateOneRequiredWithoutComunasNestedInput = {
+  export type regionesUpdateOneWithoutComunasNestedInput = {
     create?: XOR<regionesCreateWithoutComunasInput, regionesUncheckedCreateWithoutComunasInput>
     connectOrCreate?: regionesCreateOrConnectWithoutComunasInput
     upsert?: regionesUpsertWithoutComunasInput
+    disconnect?: regionesWhereInput | boolean
+    delete?: regionesWhereInput | boolean
     connect?: regionesWhereUniqueInput
     update?: XOR<XOR<regionesUpdateToOneWithWhereWithoutComunasInput, regionesUpdateWithoutComunasInput>, regionesUncheckedUpdateWithoutComunasInput>
   }
@@ -15236,6 +15315,8 @@ export namespace Prisma {
     themecuenta?: string | null
     fotoperfil?: string | null
     rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     pedidos?: pedidosCreateNestedManyWithoutUsuariosInput
   }
 
@@ -15251,6 +15332,8 @@ export namespace Prisma {
     themecuenta?: string | null
     fotoperfil?: string | null
     rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     pedidos?: pedidosUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
@@ -15316,6 +15399,8 @@ export namespace Prisma {
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
     rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     pedidos?: pedidosUpdateManyWithoutUsuariosNestedInput
   }
 
@@ -15331,6 +15416,8 @@ export namespace Prisma {
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
     rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     pedidos?: pedidosUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
@@ -15637,6 +15724,8 @@ export namespace Prisma {
     themecuenta?: string | null
     fotoperfil?: string | null
     rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     direcciones?: direccionesCreateNestedManyWithoutUsuarioInput
   }
 
@@ -15652,6 +15741,8 @@ export namespace Prisma {
     themecuenta?: string | null
     fotoperfil?: string | null
     rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     direcciones?: direccionesUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
@@ -15775,6 +15866,8 @@ export namespace Prisma {
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
     rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     direcciones?: direccionesUpdateManyWithoutUsuarioNestedInput
   }
 
@@ -15790,6 +15883,8 @@ export namespace Prisma {
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
     rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     direcciones?: direccionesUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
@@ -15874,7 +15969,7 @@ export namespace Prisma {
     NOT?: comunasScalarWhereInput | comunasScalarWhereInput[]
     id?: IntFilter<"comunas"> | number
     nombre?: StringFilter<"comunas"> | string
-    region_id?: IntFilter<"comunas"> | number
+    region_id?: IntNullableFilter<"comunas"> | number | null
   }
 
   export type regionesCreateWithoutComunasInput = {

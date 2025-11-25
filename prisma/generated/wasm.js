@@ -131,7 +131,9 @@ exports.Prisma.UsuariosScalarFieldEnum = {
   rut: 'rut',
   themecuenta: 'themecuenta',
   fotoperfil: 'fotoperfil',
-  rol: 'rol'
+  rol: 'rol',
+  resetToken: 'resetToken',
+  resetTokenExpiry: 'resetTokenExpiry'
 };
 
 exports.Prisma.DireccionesScalarFieldEnum = {

@@ -10,19 +10,21 @@ datasource db {
 }
 
 model usuarios {
-  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email       String        @unique
-  nombre      String?
-  hash_pwd    String
-  telefono    String?
-  creado_en   DateTime?     @default(now()) @db.Timestamptz(6)
-  apellido    String?
-  rut         String?
-  themecuenta String?       @default("claro") 
-  fotoperfil  String?
-  direcciones direcciones[]
-  pedidos     pedidos[]
-  rol         String?  
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String        @unique
+  nombre           String?
+  hash_pwd         String
+  telefono         String?
+  creado_en        DateTime?     @default(now()) @db.Timestamptz(6)
+  apellido         String?
+  rut              String?
+  themecuenta      String?       @default("claro")
+  fotoperfil       String?
+  rol              String?       @default("usuario")
+  resetToken       String?
+  resetTokenExpiry DateTime?     @db.Timestamptz(6)
+  direcciones      direcciones[]
+  pedidos          pedidos[]
 }
 
 model direcciones {
@@ -90,17 +92,16 @@ model productos {
 }
 
 model regiones {
-  id      Int      @id @default(autoincrement())
-  nombre  String   @unique
+  id      Int       @id @default(autoincrement())
+  nombre  String    @unique
   comunas comunas[]
 }
 
 model comunas {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   nombre    String
-  region_id Int 
-
-  region regiones @relation(fields: [region_id], references: [id])
+  region_id Int?
+  region    regiones? @relation(fields: [region_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_comuna_region")
 }
 
 model cupones {

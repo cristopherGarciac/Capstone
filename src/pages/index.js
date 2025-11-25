@@ -323,51 +323,75 @@ export default function Home() {
 
       {/* LOGIN MODAL — TU LOGIN */}
       {loginOpen && (
-        <div className="fixed inset-0 bg-black/40 flex justify-center items-start pt-24 z-50">
-          <div className="bg-white rounded-xl shadow-lg w-96 p-6 relative">
-            <button
-              onClick={() => setLoginOpen(false)}
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-            >
-              ✕
-            </button>
+  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
 
-            <h2 className="text-2xl font-bold text-[var(--color-secondary)] mb-4 text-center">
-              Iniciar Sesión
-            </h2>
+    <div
+      className="bg-white w-96 p-8 rounded-2xl shadow-xl relative animate-[zoomIn_.15s_ease-out]"
+    >
+      {/* Botón cerrar */}
+      <button
+        onClick={() => setLoginOpen(false)}
+        className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl"
+      >
+        ✕
+      </button>
 
-            <form onSubmit={handleLogin} className="flex flex-col gap-4">
-              <input
-                type="email"
-                name="email"
-                value={loginData.email}
-                onChange={handleLoginChange}
-                placeholder="Correo electrónico"
-                className="border p-2 rounded"
-                required
-              />
+      {/* Título */}
+      <h2 className="text-3xl font-bold text-center mb-6 text-[var(--color-secondary)]">
+        Iniciar sesión
+      </h2>
 
-              <input
-                type="password"
-                name="password"
-                value={loginData.password}
-                onChange={handleLoginChange}
-                placeholder="Contraseña"
-                className="border p-2 rounded"
-                required
-              />
+      {/* Formulario */}
+      <form onSubmit={handleLogin} className="flex flex-col gap-4">
 
-              <button type="submit" className="btn-primary w-full">
-                Iniciar Sesión
-              </button>
-            </form>
+        <input
+          type="email"
+          name="email"
+          value={loginData.email}
+          onChange={handleLoginChange}
+          placeholder="Correo electrónico"
+          className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+          required
+        />
 
-            {loginError && (
-              <p className="text-red-500 text-sm mt-2 text-center">{loginError}</p>
-            )}
-          </div>
+        <input
+          type="password"
+          name="password"
+          value={loginData.password}
+          onChange={handleLoginChange}
+          placeholder="Contraseña"
+          className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+          required
+        />
+
+        <button
+          type="submit"
+          className="bg-[var(--color-primary)] text-white font-semibold py-3 rounded-lg hover:opacity-90 transition"
+        >
+          Iniciar sesión
+        </button>
+
+        {/* Enlaces */}
+        <div className="flex flex-col items-center gap-2 mt-2 text-sm">
+          <Link href="/recuperar_password" className="text-[var(--color-primary)] hover:underline">
+            Olvidé mi contraseña
+          </Link>
+
+          <Link href="/registro" className="text-[var(--color-secondary)] hover:underline font-semibold">
+            Crear una cuenta
+          </Link>
         </div>
+
+      </form>
+
+      {/* Error */}
+      {loginError && (
+        <p className="text-red-500 text-center text-sm mt-3">{loginError}</p>
       )}
+    </div>
+  </div>
+)}
+
 
       {/* CARRUSEL FULL */}
       <section className="w-full">
