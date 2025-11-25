@@ -19,12 +19,16 @@ export default function Configuracion() {
     btnHoverBg: "#6b21a8",
     btnHoverText: "#ffffff",
 
-    // Carrusel (ahora como OBJETOS + zoom)
+    // Carrusel (OBJETOS + zoom + CONFIG NUEVA)
     carrusel: [
       { url: "/images/blitzHardware banner.png", posX: 50, posY: 50, zoom: 100 },
-      { url: "/images/componentes.png",          posX: 50, posY: 50, zoom: 100 },
+      { url: "/images/componentes.png",         posX: 50, posY: 50, zoom: 100 },
       { url: "/images/nvidia.png",              posX: 50, posY: 50, zoom: 100 },
     ],
+    // --- NUEVO: Configuración de ajuste y altura ---
+    carruselFit: "cover",    // 'cover' | 'contain' | 'fill'
+    carruselHeight: "500px", // Altura del banner (px o vh)
+    // ----------------------------------------------
     carruselAuto: true,
     carruselDelaySec: 5,
 
@@ -57,6 +61,16 @@ export default function Configuracion() {
     // Fondo general
     colorFondo: "#ffffff",
     fondoImagen: "",
+
+    // Cupones
+    cupones: [],
+  });
+
+  // Estado local para nuevo cupón
+  const [nuevoCupon, setNuevoCupon] = useState({
+    codigo: "",
+    descuento: "",
+    expiracion: "",
   });
 
   // ====== LOAD CONFIG FROM LS (con MIGRACIÓN de carrusel) ======
@@ -97,6 +111,11 @@ export default function Configuracion() {
           }
           return { url: "", posX: 50, posY: 50, zoom: 100 };
         });
+      }
+
+      // Asegurar cupones como array
+      if (!Array.isArray(migrated.cupones)) {
+        migrated.cupones = [];
       }
 
       setConfigTemp((prev) => ({ ...prev, ...migrated }));
@@ -149,11 +168,11 @@ export default function Configuracion() {
         const w = img.naturalWidth;
         const h = img.naturalHeight;
 
-        // Recomendación de resolución (puedes ajustar el umbral)
+        // Recomendación de resolución (solo advertencia)
         if (w < 1920 || h < 600) {
           alert(
             `⚠ La imagen tiene resolución baja (${w}x${h}). ` +
-              `Se recomienda al menos 1920x600 para evitar que se vea pixelada en el carrusel.`
+              `Se recomienda al menos 1920x600 para evitar que se vea pixelada.`
           );
         }
 
@@ -174,39 +193,8 @@ export default function Configuracion() {
   // ====== SAVE / RESET ======
   const aplicarCambios = () => {
     if (typeof window === "undefined") return;
-
-    let toSave = { ...configTemp };
+    const toSave = { ...configTemp };
     delete toSave.featuredProductIds;
-
-    // --- Limitar tamaño de imágenes en base64 para no reventar localStorage ---
-    const MAX_LEN = 200_000; // ~200KB de texto base64 aprox
-
-    const trimDataUrl = (val) => {
-      if (typeof val !== "string") return val;
-      if (!val.startsWith("data:image")) return val;
-      if (val.length <= MAX_LEN) return val;
-      console.warn("Imagen demasiado grande, se recorta para evitar QuotaExceeded.");
-      // Puedes cambiar "" por null si prefieres
-      return "";
-    };
-
-    // Limpiar logo y fondo si son data URLs gigantes
-    toSave.logo = trimDataUrl(toSave.logo);
-    toSave.fondoImagen = trimDataUrl(toSave.fondoImagen);
-
-    // Limpiar carrusel
-    if (Array.isArray(toSave.carrusel)) {
-      toSave.carrusel = toSave.carrusel.map((item) => {
-        if (!item) return item;
-        if (typeof item === "string") {
-          return trimDataUrl(item);
-        }
-        return {
-          ...item,
-          url: trimDataUrl(item.url || item.src || ""),
-        };
-      });
-    }
 
     try {
       localStorage.setItem("config", JSON.stringify(toSave));
@@ -219,8 +207,8 @@ export default function Configuracion() {
         e.code === 22
       ) {
         alert(
-          "La configuración no se pudo guardar porque las imágenes (logo/fondo/carrusel) son demasiado pesadas.\n\n" +
-            "Prueba usar imágenes más livianas o quitar algunas imágenes del carrusel."
+          "La configuración no se pudo guardar porque las imágenes son demasiado pesadas para el almacenamiento local.\n\n" +
+            "Prueba usar imágenes más livianas o quitar algunas del carrusel."
         );
       } else {
         alert("Ocurrió un error al guardar la configuración.");
@@ -239,45 +227,7 @@ export default function Configuracion() {
       window.location.reload();
     }
   };
-const [cupones, setCupones] = useState([]);
-const [nuevoCupon, setNuevoCupon] = useState({
-  codigo: "",
-  descuento: "",
-  expiracion: ""
-});
-const crearCupon = async () => {
-  if (!nuevoCupon.codigo || !nuevoCupon.descuento || !nuevoCupon.expiracion) {
-    return alert("Completa todos los campos");
-  }
 
-  const res = await fetch("/api/cupones", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(nuevoCupon)
-  });
-
-  const data = await res.json();
-
-  if (res.ok) {
-    setCupones([...cupones, data]);
-    setNuevoCupon({ codigo: "", descuento: "", expiracion: "" });
-  } else {
-    alert(data.error);
-  }
-};
-const eliminarCupon = async (codigo) => {
-  const res = await fetch("/api/cupones/delete", {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ codigo })
-  });
-
-  if (res.ok) {
-    setCupones(cupones.filter(c => c.codigo !== codigo));
-  } else {
-    alert("Error eliminando cupón");
-  }
-};
   // ====== APPLY CSS VARS + BG ======
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -300,11 +250,16 @@ const eliminarCupon = async (codigo) => {
       String(configTemp.colorFondoDestacados)
     );
 
+    // --- NUEVO: Variables del Carrusel ---
+    r.setProperty("--carrusel-fit", configTemp.carruselFit || "cover");
+    r.setProperty("--carrusel-height", configTemp.carruselHeight || "500px");
+    // ------------------------------------
+
     // Fondo body (imagen o color)
     const body = document.body;
     if (configTemp.fondoImagen) {
       body.style.backgroundImage = `url(${configTemp.fondoImagen})`;
-      body.style.backgroundSize = "cover";
+      body.style.backgroundSize = "cover";      // <- la imagen se adapta al viewport
       body.style.backgroundRepeat = "no-repeat";
       body.style.backgroundPosition = "center";
       body.style.backgroundColor = "";
@@ -325,9 +280,11 @@ const eliminarCupon = async (codigo) => {
     configTemp.colorFondoDestacados,
     configTemp.fondoImagen,
     configTemp.colorFondo,
+    configTemp.carruselFit,    // Agregado a dependencias
+    configTemp.carruselHeight, // Agregado a dependencias
   ]);
 
-  // ====== NUEVO: helpers carrusel (lectura segura) ======
+  // ====== helpers carrusel ======
   const carruselArray = Array.isArray(configTemp.carrusel)
     ? configTemp.carrusel
     : [];
@@ -379,7 +336,7 @@ const eliminarCupon = async (codigo) => {
     });
   };
 
-  // ====== NUEVO: UI de selección de destacados (consulta a BD) ======
+  // ====== UI de selección de destacados (consulta a BD) ======
   const [rawProducts, setRawProducts] = useState([]);
   const [loadingProds, setLoadingProds] = useState(false);
   const [errProds, setErrProds] = useState("");
@@ -492,6 +449,51 @@ const eliminarCupon = async (codigo) => {
       ),
     }));
 
+  // ====== Cupones helpers ======
+  const cupones = Array.isArray(configTemp.cupones)
+    ? configTemp.cupones
+    : [];
+
+  const crearCupon = () => {
+    const codigo = nuevoCupon.codigo.trim().toUpperCase();
+    const descuentoNum = Number(nuevoCupon.descuento);
+    const expiracion = nuevoCupon.expiracion;
+
+    if (!codigo || !descuentoNum || !expiracion) {
+      alert("Completa código, descuento y fecha de expiración.");
+      return;
+    }
+
+    if (isNaN(descuentoNum) || descuentoNum <= 0 || descuentoNum > 100) {
+      alert("El descuento debe ser un número entre 1 y 100.");
+      return;
+    }
+
+    setConfigTemp((prev) => {
+      const actuales = Array.isArray(prev.cupones) ? prev.cupones : [];
+      if (actuales.some((c) => c.codigo === codigo)) {
+        alert("Ya existe un cupón con ese código.");
+        return prev;
+      }
+      return {
+        ...prev,
+        cupones: [
+          ...actuales,
+          { codigo, descuento: descuentoNum, expiracion },
+        ],
+      };
+    });
+
+    setNuevoCupon({ codigo: "", descuento: "", expiracion: "" });
+  };
+
+  const eliminarCupon = (codigo) => {
+    setConfigTemp((prev) => ({
+      ...prev,
+      cupones: (prev.cupones || []).filter((c) => c.codigo !== codigo),
+    }));
+  };
+
   return (
     <div className="flex min-h-screen">
       {/* Panel lateral */}
@@ -514,22 +516,16 @@ const eliminarCupon = async (codigo) => {
           ConfigFooter
         </Link>
         <Link
-          href="/usuarios"
-          className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700"
-        >
-          Usuarios
-        </Link>
-        <Link
           href="/pedidos"
           className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700"
         >
           Pedidos
         </Link>
         <Link
-          href="/mapausuarios"
+          href="/report"
           className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700"
         >
-          MapaUsuarios
+          Reportes
         </Link>
         <Link
           href="/"
@@ -707,6 +703,46 @@ const eliminarCupon = async (codigo) => {
             <div>
               <h3 className="font-semibold mb-2">Imágenes del Carrusel</h3>
 
+              {/* --- NUEVOS CONTROLES DE AJUSTE (FIT y HEIGHT) --- */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 p-3 bg-white border rounded">
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Ajuste de imagen (Fit)
+                  </label>
+                  <select
+                    name="carruselFit"
+                    value={configTemp.carruselFit}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded text-sm bg-white"
+                  >
+                    <option value="cover">Cover (Rellenar / Recortar)</option>
+                    <option value="contain">Contain (Imagen completa)</option>
+                    <option value="fill">Fill (Estirar / Deformar)</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    "Contain" muestra la imagen entera sin recortar. "Cover" recorta para llenar.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-1">
+                    Altura del Carrusel
+                  </label>
+                  <input
+                    type="text"
+                    name="carruselHeight"
+                    value={configTemp.carruselHeight}
+                    onChange={handleInputChange}
+                    placeholder="Ej: 500px, 80vh"
+                    className="w-full p-2 border rounded text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Usa píxeles (ej. 600px) o porcentaje de vista (ej. 80vh).
+                  </p>
+                </div>
+              </div>
+              {/* ------------------------------------------------ */}
+
               <div className="flex items-center gap-4 mb-4">
                 <label className="flex items-center gap-2 text-sm">
                   <input
@@ -772,8 +808,10 @@ const eliminarCupon = async (codigo) => {
                         <img
                           src={src}
                           alt={`Carrusel ${idx + 1}`}
-                          className="w-full h-full object-cover transition-transform duration-200"
+                          className="w-full h-full transition-transform duration-200"
                           style={{
+                            // AQUI APLICAMOS LA PREVISUALIZACION DEL FIT
+                            objectFit: configTemp.carruselFit || "cover",
                             objectPosition: `${posX}% ${posY}%`,
                             transform: `scale(${zoom / 100})`,
                           }}
@@ -1112,61 +1150,78 @@ const eliminarCupon = async (codigo) => {
                 </div>
               </div>
             </div>
-            <div className="bg-white p-4 rounded shadow mt-6">
-  <h2 className="text-xl font-bold mb-3">Crear cupón de descuento</h2>
 
-  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-    <input
-      type="text"
-      placeholder="Código del cupón"
-      value={nuevoCupon.codigo}
-      onChange={(e) => setNuevoCupon({ ...nuevoCupon, codigo: e.target.value })}
-      className="border p-2 rounded"
-    />
+            {/* ====== CUPONES DE DESCUENTO ====== */}
+            <div>
+              <h2 className="text-xl font-bold mb-3">Crear cupón de descuento</h2>
 
-    <input
-      type="number"
-      placeholder="Descuento %"
-      value={nuevoCupon.descuento}
-      onChange={(e) => setNuevoCupon({ ...nuevoCupon, descuento: e.target.value })}
-      className="border p-2 rounded"
-    />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input
+                  type="text"
+                  placeholder="Código del cupón"
+                  value={nuevoCupon.codigo}
+                  onChange={(e) =>
+                    setNuevoCupon({ ...nuevoCupon, codigo: e.target.value })
+                  }
+                  className="border p-2 rounded"
+                />
 
-    <input
-      type="date"
-      value={nuevoCupon.expiracion}
-      onChange={(e) => setNuevoCupon({ ...nuevoCupon, expiracion: e.target.value })}
-      className="border p-2 rounded"
-    />
-  </div>
+                <input
+                  type="number"
+                  placeholder="Descuento %"
+                  value={nuevoCupon.descuento}
+                  onChange={(e) =>
+                    setNuevoCupon({ ...nuevoCupon, descuento: e.target.value })
+                  }
+                  className="border p-2 rounded"
+                />
 
-  <button
-    onClick={crearCupon}
-    className="mt-3 bg-purple-600 text-white px-3 py-2 rounded"
-  >
-    Crear cupón
-  </button>
+                <input
+                  type="date"
+                  value={nuevoCupon.expiracion}
+                  onChange={(e) =>
+                    setNuevoCupon({
+                      ...nuevoCupon,
+                      expiracion: e.target.value,
+                    })
+                  }
+                  className="border p-2 rounded"
+                />
+              </div>
 
-  <hr className="my-4" />
+              <button
+                onClick={crearCupon}
+                className="mt-3 bg-purple-600 text-white px-3 py-2 rounded"
+              >
+                Crear cupón
+              </button>
 
-  <h3 className="font-semibold mb-2">Cupones creados</h3>
-  <ul>
-    {cupones.map(c => (
-      <li key={c.codigo} className="flex justify-between py-1">
-        <span>
-          <strong>{c.codigo}</strong> — {c.descuento}% (expira {c.expiracion})
-        </span>
+              <hr className="my-4" />
 
-        <button
-          className="text-red-500"
-          onClick={() => eliminarCupon(c.codigo)}
-        >
-          Eliminar
-        </button>
-      </li>
-    ))}
-  </ul>
-</div>
+              <h3 className="font-semibold mb-2">Cupones creados</h3>
+              <ul>
+                {cupones.length === 0 && (
+                  <li className="text-sm text-gray-500">
+                    Aún no hay cupones creados.
+                  </li>
+                )}
+                {cupones.map((c) => (
+                  <li key={c.codigo} className="flex justify-between py-1">
+                    <span>
+                      <strong>{c.codigo}</strong> — {c.descuento}% (expira{" "}
+                      {c.expiracion})
+                    </span>
+
+                    <button
+                      className="text-red-500"
+                      onClick={() => eliminarCupon(c.codigo)}
+                    >
+                      Eliminar
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             {/* Acciones */}
             <div className="flex gap-3">
