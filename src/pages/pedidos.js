@@ -138,25 +138,51 @@ export default function Pedidos() {
     }
   };
 
+  // --- RENDERIZADO COMPLETO CON LAYOUT DE ADMIN ---
   return (
-    <div className="flex min-h-screen font-sans">
-      {/* Panel lateral */}
-      <div className="w-60 bg-gray-800 text-white flex flex-col p-4 gap-2 shrink-0">
-        <h1 className="text-xl font-bold mb-4 text-center">Admin Panel</h1>
+    <div className="flex min-h-screen font-sans bg-gray-50">
+      
+      {/* 1. SIDEBAR (PANEL LATERAL) - Idéntico a admin.js pero con rutas activas ajustadas */}
+      <aside className="w-64 bg-gray-900 text-white flex flex-col shadow-xl">
+        <div className="p-6 border-b border-gray-800">
+             <h1 className="text-2xl font-bold tracking-wider text-center text-blue-400">ADMIN PANEL</h1>
+        </div>
         
-        <Link href="/admin" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">Productos</Link>
-        <Link href="/config" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">Configuración</Link>
-        <Link href="/configfooter" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">ConfigFooter</Link>
-        <Link href="/usuarios" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">Usuarios</Link>
+        <nav className="flex-1 p-4 space-y-2">
+          {/* Enlace a Admin principal */}
+          <Link href="/admin" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            📦 Productos
+          </Link>
+         <Link href="/config" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            ⚙️ Configuración
+          </Link>
+
         
-        {/* Botón Activo */}
-        <button className="py-2 border-b border-gray-700 w-full text-center bg-gray-700 cursor-default font-bold border-l-4 border-l-purple-500">
-          Pedidos
-        </button>
-        
-        <Link href="/mapausuarios" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">MapaUsuarios</Link>
-        <Link href="/" className="mt-auto py-2 px-4 bg-gray-600 rounded text-center hover:bg-gray-500">Volver al inicio</Link>
-      </div>  
+          <Link href="/sucursalConfig" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            🏪 Sucursales
+          </Link>
+          
+          <Link href="/usuarios" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            👥 Usuarios
+          </Link>
+          <button className="w-full text-left py-3 px-4 rounded bg-blue-600 text-white shadow-lg transition duration-200 flex items-center gap-3">
+          <Link href="/pedidos" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            🛒 Pedidos
+            
+          </Link>
+          </button>
+          <Link href="/mapausuarios" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            🗺️ Mapa Usuarios
+          </Link>
+          
+        </nav>
+
+        <div className="p-4 border-t border-gray-800">
+            <Link href="/" className="block py-2 px-4 bg-gray-800 text-center rounded text-gray-300 hover:bg-gray-700 hover:text-white transition text-sm">
+             ← Volver a la Tienda
+            </Link>
+        </div>
+      </aside>
 
       {/* Contenido Principal */}
       <div className="flex-1 flex flex-col min-w-0">

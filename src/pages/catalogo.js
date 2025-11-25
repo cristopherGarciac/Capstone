@@ -208,72 +208,77 @@ const { user, setUser } = useContext(UserContext);
         }
       `}</style>
 
-      {/* Navbar */}
+      <main className="min-h-screen">
+
+      
+
+      {/* NAVBAR (IGUAL A TU AMIGO, CON LOGIN TUYO) */}
       <nav
         className="shadow sticky top-0 z-50"
         style={{ backgroundColor: colorHeader }}
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-          <Link
-            className="logo text-2xl font-bold text-[var(--color-primary)]"
-            href="/"
-          >
-            <img src={logo} alt="Blitz Hardware Logo" className="h-20 w-auto" />
+
+          {/* LOGO */}
+          <Link href="/" className="logo text-2xl font-bold">
+            <img src={logo} alt="logo" className="h-20 w-auto" />
           </Link>
 
+          {/* LINKS */}
           <div className="flex items-center space-x-6">
             <span className="text-2xl font-semibold">{nombrePagina}</span>
-            <Link
-              href="/"
-              className="text-gray-700 hover:text-[var(--color-accent)]"
-            >
+
+            <Link href="/" className="text-gray-700 hover:text-[var(--color-primary)]">
               Inicio
             </Link>
-            <Link
-              href="/catalogo"
-              className="text-gray-700 hover:text-[var(--color-accent)]"
-            >
+
+            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-primary)]">
               Catálogo
             </Link>
-            <Link
-              href="/carrito"
-              className="text-gray-700 hover:text-[var(--color-accent)]"
-            >
-              <img
-                src="/images/carrito.png"
-                alt="Carrito Compra Logo"
-                className="h-11 w-auto"
-              />
-            </Link>
-            <Link
-              href="/admin"
-              className="text-gray-700 hover:text-[var(--color-accent)]"
-            >
-              Admin
+
+            <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-primary)]">
+              <img src="/images/carrito.png" className="h-11" />
             </Link>
 
+            {/* SOLO ADMIN VE EL BOTÓN */}
+{user?.rol === "admin" && (
+  <Link
+    href="/admin"
+    className="text-gray-700 hover:text-[var(--color-primary)] font-semibold"
+  >
+    Admin
+  </Link>
+)}
+
+
             {user ? (
-              <span className="text-gray-700 flex items-center">
-                Hola, {user.nombre}
-              </span>
-            ) : (
+  <div className="flex items-center space-x-4">
+
+
+<Link href="/mi_cuenta" className="text-gray-700 hover:text-[var(--color-primary)]">
+  Hola, {user.nombre}
+</Link>
+
+    {/* Ver mi cuenta */}
+    <Link href="/mi_cuenta" className="flex items-center">
+      <img
+        src={user.fotoperfil || "/images/default-user.jpg"}
+        alt="perfil"
+        className="h-10 w-10 rounded-full object-cover border border-gray-300 cursor-pointer hover:opacity-90"
+      />
+    </Link>
+
+
+  </div>
+) : (
+
               <button
                 onClick={() => setLoginOpen(true)}
                 className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z"
-                  />
+                <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z" />
                 </svg>
                 Iniciar sesión
               </button>
@@ -282,12 +287,9 @@ const { user, setUser } = useContext(UserContext);
         </div>
       </nav>
 
-      {/* Modal de login */}
+      {/* LOGIN MODAL — TU LOGIN */}
       {loginOpen && (
-        <div
-          className="fixed inset-0 bg-black flex justify-center items-start pt-24 z-50"
-          style={{ backgroundColor: "rgba(0,0,0,0.3)" }}
-        >
+        <div className="fixed inset-0 bg-black/40 flex justify-center items-start pt-24 z-50">
           <div className="bg-white rounded-xl shadow-lg w-96 p-6 relative">
             <button
               onClick={() => setLoginOpen(false)}
@@ -295,11 +297,12 @@ const { user, setUser } = useContext(UserContext);
             >
               ✕
             </button>
+
             <h2 className="text-2xl font-bold text-[var(--color-secondary)] mb-4 text-center">
               Iniciar Sesión
             </h2>
 
-            <form className="flex flex-col gap-4" onSubmit={handleLogin}>
+            <form onSubmit={handleLogin} className="flex flex-col gap-4">
               <input
                 type="email"
                 name="email"
@@ -309,6 +312,7 @@ const { user, setUser } = useContext(UserContext);
                 className="border p-2 rounded"
                 required
               />
+
               <input
                 type="password"
                 name="password"
@@ -318,7 +322,8 @@ const { user, setUser } = useContext(UserContext);
                 className="border p-2 rounded"
                 required
               />
-              <button type="submit" className="btn-primary w-full py-2 rounded">
+
+              <button type="submit" className="btn-primary w-full">
                 Iniciar Sesión
               </button>
             </form>
@@ -326,18 +331,6 @@ const { user, setUser } = useContext(UserContext);
             {loginError && (
               <p className="text-red-500 text-sm mt-2 text-center">{loginError}</p>
             )}
-
-            <div className="flex flex-col items-center text-sm mt-4 gap-2">
-              <button className="text-blue-600 hover:underline">
-                Olvidé mi contraseña
-              </button>
-              <span>
-                ¿No estás registrado?{" "}
-                <Link href="/register" className="text-blue-600 hover:underline">
-                  Regístrate
-                </Link>
-              </span>
-            </div>
           </div>
         </div>
       )}
@@ -528,6 +521,8 @@ const { user, setUser } = useContext(UserContext);
           © 2025–2025 | Desarrollado por Cristopher Garcia, Jesus Lagos e Ignacio Varas, Proyecto Capstone
         </div>
       </footer>
+      </main>
     </div>
+    
   );
 }

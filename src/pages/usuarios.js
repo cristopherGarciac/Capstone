@@ -76,26 +76,71 @@ export default function Usuarios() {
     return new Date(fecha).toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
   };
 
+  // --- RENDERIZADO COMPLETO CON LAYOUT DE ADMIN ---
   return (
-    <div className="flex min-h-screen">
-      {/* Panel lateral */}
-      <div className="w-60 bg-gray-800 text-white flex flex-col p-4 gap-2">
-        <h1 className="text-xl font-bold mb-4 text-center">Admin Panel</h1>
-        <Link href="/admin" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">Productos</Link>
-        <Link href="/config" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">Configuración</Link>
-        <button className="py-2 border-b border-gray-700 w-full text-center bg-gray-700 cursor-default">Usuarios</button>
-        <Link href="/pedidos" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">Pedidos</Link>
-        <Link href="/mapausuarios" className="py-2 border-b border-gray-700 w-full text-center hover:bg-gray-700">MapaUsuarios</Link>
-        <Link href="/" className="mt-auto py-2 px-4 bg-gray-600 rounded text-center hover:bg-gray-500">Volver al inicio</Link>
-      </div>  
+    <div className="flex min-h-screen font-sans bg-gray-50">
+      
+      {/* 1. SIDEBAR (PANEL LATERAL) - Idéntico a admin.js pero con rutas activas ajustadas */}
+      <aside className="w-64 bg-gray-900 text-white flex flex-col shadow-xl">
+        <div className="p-6 border-b border-gray-800">
+             <h1 className="text-2xl font-bold tracking-wider text-center text-blue-400">ADMIN PANEL</h1>
+        </div>
+        
+        <nav className="flex-1 p-4 space-y-2">
+          {/* Enlace a Admin principal */}
+          <Link href="/admin" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            📦 Productos
+          </Link>
+         <Link href="/config" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            ⚙️ Configuración
+          </Link>
+          <Link href="/configfooter" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            ⚙️ ConfigFooter
+          </Link>
+          <Link href="/sucursalConfig" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            🏪 Sucursales
+          </Link>
+          {/* Botón Activo Actual */}
+          <button className="w-full text-left py-3 px-4 rounded bg-blue-600 text-white shadow-lg transition duration-200 flex items-center gap-3">
+            👥 Usuarios
+          </button>
+          
+          <Link href="/pedidos" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            🛒 Pedidos
+          </Link>
 
-      {/* Contenido */}
-      <div className="flex-1 flex flex-col">
-        <header className="flex items-center justify-between bg-gray-100 border-b p-4 shadow-sm">
-          <h2 className="text-xl font-bold">Usuarios</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-gray-700 font-medium">{admin.nombre}</span>
-            <img src={admin.avatar} alt="Avatar" className="w-10 h-10 rounded-full border border-gray-300 object-cover" />
+          <Link href="/mapausuarios" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
+            🗺️ Mapa Usuarios
+          </Link>
+          
+        </nav>
+
+        <div className="p-4 border-t border-gray-800">
+            <Link href="/" className="block py-2 px-4 bg-gray-800 text-center rounded text-gray-300 hover:bg-gray-700 hover:text-white transition text-sm">
+             ← Volver a la Tienda
+            </Link>
+        </div>
+      </aside>
+
+      {/* 2. CONTENIDO PRINCIPAL */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        
+        {/* HEADER (BARRA SUPERIOR) */}
+        <header className="flex items-center justify-between bg-white border-b px-8 py-4 shadow-sm">
+          <h2 className="text-2xl font-bold text-gray-800 capitalize">
+            Gestión de usuarios
+          </h2>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+                <p className="text-sm font-bold text-gray-800">{admin.nombre}</p>
+                
+            </div>
+            <img
+              src={admin.avatar}
+              alt="Avatar Admin"
+              className="w-12 h-12 rounded-full border-2 border-blue-100 object-cover p-0.5 shadow-sm"
+            />
           </div>
         </header>
 
