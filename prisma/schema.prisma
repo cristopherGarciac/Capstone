@@ -68,7 +68,7 @@ model pedidos {
   usuario_id         String?        @db.Uuid
   total              Decimal?       @db.Decimal
   estado             String?        @default("creado")
-  fecha              DateTime       @unique @db.Date
+  fecha              DateTime       @default(now()) @db.Timestamptz(6)
   direccion_envio_id String?        @db.Uuid
   Retiro_tienda      String
   trackingnumber     String?        @unique @db.VarChar(50)
