@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model usuarios {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email       String        @unique
+  nombre      String?
+  hash_pwd    String
+  telefono    String?
+  creado_en   DateTime?     @default(now()) @db.Timestamptz(6)
+  apellido    String?
+  rut         String?
+  themecuenta String?       @default("claro")
+  fotoperfil  String?
+  direcciones direcciones[]
+  pedidos     pedidos[]
+  rol         String?
+}
+
+model direcciones {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id String?   @db.Uuid
+  comuna     String?
+  region     String?
+  calle      String?
+  numero     String?
+  creado_en  DateTime? @default(now()) @db.Timestamptz(6)
+  lat        Float?
+  lng        Float?
+  usuario    usuarios? @relation(fields: [usuario_id], references: [id])
+  pedidos    pedidos[]
+}
+
+model pagos {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pedido_id        String?  @db.Uuid
+  proveedor        String?
+  status           String?
+  monto            Decimal? @db.Decimal
+  moneda           String?
+  tx_id            String?
+  comprobante_json Json?
+  pedidos          pedidos? @relation(fields: [pedido_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pedido_items {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  pedido_id   String?    @db.Uuid
+  producto_id String?    @db.Uuid
+  cantidad    Int
+  precio_unit Decimal    @db.Decimal
+  pedidos     pedidos?   @relation(fields: [pedido_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  productos   productos? @relation(fields: [producto_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pedidos {
+  id                 String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  usuario_id         String?        @db.Uuid
+  total              Decimal?       @db.Decimal
+  estado             String?        @default("creado")
+  fecha              DateTime       @unique @db.Date
+  direccion_envio_id String?        @db.Uuid
+  Retiro_tienda      String
+  trackingnumber     String?        @unique @db.VarChar(50)
+  pagos              pagos[]
+  pedido_items       pedido_items[]
+  direcciones        direcciones?   @relation(fields: [direccion_envio_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios           usuarios?      @relation(fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model productos {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sku          String         @unique
+  titulo       String
+  descripcion  String?
+  precio       Decimal        @db.Decimal
+  stock        Int?           @default(0)
+  categoria    String?
+  imagenes     String[]
+  creado_en    DateTime?      @default(now()) @db.Timestamptz(6)
+  pedido_items pedido_items[]
+}
+
+model regiones {
+  id      Int       @id @default(autoincrement())
+  nombre  String    @unique
+  comunas comunas[]
+}
+
+model comunas {
+  id        Int    @id @default(autoincrement())
+  nombre    String
+  region_id Int
+
+  region regiones @relation(fields: [region_id], references: [id])
+}
+
+model cupones {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  codigo     String    @unique
+  descuento  Int
+  activo     Boolean?  @default(true)
+  creado_en  DateTime? @default(now()) @db.Timestamptz(6)
+  expiracion DateTime? @db.Date
+}
