@@ -130,7 +130,8 @@ exports.Prisma.UsuariosScalarFieldEnum = {
   apellido: 'apellido',
   rut: 'rut',
   themecuenta: 'themecuenta',
-  fotoperfil: 'fotoperfil'
+  fotoperfil: 'fotoperfil',
+  rol: 'rol'
 };
 
 exports.Prisma.DireccionesScalarFieldEnum = {

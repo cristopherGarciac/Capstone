@@ -27,38 +27,83 @@ export default async function handler(req, res) {
       },
     });
 
-    // Parsear detalle JSON
     const productos = typeof detalle === "string" ? JSON.parse(detalle) : detalle;
+    const fecha = new Date().toLocaleString("es-CL", {
+      dateStyle: "long",
+      timeStyle: "short",
+    });
 
-    // Crear PDF
+    // ====== PDF GENERACIÓN ======
     const pdfStream = new PassThrough();
     const doc = new PDFDocument({ margin: 50, size: "A4" });
     doc.pipe(pdfStream);
 
-    doc.fontSize(20).text("Blitz Hardware", { align: "center" });
+    // ====== ENCABEZADO ======
+    doc
+      .fontSize(26)
+      .text("⚡ Blitz Hardware ⚡", { align: "center", underline: false });
+
     doc.moveDown();
-    doc.fontSize(16).text("Boleta de compra", { align: "center" });
-    doc.moveDown();
-    doc.fontSize(12).text(`Cliente: ${email}`);
-    doc.text(`Fecha: ${new Date().toLocaleString()}`);
+    doc.fontSize(18).text("Boleta de compra", { align: "center" });
     doc.moveDown();
 
-    doc.text("Detalle de la compra:");
-    doc.moveDown();
+    doc
+      .fontSize(12)
+      .text(`Cliente: ${email}`)
+      .text(`Fecha: ${fecha}`)
+      .moveDown();
 
-    // Tabla de productos
-    productos.forEach((item, i) => {
-      doc.text(
-        `${i + 1}. ${item.titulo} x${item.qty} - $${item.precio * item.qty}`
-      );
+    // Línea divisoria
+    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+
+    doc.moveDown();
+    doc.fontSize(14).text("Detalle de la compra", { underline: true });
+    doc.moveDown(0.7);
+
+    // ====== TABLA ======
+    const col1 = 50; // Producto
+    const col2 = 300; // Cantidad
+    const col3 = 450; // Subtotal
+
+    doc.fontSize(12).font("Helvetica-Bold");
+    doc.text("Producto", col1, doc.y);
+    doc.text("Cant.", col2, doc.y);
+    doc.text("Subtotal", col3, doc.y);
+
+    doc.moveDown(0.5);
+    doc.font("Helvetica");
+
+    productos.forEach((item) => {
+      const subtotal = item.qty * item.precio;
+
+      doc.text(item.titulo, col1, doc.y);
+      doc.text(String(item.qty), col2, doc.y);
+      doc.text(`$${subtotal.toLocaleString("es-CL")}`, col3, doc.y);
+
+      doc.moveDown(0.5);
     });
 
     doc.moveDown();
-    doc.fontSize(14).text(`Total pagado: $${total}`, { align: "right" });
+    doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+
+    // ====== TOTAL ======
+    doc.moveDown();
+    doc
+      .fontSize(16)
+      .font("Helvetica-Bold")
+      .text(`Total pagado: $${total.toLocaleString("es-CL")}`, {
+        align: "right",
+      });
+
+    // ====== PIE DE PÁGINA ======
+    doc.moveDown(3);
+    doc.fontSize(10).font("Helvetica-Oblique");
+    doc.text("Gracias por comprar en Blitz Hardware.", { align: "center" });
+    doc.text("© 2025 - Sistema de Ventas Blitz Hardware", { align: "center" });
 
     doc.end();
 
-    // Enviar correo con PDF
+    // ====== ENVÍO DEL EMAIL ======
     const mailOptions = {
       from: `"Blitz Hardware" <${process.env.EMAIL_USER}>`,
       to: email,

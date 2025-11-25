@@ -274,36 +274,38 @@ export default function Home() {
               <img src="/images/carrito.png" className="h-11" />
             </Link>
 
-            <Link href="/admin" className="text-gray-700 hover:text-[var(--color-primary)]">
-              Admin
-            </Link>
+            {/* SOLO ADMIN VE EL BOTÓN */}
+{user?.rol === "admin" && (
+  <Link
+    href="/admin"
+    className="text-gray-700 hover:text-[var(--color-primary)] font-semibold"
+  >
+    Admin
+  </Link>
+)}
+
 
             {user ? (
-              <div className="flex items-center space-x-3">
-                <Link
-                  href="/mi_cuenta"
-                  className="text-gray-700 hover:text-[var(--color-primary)]"
-                >
-                  Hola, {user.nombre}
-                </Link>
+  <div className="flex items-center space-x-4">
 
-                <button
-                  onClick={logout}
-                  className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
-                >
-                  <svg
-                    className="h-5 w-5 mr-1"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
-                  </svg>
-                  Cerrar sesión
-                </button>
-              </div>
-            ) : (
+
+<Link href="/mi_cuenta" className="text-gray-700 hover:text-[var(--color-primary)]">
+  Hola, {user.nombre}
+</Link>
+
+    {/* Ver mi cuenta */}
+    <Link href="/mi_cuenta" className="flex items-center">
+      <img
+        src={user.fotoperfil || "/images/default-user.jpg"}
+        alt="perfil"
+        className="h-10 w-10 rounded-full object-cover border border-gray-300 cursor-pointer hover:opacity-90"
+      />
+    </Link>
+
+
+  </div>
+) : (
+
               <button
                 onClick={() => setLoginOpen(true)}
                 className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
@@ -494,7 +496,7 @@ export default function Home() {
             </h4>
             <ul className="space-y-2">
               <li>
-                <a href="https://www.instagram.com/blitz.hardware" target="_blank">
+                <a href="https://www.instagram.com/tu.eccomerce.personalizable" target="_blank">
                   Instagram
                 </a>
               </li>

@@ -1,4 +1,4 @@
-import prisma from "../../../../lib/prisma";
+import prisma from "../../../../lib/prisma"; 
 import bcrypt from 'bcryptjs';
 
 export default async function handler(req, res) {
@@ -13,10 +13,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Buscar usuario incluyendo direcciones
+    // Buscar usuario con su última dirección
     const user = await prisma.usuarios.findUnique({
       where: { email },
-      include: { direcciones: true },
+      include: {
+        direcciones: {
+          orderBy: { creado_en: "desc" }, // <-- dirección más reciente
+          take: 1
+        }
+      }
     });
 
     if (!user) {
@@ -29,27 +34,28 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Contraseña incorrecta' });
     }
 
-    // Sacar primera dirección (si existe)
-    const direccion = user.direcciones.length > 0 ? user.direcciones[0] : null;
+    // Dirección reciente
+    const direccion = user.direcciones[0] || null;
 
-    // RESPUESTA COMPLETA
+    // RESPUESTA
     return res.status(200).json({
-  id: user.id,
-  email: user.email,
-  nombre: user.nombre,
-  apellido: user.apellido,
-  rut: user.rut,
-  telefono: user.telefono,
-  foto: user.fotoperfil || null,      // 👈 AÑADE ESTO
-  direccion: direccion ? {
-    region: direccion.region,
-    comuna: direccion.comuna,
-    calle: direccion.calle,
-    numero: direccion.numero,
-  } : null,
-  mensaje: 'Inicio de sesión exitoso',
-});
-
+      id: user.id,
+      email: user.email,
+      nombre: user.nombre,
+      apellido: user.apellido,
+      rut: user.rut,
+      telefono: user.telefono,
+      fotoperfil: user.fotoperfil || null,
+      themecuenta: user.themecuenta,
+      rol: user.rol,
+      direccion: direccion ? {
+        region: direccion.region,
+        comuna: direccion.comuna,
+        calle: direccion.calle,
+        numero: direccion.numero,
+      } : null,
+      mensaje: 'Inicio de sesión exitoso',
+    });
 
   } catch (error) {
     console.error('Error en login:', error);

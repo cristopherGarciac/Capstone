@@ -8,20 +8,20 @@ export default async function handler(req, res) {
   const { id, theme } = req.body;
 
   if (!id || !theme) {
-    return res.status(400).json({ error: "Faltan datos" });
+    return res.status(400).json({ error: "Datos incompletos" });
   }
 
   try {
     const updated = await prisma.usuarios.update({
       where: { id },
-      data: { themeCuenta: theme },
-      select: { id: true, themeCuenta: true }
+      data: { themecuenta: theme },
+      select: { id: true, themecuenta: true },
     });
 
     return res.status(200).json(updated);
 
   } catch (err) {
-    console.log("Error actualizando tema:", err);
+    console.error("Error al guardar tema:", err);
     return res.status(500).json({ error: "Error interno" });
   }
 }

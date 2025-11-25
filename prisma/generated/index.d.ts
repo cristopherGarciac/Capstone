@@ -1722,6 +1722,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type RegionesCountOutputType
+   */
+
+  export type RegionesCountOutputType = {
+    comunas: number
+  }
+
+  export type RegionesCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    comunas?: boolean | RegionesCountOutputTypeCountComunasArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * RegionesCountOutputType without action
+   */
+  export type RegionesCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the RegionesCountOutputType
+     */
+    select?: RegionesCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * RegionesCountOutputType without action
+   */
+  export type RegionesCountOutputTypeCountComunasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: comunasWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -1746,6 +1777,7 @@ export namespace Prisma {
     rut: string | null
     themecuenta: string | null
     fotoperfil: string | null
+    rol: string | null
   }
 
   export type UsuariosMaxAggregateOutputType = {
@@ -1759,6 +1791,7 @@ export namespace Prisma {
     rut: string | null
     themecuenta: string | null
     fotoperfil: string | null
+    rol: string | null
   }
 
   export type UsuariosCountAggregateOutputType = {
@@ -1772,6 +1805,7 @@ export namespace Prisma {
     rut: number
     themecuenta: number
     fotoperfil: number
+    rol: number
     _all: number
   }
 
@@ -1787,6 +1821,7 @@ export namespace Prisma {
     rut?: true
     themecuenta?: true
     fotoperfil?: true
+    rol?: true
   }
 
   export type UsuariosMaxAggregateInputType = {
@@ -1800,6 +1835,7 @@ export namespace Prisma {
     rut?: true
     themecuenta?: true
     fotoperfil?: true
+    rol?: true
   }
 
   export type UsuariosCountAggregateInputType = {
@@ -1813,6 +1849,7 @@ export namespace Prisma {
     rut?: true
     themecuenta?: true
     fotoperfil?: true
+    rol?: true
     _all?: true
   }
 
@@ -1899,6 +1936,7 @@ export namespace Prisma {
     rut: string | null
     themecuenta: string | null
     fotoperfil: string | null
+    rol: string | null
     _count: UsuariosCountAggregateOutputType | null
     _min: UsuariosMinAggregateOutputType | null
     _max: UsuariosMaxAggregateOutputType | null
@@ -1929,6 +1967,7 @@ export namespace Prisma {
     rut?: boolean
     themecuenta?: boolean
     fotoperfil?: boolean
+    rol?: boolean
     direcciones?: boolean | usuarios$direccionesArgs<ExtArgs>
     pedidos?: boolean | usuarios$pedidosArgs<ExtArgs>
     _count?: boolean | UsuariosCountOutputTypeDefaultArgs<ExtArgs>
@@ -1945,6 +1984,7 @@ export namespace Prisma {
     rut?: boolean
     themecuenta?: boolean
     fotoperfil?: boolean
+    rol?: boolean
   }, ExtArgs["result"]["usuarios"]>
 
   export type usuariosSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1958,6 +1998,7 @@ export namespace Prisma {
     rut?: boolean
     themecuenta?: boolean
     fotoperfil?: boolean
+    rol?: boolean
   }, ExtArgs["result"]["usuarios"]>
 
   export type usuariosSelectScalar = {
@@ -1971,9 +2012,10 @@ export namespace Prisma {
     rut?: boolean
     themecuenta?: boolean
     fotoperfil?: boolean
+    rol?: boolean
   }
 
-  export type usuariosOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "nombre" | "hash_pwd" | "telefono" | "creado_en" | "apellido" | "rut" | "themecuenta" | "fotoperfil", ExtArgs["result"]["usuarios"]>
+  export type usuariosOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "nombre" | "hash_pwd" | "telefono" | "creado_en" | "apellido" | "rut" | "themecuenta" | "fotoperfil" | "rol", ExtArgs["result"]["usuarios"]>
   export type usuariosInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     direcciones?: boolean | usuarios$direccionesArgs<ExtArgs>
     pedidos?: boolean | usuarios$pedidosArgs<ExtArgs>
@@ -1999,6 +2041,7 @@ export namespace Prisma {
       rut: string | null
       themecuenta: string | null
       fotoperfil: string | null
+      rol: string | null
     }, ExtArgs["result"]["usuarios"]>
     composites: {}
   }
@@ -2434,6 +2477,7 @@ export namespace Prisma {
     readonly rut: FieldRef<"usuarios", 'String'>
     readonly themecuenta: FieldRef<"usuarios", 'String'>
     readonly fotoperfil: FieldRef<"usuarios", 'String'>
+    readonly rol: FieldRef<"usuarios", 'String'>
   }
     
 
@@ -8938,6 +8982,8 @@ export namespace Prisma {
   export type regionesSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     nombre?: boolean
+    comunas?: boolean | regiones$comunasArgs<ExtArgs>
+    _count?: boolean | RegionesCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["regiones"]>
 
   export type regionesSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -8956,10 +9002,18 @@ export namespace Prisma {
   }
 
   export type regionesOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre", ExtArgs["result"]["regiones"]>
+  export type regionesInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    comunas?: boolean | regiones$comunasArgs<ExtArgs>
+    _count?: boolean | RegionesCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type regionesIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type regionesIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $regionesPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "regiones"
-    objects: {}
+    objects: {
+      comunas: Prisma.$comunasPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       nombre: string
@@ -9357,6 +9411,7 @@ export namespace Prisma {
    */
   export interface Prisma__regionesClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    comunas<T extends regiones$comunasArgs<ExtArgs> = {}>(args?: Subset<T, regiones$comunasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$comunasPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9405,6 +9460,10 @@ export namespace Prisma {
      */
     omit?: regionesOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
+    /**
      * Filter, which regiones to fetch.
      */
     where: regionesWhereUniqueInput
@@ -9423,6 +9482,10 @@ export namespace Prisma {
      */
     omit?: regionesOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
+    /**
      * Filter, which regiones to fetch.
      */
     where: regionesWhereUniqueInput
@@ -9440,6 +9503,10 @@ export namespace Prisma {
      * Omit specific fields from the regiones
      */
     omit?: regionesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
     /**
      * Filter, which regiones to fetch.
      */
@@ -9489,6 +9556,10 @@ export namespace Prisma {
      */
     omit?: regionesOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
+    /**
      * Filter, which regiones to fetch.
      */
     where?: regionesWhereInput
@@ -9537,6 +9608,10 @@ export namespace Prisma {
      */
     omit?: regionesOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
+    /**
      * Filter, which regiones to fetch.
      */
     where?: regionesWhereInput
@@ -9579,6 +9654,10 @@ export namespace Prisma {
      * Omit specific fields from the regiones
      */
     omit?: regionesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
     /**
      * The data needed to create a regiones.
      */
@@ -9627,6 +9706,10 @@ export namespace Prisma {
      * Omit specific fields from the regiones
      */
     omit?: regionesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
     /**
      * The data needed to update a regiones.
      */
@@ -9694,6 +9777,10 @@ export namespace Prisma {
      */
     omit?: regionesOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
+    /**
      * The filter to search for the regiones to update in case it exists.
      */
     where: regionesWhereUniqueInput
@@ -9720,6 +9807,10 @@ export namespace Prisma {
      */
     omit?: regionesOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
+    /**
      * Filter which regiones to delete.
      */
     where: regionesWhereUniqueInput
@@ -9740,6 +9831,30 @@ export namespace Prisma {
   }
 
   /**
+   * regiones.comunas
+   */
+  export type regiones$comunasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the comunas
+     */
+    select?: comunasSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the comunas
+     */
+    omit?: comunasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
+    where?: comunasWhereInput
+    orderBy?: comunasOrderByWithRelationInput | comunasOrderByWithRelationInput[]
+    cursor?: comunasWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ComunasScalarFieldEnum | ComunasScalarFieldEnum[]
+  }
+
+  /**
    * regiones without action
    */
   export type regionesDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9751,6 +9866,10 @@ export namespace Prisma {
      * Omit specific fields from the regiones
      */
     omit?: regionesOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: regionesInclude<ExtArgs> | null
   }
 
 
@@ -9914,7 +10033,7 @@ export namespace Prisma {
   export type ComunasGroupByOutputType = {
     id: number
     nombre: string
-    region_id: number | null
+    region_id: number
     _count: ComunasCountAggregateOutputType | null
     _avg: ComunasAvgAggregateOutputType | null
     _sum: ComunasSumAggregateOutputType | null
@@ -9940,18 +10059,21 @@ export namespace Prisma {
     id?: boolean
     nombre?: boolean
     region_id?: boolean
+    region?: boolean | regionesDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["comunas"]>
 
   export type comunasSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     nombre?: boolean
     region_id?: boolean
+    region?: boolean | regionesDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["comunas"]>
 
   export type comunasSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     nombre?: boolean
     region_id?: boolean
+    region?: boolean | regionesDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["comunas"]>
 
   export type comunasSelectScalar = {
@@ -9961,14 +10083,25 @@ export namespace Prisma {
   }
 
   export type comunasOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "nombre" | "region_id", ExtArgs["result"]["comunas"]>
+  export type comunasInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    region?: boolean | regionesDefaultArgs<ExtArgs>
+  }
+  export type comunasIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    region?: boolean | regionesDefaultArgs<ExtArgs>
+  }
+  export type comunasIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    region?: boolean | regionesDefaultArgs<ExtArgs>
+  }
 
   export type $comunasPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "comunas"
-    objects: {}
+    objects: {
+      region: Prisma.$regionesPayload<ExtArgs>
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       nombre: string
-      region_id: number | null
+      region_id: number
     }, ExtArgs["result"]["comunas"]>
     composites: {}
   }
@@ -10363,6 +10496,7 @@ export namespace Prisma {
    */
   export interface Prisma__comunasClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    region<T extends regionesDefaultArgs<ExtArgs> = {}>(args?: Subset<T, regionesDefaultArgs<ExtArgs>>): Prisma__regionesClient<$Result.GetResult<Prisma.$regionesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -10412,6 +10546,10 @@ export namespace Prisma {
      */
     omit?: comunasOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
+    /**
      * Filter, which comunas to fetch.
      */
     where: comunasWhereUniqueInput
@@ -10430,6 +10568,10 @@ export namespace Prisma {
      */
     omit?: comunasOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
+    /**
      * Filter, which comunas to fetch.
      */
     where: comunasWhereUniqueInput
@@ -10447,6 +10589,10 @@ export namespace Prisma {
      * Omit specific fields from the comunas
      */
     omit?: comunasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
     /**
      * Filter, which comunas to fetch.
      */
@@ -10496,6 +10642,10 @@ export namespace Prisma {
      */
     omit?: comunasOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
+    /**
      * Filter, which comunas to fetch.
      */
     where?: comunasWhereInput
@@ -10544,6 +10694,10 @@ export namespace Prisma {
      */
     omit?: comunasOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
+    /**
      * Filter, which comunas to fetch.
      */
     where?: comunasWhereInput
@@ -10587,6 +10741,10 @@ export namespace Prisma {
      */
     omit?: comunasOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
+    /**
      * The data needed to create a comunas.
      */
     data: XOR<comunasCreateInput, comunasUncheckedCreateInput>
@@ -10620,6 +10778,10 @@ export namespace Prisma {
      */
     data: comunasCreateManyInput | comunasCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -10634,6 +10796,10 @@ export namespace Prisma {
      * Omit specific fields from the comunas
      */
     omit?: comunasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
     /**
      * The data needed to update a comunas.
      */
@@ -10686,6 +10852,10 @@ export namespace Prisma {
      * Limit how many comunas to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -10700,6 +10870,10 @@ export namespace Prisma {
      * Omit specific fields from the comunas
      */
     omit?: comunasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
     /**
      * The filter to search for the comunas to update in case it exists.
      */
@@ -10726,6 +10900,10 @@ export namespace Prisma {
      * Omit specific fields from the comunas
      */
     omit?: comunasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
     /**
      * Filter which comunas to delete.
      */
@@ -10758,6 +10936,10 @@ export namespace Prisma {
      * Omit specific fields from the comunas
      */
     omit?: comunasOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: comunasInclude<ExtArgs> | null
   }
 
 
@@ -11827,7 +12009,8 @@ export namespace Prisma {
     apellido: 'apellido',
     rut: 'rut',
     themecuenta: 'themecuenta',
-    fotoperfil: 'fotoperfil'
+    fotoperfil: 'fotoperfil',
+    rol: 'rol'
   };
 
   export type UsuariosScalarFieldEnum = (typeof UsuariosScalarFieldEnum)[keyof typeof UsuariosScalarFieldEnum]
@@ -12085,6 +12268,7 @@ export namespace Prisma {
     rut?: StringNullableFilter<"usuarios"> | string | null
     themecuenta?: StringNullableFilter<"usuarios"> | string | null
     fotoperfil?: StringNullableFilter<"usuarios"> | string | null
+    rol?: StringNullableFilter<"usuarios"> | string | null
     direcciones?: DireccionesListRelationFilter
     pedidos?: PedidosListRelationFilter
   }
@@ -12100,6 +12284,7 @@ export namespace Prisma {
     rut?: SortOrderInput | SortOrder
     themecuenta?: SortOrderInput | SortOrder
     fotoperfil?: SortOrderInput | SortOrder
+    rol?: SortOrderInput | SortOrder
     direcciones?: direccionesOrderByRelationAggregateInput
     pedidos?: pedidosOrderByRelationAggregateInput
   }
@@ -12118,6 +12303,7 @@ export namespace Prisma {
     rut?: StringNullableFilter<"usuarios"> | string | null
     themecuenta?: StringNullableFilter<"usuarios"> | string | null
     fotoperfil?: StringNullableFilter<"usuarios"> | string | null
+    rol?: StringNullableFilter<"usuarios"> | string | null
     direcciones?: DireccionesListRelationFilter
     pedidos?: PedidosListRelationFilter
   }, "id" | "email">
@@ -12133,6 +12319,7 @@ export namespace Prisma {
     rut?: SortOrderInput | SortOrder
     themecuenta?: SortOrderInput | SortOrder
     fotoperfil?: SortOrderInput | SortOrder
+    rol?: SortOrderInput | SortOrder
     _count?: usuariosCountOrderByAggregateInput
     _max?: usuariosMaxOrderByAggregateInput
     _min?: usuariosMinOrderByAggregateInput
@@ -12152,6 +12339,7 @@ export namespace Prisma {
     rut?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
     themecuenta?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
     fotoperfil?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
+    rol?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
   }
 
   export type direccionesWhereInput = {
@@ -12530,11 +12718,13 @@ export namespace Prisma {
     NOT?: regionesWhereInput | regionesWhereInput[]
     id?: IntFilter<"regiones"> | number
     nombre?: StringFilter<"regiones"> | string
+    comunas?: ComunasListRelationFilter
   }
 
   export type regionesOrderByWithRelationInput = {
     id?: SortOrder
     nombre?: SortOrder
+    comunas?: comunasOrderByRelationAggregateInput
   }
 
   export type regionesWhereUniqueInput = Prisma.AtLeast<{
@@ -12543,6 +12733,7 @@ export namespace Prisma {
     AND?: regionesWhereInput | regionesWhereInput[]
     OR?: regionesWhereInput[]
     NOT?: regionesWhereInput | regionesWhereInput[]
+    comunas?: ComunasListRelationFilter
   }, "id" | "nombre">
 
   export type regionesOrderByWithAggregationInput = {
@@ -12569,13 +12760,15 @@ export namespace Prisma {
     NOT?: comunasWhereInput | comunasWhereInput[]
     id?: IntFilter<"comunas"> | number
     nombre?: StringFilter<"comunas"> | string
-    region_id?: IntNullableFilter<"comunas"> | number | null
+    region_id?: IntFilter<"comunas"> | number
+    region?: XOR<RegionesScalarRelationFilter, regionesWhereInput>
   }
 
   export type comunasOrderByWithRelationInput = {
     id?: SortOrder
     nombre?: SortOrder
-    region_id?: SortOrderInput | SortOrder
+    region_id?: SortOrder
+    region?: regionesOrderByWithRelationInput
   }
 
   export type comunasWhereUniqueInput = Prisma.AtLeast<{
@@ -12584,13 +12777,14 @@ export namespace Prisma {
     OR?: comunasWhereInput[]
     NOT?: comunasWhereInput | comunasWhereInput[]
     nombre?: StringFilter<"comunas"> | string
-    region_id?: IntNullableFilter<"comunas"> | number | null
+    region_id?: IntFilter<"comunas"> | number
+    region?: XOR<RegionesScalarRelationFilter, regionesWhereInput>
   }, "id">
 
   export type comunasOrderByWithAggregationInput = {
     id?: SortOrder
     nombre?: SortOrder
-    region_id?: SortOrderInput | SortOrder
+    region_id?: SortOrder
     _count?: comunasCountOrderByAggregateInput
     _avg?: comunasAvgOrderByAggregateInput
     _max?: comunasMaxOrderByAggregateInput
@@ -12604,7 +12798,7 @@ export namespace Prisma {
     NOT?: comunasScalarWhereWithAggregatesInput | comunasScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"comunas"> | number
     nombre?: StringWithAggregatesFilter<"comunas"> | string
-    region_id?: IntNullableWithAggregatesFilter<"comunas"> | number | null
+    region_id?: IntWithAggregatesFilter<"comunas"> | number
   }
 
   export type cuponesWhereInput = {
@@ -12677,6 +12871,7 @@ export namespace Prisma {
     rut?: string | null
     themecuenta?: string | null
     fotoperfil?: string | null
+    rol?: string | null
     direcciones?: direccionesCreateNestedManyWithoutUsuarioInput
     pedidos?: pedidosCreateNestedManyWithoutUsuariosInput
   }
@@ -12692,6 +12887,7 @@ export namespace Prisma {
     rut?: string | null
     themecuenta?: string | null
     fotoperfil?: string | null
+    rol?: string | null
     direcciones?: direccionesUncheckedCreateNestedManyWithoutUsuarioInput
     pedidos?: pedidosUncheckedCreateNestedManyWithoutUsuariosInput
   }
@@ -12707,6 +12903,7 @@ export namespace Prisma {
     rut?: NullableStringFieldUpdateOperationsInput | string | null
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
     direcciones?: direccionesUpdateManyWithoutUsuarioNestedInput
     pedidos?: pedidosUpdateManyWithoutUsuariosNestedInput
   }
@@ -12722,6 +12919,7 @@ export namespace Prisma {
     rut?: NullableStringFieldUpdateOperationsInput | string | null
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
     direcciones?: direccionesUncheckedUpdateManyWithoutUsuarioNestedInput
     pedidos?: pedidosUncheckedUpdateManyWithoutUsuariosNestedInput
   }
@@ -12737,6 +12935,7 @@ export namespace Prisma {
     rut?: string | null
     themecuenta?: string | null
     fotoperfil?: string | null
+    rol?: string | null
   }
 
   export type usuariosUpdateManyMutationInput = {
@@ -12750,6 +12949,7 @@ export namespace Prisma {
     rut?: NullableStringFieldUpdateOperationsInput | string | null
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type usuariosUncheckedUpdateManyInput = {
@@ -12763,6 +12963,7 @@ export namespace Prisma {
     rut?: NullableStringFieldUpdateOperationsInput | string | null
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type direccionesCreateInput = {
@@ -13155,20 +13356,24 @@ export namespace Prisma {
 
   export type regionesCreateInput = {
     nombre: string
+    comunas?: comunasCreateNestedManyWithoutRegionInput
   }
 
   export type regionesUncheckedCreateInput = {
     id?: number
     nombre: string
+    comunas?: comunasUncheckedCreateNestedManyWithoutRegionInput
   }
 
   export type regionesUpdateInput = {
     nombre?: StringFieldUpdateOperationsInput | string
+    comunas?: comunasUpdateManyWithoutRegionNestedInput
   }
 
   export type regionesUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
+    comunas?: comunasUncheckedUpdateManyWithoutRegionNestedInput
   }
 
   export type regionesCreateManyInput = {
@@ -13187,41 +13392,40 @@ export namespace Prisma {
 
   export type comunasCreateInput = {
     nombre: string
-    region_id?: number | null
+    region: regionesCreateNestedOneWithoutComunasInput
   }
 
   export type comunasUncheckedCreateInput = {
     id?: number
     nombre: string
-    region_id?: number | null
+    region_id: number
   }
 
   export type comunasUpdateInput = {
     nombre?: StringFieldUpdateOperationsInput | string
-    region_id?: NullableIntFieldUpdateOperationsInput | number | null
+    region?: regionesUpdateOneRequiredWithoutComunasNestedInput
   }
 
   export type comunasUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
-    region_id?: NullableIntFieldUpdateOperationsInput | number | null
+    region_id?: IntFieldUpdateOperationsInput | number
   }
 
   export type comunasCreateManyInput = {
     id?: number
     nombre: string
-    region_id?: number | null
+    region_id: number
   }
 
   export type comunasUpdateManyMutationInput = {
     nombre?: StringFieldUpdateOperationsInput | string
-    region_id?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type comunasUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     nombre?: StringFieldUpdateOperationsInput | string
-    region_id?: NullableIntFieldUpdateOperationsInput | number | null
+    region_id?: IntFieldUpdateOperationsInput | number
   }
 
   export type cuponesCreateInput = {
@@ -13376,6 +13580,7 @@ export namespace Prisma {
     rut?: SortOrder
     themecuenta?: SortOrder
     fotoperfil?: SortOrder
+    rol?: SortOrder
   }
 
   export type usuariosMaxOrderByAggregateInput = {
@@ -13389,6 +13594,7 @@ export namespace Prisma {
     rut?: SortOrder
     themecuenta?: SortOrder
     fotoperfil?: SortOrder
+    rol?: SortOrder
   }
 
   export type usuariosMinOrderByAggregateInput = {
@@ -13402,6 +13608,7 @@ export namespace Prisma {
     rut?: SortOrder
     themecuenta?: SortOrder
     fotoperfil?: SortOrder
+    rol?: SortOrder
   }
 
   export type UuidWithAggregatesFilter<$PrismaModel = never> = {
@@ -13957,6 +14164,16 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type ComunasListRelationFilter = {
+    every?: comunasWhereInput
+    some?: comunasWhereInput
+    none?: comunasWhereInput
+  }
+
+  export type comunasOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type regionesCountOrderByAggregateInput = {
     id?: SortOrder
     nombre?: SortOrder
@@ -13978,6 +14195,11 @@ export namespace Prisma {
 
   export type regionesSumOrderByAggregateInput = {
     id?: SortOrder
+  }
+
+  export type RegionesScalarRelationFilter = {
+    is?: regionesWhereInput
+    isNot?: regionesWhereInput
   }
 
   export type comunasCountOrderByAggregateInput = {
@@ -14469,6 +14691,62 @@ export namespace Prisma {
     deleteMany?: pedido_itemsScalarWhereInput | pedido_itemsScalarWhereInput[]
   }
 
+  export type comunasCreateNestedManyWithoutRegionInput = {
+    create?: XOR<comunasCreateWithoutRegionInput, comunasUncheckedCreateWithoutRegionInput> | comunasCreateWithoutRegionInput[] | comunasUncheckedCreateWithoutRegionInput[]
+    connectOrCreate?: comunasCreateOrConnectWithoutRegionInput | comunasCreateOrConnectWithoutRegionInput[]
+    createMany?: comunasCreateManyRegionInputEnvelope
+    connect?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+  }
+
+  export type comunasUncheckedCreateNestedManyWithoutRegionInput = {
+    create?: XOR<comunasCreateWithoutRegionInput, comunasUncheckedCreateWithoutRegionInput> | comunasCreateWithoutRegionInput[] | comunasUncheckedCreateWithoutRegionInput[]
+    connectOrCreate?: comunasCreateOrConnectWithoutRegionInput | comunasCreateOrConnectWithoutRegionInput[]
+    createMany?: comunasCreateManyRegionInputEnvelope
+    connect?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+  }
+
+  export type comunasUpdateManyWithoutRegionNestedInput = {
+    create?: XOR<comunasCreateWithoutRegionInput, comunasUncheckedCreateWithoutRegionInput> | comunasCreateWithoutRegionInput[] | comunasUncheckedCreateWithoutRegionInput[]
+    connectOrCreate?: comunasCreateOrConnectWithoutRegionInput | comunasCreateOrConnectWithoutRegionInput[]
+    upsert?: comunasUpsertWithWhereUniqueWithoutRegionInput | comunasUpsertWithWhereUniqueWithoutRegionInput[]
+    createMany?: comunasCreateManyRegionInputEnvelope
+    set?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+    disconnect?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+    delete?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+    connect?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+    update?: comunasUpdateWithWhereUniqueWithoutRegionInput | comunasUpdateWithWhereUniqueWithoutRegionInput[]
+    updateMany?: comunasUpdateManyWithWhereWithoutRegionInput | comunasUpdateManyWithWhereWithoutRegionInput[]
+    deleteMany?: comunasScalarWhereInput | comunasScalarWhereInput[]
+  }
+
+  export type comunasUncheckedUpdateManyWithoutRegionNestedInput = {
+    create?: XOR<comunasCreateWithoutRegionInput, comunasUncheckedCreateWithoutRegionInput> | comunasCreateWithoutRegionInput[] | comunasUncheckedCreateWithoutRegionInput[]
+    connectOrCreate?: comunasCreateOrConnectWithoutRegionInput | comunasCreateOrConnectWithoutRegionInput[]
+    upsert?: comunasUpsertWithWhereUniqueWithoutRegionInput | comunasUpsertWithWhereUniqueWithoutRegionInput[]
+    createMany?: comunasCreateManyRegionInputEnvelope
+    set?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+    disconnect?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+    delete?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+    connect?: comunasWhereUniqueInput | comunasWhereUniqueInput[]
+    update?: comunasUpdateWithWhereUniqueWithoutRegionInput | comunasUpdateWithWhereUniqueWithoutRegionInput[]
+    updateMany?: comunasUpdateManyWithWhereWithoutRegionInput | comunasUpdateManyWithWhereWithoutRegionInput[]
+    deleteMany?: comunasScalarWhereInput | comunasScalarWhereInput[]
+  }
+
+  export type regionesCreateNestedOneWithoutComunasInput = {
+    create?: XOR<regionesCreateWithoutComunasInput, regionesUncheckedCreateWithoutComunasInput>
+    connectOrCreate?: regionesCreateOrConnectWithoutComunasInput
+    connect?: regionesWhereUniqueInput
+  }
+
+  export type regionesUpdateOneRequiredWithoutComunasNestedInput = {
+    create?: XOR<regionesCreateWithoutComunasInput, regionesUncheckedCreateWithoutComunasInput>
+    connectOrCreate?: regionesCreateOrConnectWithoutComunasInput
+    upsert?: regionesUpsertWithoutComunasInput
+    connect?: regionesWhereUniqueInput
+    update?: XOR<XOR<regionesUpdateToOneWithWhereWithoutComunasInput, regionesUpdateWithoutComunasInput>, regionesUncheckedUpdateWithoutComunasInput>
+  }
+
   export type NullableBoolFieldUpdateOperationsInput = {
     set?: boolean | null
   }
@@ -14957,6 +15235,7 @@ export namespace Prisma {
     rut?: string | null
     themecuenta?: string | null
     fotoperfil?: string | null
+    rol?: string | null
     pedidos?: pedidosCreateNestedManyWithoutUsuariosInput
   }
 
@@ -14971,6 +15250,7 @@ export namespace Prisma {
     rut?: string | null
     themecuenta?: string | null
     fotoperfil?: string | null
+    rol?: string | null
     pedidos?: pedidosUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
@@ -15035,6 +15315,7 @@ export namespace Prisma {
     rut?: NullableStringFieldUpdateOperationsInput | string | null
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
     pedidos?: pedidosUpdateManyWithoutUsuariosNestedInput
   }
 
@@ -15049,6 +15330,7 @@ export namespace Prisma {
     rut?: NullableStringFieldUpdateOperationsInput | string | null
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
     pedidos?: pedidosUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
@@ -15354,6 +15636,7 @@ export namespace Prisma {
     rut?: string | null
     themecuenta?: string | null
     fotoperfil?: string | null
+    rol?: string | null
     direcciones?: direccionesCreateNestedManyWithoutUsuarioInput
   }
 
@@ -15368,6 +15651,7 @@ export namespace Prisma {
     rut?: string | null
     themecuenta?: string | null
     fotoperfil?: string | null
+    rol?: string | null
     direcciones?: direccionesUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
@@ -15490,6 +15774,7 @@ export namespace Prisma {
     rut?: NullableStringFieldUpdateOperationsInput | string | null
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
     direcciones?: direccionesUpdateManyWithoutUsuarioNestedInput
   }
 
@@ -15504,6 +15789,7 @@ export namespace Prisma {
     rut?: NullableStringFieldUpdateOperationsInput | string | null
     themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
     fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
     direcciones?: direccionesUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 
@@ -15545,6 +15831,84 @@ export namespace Prisma {
   export type pedido_itemsUpdateManyWithWhereWithoutProductosInput = {
     where: pedido_itemsScalarWhereInput
     data: XOR<pedido_itemsUpdateManyMutationInput, pedido_itemsUncheckedUpdateManyWithoutProductosInput>
+  }
+
+  export type comunasCreateWithoutRegionInput = {
+    nombre: string
+  }
+
+  export type comunasUncheckedCreateWithoutRegionInput = {
+    id?: number
+    nombre: string
+  }
+
+  export type comunasCreateOrConnectWithoutRegionInput = {
+    where: comunasWhereUniqueInput
+    create: XOR<comunasCreateWithoutRegionInput, comunasUncheckedCreateWithoutRegionInput>
+  }
+
+  export type comunasCreateManyRegionInputEnvelope = {
+    data: comunasCreateManyRegionInput | comunasCreateManyRegionInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type comunasUpsertWithWhereUniqueWithoutRegionInput = {
+    where: comunasWhereUniqueInput
+    update: XOR<comunasUpdateWithoutRegionInput, comunasUncheckedUpdateWithoutRegionInput>
+    create: XOR<comunasCreateWithoutRegionInput, comunasUncheckedCreateWithoutRegionInput>
+  }
+
+  export type comunasUpdateWithWhereUniqueWithoutRegionInput = {
+    where: comunasWhereUniqueInput
+    data: XOR<comunasUpdateWithoutRegionInput, comunasUncheckedUpdateWithoutRegionInput>
+  }
+
+  export type comunasUpdateManyWithWhereWithoutRegionInput = {
+    where: comunasScalarWhereInput
+    data: XOR<comunasUpdateManyMutationInput, comunasUncheckedUpdateManyWithoutRegionInput>
+  }
+
+  export type comunasScalarWhereInput = {
+    AND?: comunasScalarWhereInput | comunasScalarWhereInput[]
+    OR?: comunasScalarWhereInput[]
+    NOT?: comunasScalarWhereInput | comunasScalarWhereInput[]
+    id?: IntFilter<"comunas"> | number
+    nombre?: StringFilter<"comunas"> | string
+    region_id?: IntFilter<"comunas"> | number
+  }
+
+  export type regionesCreateWithoutComunasInput = {
+    nombre: string
+  }
+
+  export type regionesUncheckedCreateWithoutComunasInput = {
+    id?: number
+    nombre: string
+  }
+
+  export type regionesCreateOrConnectWithoutComunasInput = {
+    where: regionesWhereUniqueInput
+    create: XOR<regionesCreateWithoutComunasInput, regionesUncheckedCreateWithoutComunasInput>
+  }
+
+  export type regionesUpsertWithoutComunasInput = {
+    update: XOR<regionesUpdateWithoutComunasInput, regionesUncheckedUpdateWithoutComunasInput>
+    create: XOR<regionesCreateWithoutComunasInput, regionesUncheckedCreateWithoutComunasInput>
+    where?: regionesWhereInput
+  }
+
+  export type regionesUpdateToOneWithWhereWithoutComunasInput = {
+    where?: regionesWhereInput
+    data: XOR<regionesUpdateWithoutComunasInput, regionesUncheckedUpdateWithoutComunasInput>
+  }
+
+  export type regionesUpdateWithoutComunasInput = {
+    nombre?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type regionesUncheckedUpdateWithoutComunasInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    nombre?: StringFieldUpdateOperationsInput | string
   }
 
   export type direccionesCreateManyUsuarioInput = {
@@ -15775,6 +16139,25 @@ export namespace Prisma {
     pedido_id?: NullableStringFieldUpdateOperationsInput | string | null
     cantidad?: IntFieldUpdateOperationsInput | number
     precio_unit?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+  }
+
+  export type comunasCreateManyRegionInput = {
+    id?: number
+    nombre: string
+  }
+
+  export type comunasUpdateWithoutRegionInput = {
+    nombre?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type comunasUncheckedUpdateWithoutRegionInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    nombre?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type comunasUncheckedUpdateManyWithoutRegionInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    nombre?: StringFieldUpdateOperationsInput | string
   }
 
 

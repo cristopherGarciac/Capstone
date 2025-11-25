@@ -21,15 +21,25 @@ export default function CentroDeAyuda() {
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/chatbot", { message: userMessage });
-      const botMsg = { sender: "chatbot", message: response.data.response };
+      const response = await axios.post("/api/chatbot", {
+        message: userMessage,
+      });
+
+      const botMsg = {
+        sender: "chatbot",
+        message: response.data.response,
+      };
 
       setChatHistory((prev) => [...prev, botMsg]);
     } catch (error) {
-      console.error("Error al enviar el mensaje al chatbot:", error);
+      console.error("Error al enviar mensaje:", error);
       setChatHistory((prev) => [
         ...prev,
-        { sender: "chatbot", message: "Lo siento, ocurrió un error al procesar tu mensaje." },
+        {
+          sender: "chatbot",
+          message:
+            "Lo siento, ocurrió un error al comunicarme con el servidor.",
+        },
       ]);
     }
 
@@ -39,10 +49,11 @@ export default function CentroDeAyuda() {
 
   return (
     <main className="min-h-screen bg-[var(--color-bg)]">
+
       {/* ==== BARRA SUPERIOR ==== */}
       <div className="bg-[var(--color-secondary)] text-white text-center py-2 text-sm">
         {promociones.map((p, i) => (
-          <span key={i} className={`mx-4 ${p.destaque ? "font-semibold" : ""}`}>
+          <span key={i} className="mx-4">
             {p.texto}
           </span>
         ))}
@@ -51,24 +62,36 @@ export default function CentroDeAyuda() {
       {/* ==== NAVBAR ==== */}
       <nav className="bg-white shadow sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-          {/* Logo */}
-          <Link href="/" className="text-2xl font-bold text-[var(--color-primary)]">
-            <img src="/images/blitz.png" alt="Blitz Hardware Logo" className="h-20 w-auto" />
+
+          <Link href="/" className="text-2xl font-bold">
+            <img
+              src="/images/blitz.png"
+              alt="Blitz Hardware Logo"
+              className="h-20"
+            />
           </Link>
-          <div className="flex items-center space-x-6">
-            <Link href="/" className="text-gray-700 hover:text-[var(--color-accent)]">Inicio</Link>
-            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-accent)]">Catálogo</Link>
-            <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-accent)]">
-              <img src="/images/carrito.png" alt="Carrito Compra Logo" className="h-11 w-auto" />
+
+          <div className="flex items-center gap-6">
+            <Link href="/" className="text-gray-700 hover:text-yellow-600">
+              Inicio
             </Link>
 
-            {/* Botón login */}
+            <Link href="/catalogo" className="text-gray-700 hover:text-yellow-600">
+              Catálogo
+            </Link>
+
+            <Link href="/carrito">
+              <img src="/images/carrito.png" className="h-11" />
+            </Link>
+
             <button
               onClick={() => setLoginOpen(true)}
-              className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
+              className="flex items-center text-gray-700 hover:text-yellow-600"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z" />
+              <svg className="h-5 w-5 mr-1" fill="none" stroke="currentColor" strokeWidth="2"
+                viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round"
+                  d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z" />
               </svg>
               Iniciar sesión
             </button>
@@ -76,139 +99,109 @@ export default function CentroDeAyuda() {
         </div>
       </nav>
 
-      {/* ==== MODAL LOGIN ==== */}
-      {loginOpen && (
-        <div className="fixed inset-0 bg-black flex justify-center items-start pt-24 z-50" style={{ backgroundColor: "rgba(0,0,0,0.3)" }}>
-          <div className="bg-white rounded-xl shadow-lg w-96 p-6 relative">
-            <button
-              onClick={() => setLoginOpen(false)}
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-            >
-              ✕
-            </button>
-            <h2 className="text-2xl font-bold text-[var(--color-secondary)] mb-4 text-center">Iniciar Sesión</h2>
-            <form className="flex flex-col gap-4">
-              <input type="email" placeholder="Correo electrónico" className="border p-2 rounded" />
-              <input type="password" placeholder="Contraseña" className="border p-2 rounded" />
-              <button type="submit" className="btn-primary w-full">Iniciar Sesión</button>
-            </form>
-            <div className="flex flex-col items-center text-sm mt-4 gap-2">
-              <button className="text-blue-600 hover:underline">Olvidé mi contraseña</button>
-              <span>
-                ¿No estás registrado?{" "}
-                <Link href="/register" className="text-blue-600 hover:underline">
-                  Regístrate
-                </Link>
-              </span>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ==== CHAT ==== */}
+      <div className="max-w-5xl mx-auto px-6 py-12">
 
-      {/* ==== CENTRO DE AYUDA ==== */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <h1 className="text-4xl font-bold text-center text-[var(--color-secondary)] mb-6">
+        <h1 className="text-4xl font-bold text-center text-yellow-600 mb-6">
           Centro de Ayuda (Chat-bot)
         </h1>
 
         <div className="text-center mb-4">
-          <img src="/images/bitzi.png" alt="Bot" className="w-32 mx-auto" />
+          <img src="/images/bitzi.png" className="w-32 mx-auto" />
         </div>
 
-        {/* ==== CHAT ==== */}
-        <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-[var(--color-primary)]">
-          <div className="overflow-y-auto max-h-96 mb-4">
+        <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+
+          {/* CHAT WINDOW */}
+          <div className="overflow-y-auto max-h-[400px] p-4 bg-gray-50 rounded-xl shadow-inner space-y-4">
+
             {chatHistory.map((msg, index) => (
-              <div key={index} className={`mb-2 ${msg.sender === "user" ? "text-right" : "text-left"}`}>
-                <div className={`${msg.sender === "user" ? "bg-blue-100" : "bg-gray-100"} p-3 rounded-lg inline-block max-w-xs`}>
-                  <p className="font-medium">{msg.message}</p>
+              <div key={index} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+                <div
+                  className={`px-4 py-3 max-w-sm rounded-2xl text-sm shadow ${
+                    msg.sender === "user"
+                      ? "bg-blue-500 text-white rounded-br-none"
+                      : "bg-white border rounded-bl-none text-gray-800"
+                  }`}
+                >
+                  {msg.message.split("\n").map((line, i) => (
+                    <p key={i}>{line}</p>
+                  ))}
                 </div>
               </div>
             ))}
+
             {loading && (
-              <div className="text-center text-gray-600">
-                <p>El chatbot está escribiendo...</p>
-              </div>
+              <p className="text-center text-gray-400 italic">
+                Bitzi está escribiendo...
+              </p>
             )}
           </div>
 
-          <div className="flex items-center border-t pt-4">
+          {/* INPUT */}
+          <div className="mt-4 flex gap-3">
             <input
               type="text"
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
-              className="border border-yellow-300 p-3 rounded-l-lg w-full text-sm text-gray"
-              placeholder="Escribe tu mensaje..."
               onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+              className="w-full px-4 py-3 rounded-xl border border-gray-300 shadow focus:ring-2 focus:ring-yellow-400"
+              placeholder="Escribe tu mensaje..."
             />
+
             <button
               onClick={handleSendMessage}
-              className="bg-[var(--color-primary)] text-white p-3 rounded-r-lg"
               disabled={loading}
+              className="bg-yellow-400 hover:bg-yellow-500 transition font-semibold px-6 py-3 rounded-xl shadow"
             >
               Enviar
             </button>
           </div>
         </div>
+
       </div>
 
       {/* ==== FOOTER ==== */}
       <footer className="bg-[#FFD700] text-black mt-16">
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+
           <div>
-            <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Ayuda</h4>
-            <ul className="space-y-2 text-black">
-              <li><Link href="/ayuda" className="hover:text-teal-300">Centro de ayuda</Link></li>
-              <li><Link href="/seguimiento" className="hover:text-teal-300">Seguimiento de mi compra</Link></li>
+            <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">
+              Ayuda
+            </h4>
+            <ul className="space-y-2">
+              <li><Link href="/ayuda">Centro de ayuda</Link></li>
+              <li><Link href="/seguimiento">Seguimiento de compra</Link></li>
             </ul>
           </div>
+
           <div>
-            <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Nosotros</h4>
-            <ul className="space-y-2 text-black">
-              <li><Link href="/quienes_somos" className="hover:text-teal-300">Quiénes somos</Link></li>
-              <li><Link href="/terminos" className="hover:text-teal-300">Términos y Condiciones</Link></li>
+            <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">
+              Nosotros
+            </h4>
+            <ul className="space-y-2">
+              <li><Link href="/quienes_somos">Quiénes somos</Link></li>
+              <li><Link href="/terminos">Términos y condiciones</Link></li>
             </ul>
           </div>
+
           <div>
-            <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">Comunidad Blitz</h4>
-            <ul className="space-y-2 text-black">
-              <li><a href="https://www.instagram.com/blitz.hardware?igsh=b29mcW00OGthcnM3" target="_blank" className="hover:text-teal-300">Instagram</a></li>
+            <h4 className="text-xl font-semibold mb-4 border-l-4 border-blue-300 pl-3">
+              Comunidad Blitz
+            </h4>
+            <ul className="space-y-2">
+              <li><a href="https://instagram.com" target="_blank">Instagram</a></li>
             </ul>
           </div>
+
         </div>
 
-        <hr className="border-white/10" />
-
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <h5 className="text-lg font-semibold mb-6 border-l-4 border-blue-300 pl-3">Medios de pago</h5>
-          <div className="flex flex-wrap items-center gap-6">
-            <span className="bg-white/5 px-4 py-2 rounded-md">
-              <img src="/images/mercado.png" alt="Mercado Pago" width={100} height={50} />
-            </span>
-          </div>
+        <div className="bg-black/20 text-center py-3 text-sm">
+          © 2025 — Proyecto Capstone
         </div>
 
-        <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-          <div className="flex flex-wrap items-center gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded bg-white/10 grid place-items-center">🏛️</div>
-              <div className="text-sm text-black">
-                Dirección <br /> <span className="font-semibold">ChileCompra</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded bg-white/10 grid place-items-center">🛡️</div>
-              <div className="text-sm text-black">
-                Protegido con <span className="font-semibold">seguridad</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-black/30 text-center text-xs text-white-300 py-3">
-          © 2025–2025 | Desarrollado por Cristopher Garcia, Jesus Lagos e Ignacio Varas, Proyecto Capstone
-        </div>
       </footer>
+
     </main>
   );
 }

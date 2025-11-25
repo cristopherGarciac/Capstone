@@ -1,6 +1,7 @@
 import { useUser } from "../context/UserContext";
 import { useState, useEffect, useRef } from "react";
 import { useThemeCuenta } from "../hooks/useThemeCuenta";
+import Link from "next/link";
 
 /* ============================================================
    MI CUENTA CON SISTEMA DE TEMAS + FOTO DE PERFIL
@@ -9,6 +10,7 @@ export default function MiCuenta() {
   const { user, setUser, logout } = useUser();
   const [showEditContacto, setShowEditContacto] = useState(false);
   const [showEditDireccion, setShowEditDireccion] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const { theme, setTheme } = useThemeCuenta();
 
@@ -23,8 +25,25 @@ export default function MiCuenta() {
   // Para subir imagen
   const fileInputRef = useRef(null);
  const [previewImg, setPreviewImg] = useState(
-  user.foto ? user.foto : "/images/default-user.jpg"
+  user?.fotoperfil || "/images/default-user.jpg"
 );
+
+useEffect(() => {
+  if (user?.fotoperfil) {
+    setPreviewImg(user.fotoperfil);
+  }
+}, [user]);
+
+const handleLogout = () => {
+  setLoggingOut(true);
+
+  // Esperar 2 segundos
+  setTimeout(() => {
+    logout();               // limpia el contexto
+    window.location.href = "/"; // redirige al index
+  }, 2000);
+};
+
 
   if (!user) return <p className="p-6">Cargando...</p>;
 
@@ -54,9 +73,9 @@ export default function MiCuenta() {
 
       // 4. Guardar en contexto + localStorage
       setUser((prev) => ({
-        ...prev,
-        foto: base64,
-      }));
+  ...prev,
+  fotoperfil: base64,
+}));
 
     } catch (error) {
       console.error("Error guardando foto:", error);
@@ -135,27 +154,30 @@ export default function MiCuenta() {
             Mis pedidos
           </button>
 
-          <button className="block text-left text-[var(--textSoft)] hover:text-[var(--text)]">
-            Métodos de pago
-          </button>
-
           <hr className="my-4" />
           {/* Botón para volver al inicio */}
           <div className="text-center mb-8">
-            <a
-              href="/"
-              className="inline-block px-5 py-2 rounded-lg font-medium bg-[var(--primary)] text-white shadow hover:opacity-90 transition"
-            >
-              ← Volver al inicio
-            </a>
-          </div>
+            <Link
+  href="/"
+  className="inline-block px-5 py-2 rounded-lg font-medium bg-[var(--primary)] text-white shadow hover:opacity-90 transition"
+>
+  ← Volver al inicio
+</Link>
 
+          </div>
+{loggingOut && (
+  <div className="fixed inset-0 bg-black/50 flex flex-col justify-center items-center text-white text-xl z-[99999]">
+    <div className="loader mb-4"></div>
+    Cerrando sesión… por favor espere
+  </div>
+)}
           <button
-            onClick={logout}
-            className="text-red-600 font-medium flex items-center gap-2"
-          >
-            🔒 Cerrar sesión
-          </button>
+  onClick={() => handleLogout()}
+  className="text-red-600 font-medium flex items-center gap-2"
+>
+  🔒 Cerrar sesión
+</button>
+
         </aside>
 
         {/* =========================
@@ -346,6 +368,7 @@ function EditarContactoForm({ user, setUser, close }) {
 /* ============================================================
    FORMULARIO DIRECCIÓN (TU VERSIÓN ORIGINAL)
 ============================================================ */
+ 
 function EditarDireccionForm({ user, setUser, close }) {
   const [regiones, setRegiones] = useState([]);
   const [regionId, setRegionId] = useState("");
@@ -397,7 +420,7 @@ function EditarDireccionForm({ user, setUser, close }) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: direccionId,
+         direccionId: direccionId,
           comuna,
           region,
           calle,
@@ -423,7 +446,7 @@ function EditarDireccionForm({ user, setUser, close }) {
       }));
 
       setOk("Dirección actualizada correctamente.");
-
+      
     } catch (err) {
       setError(err.message);
     } finally {
@@ -474,36 +497,19 @@ function EditarDireccionForm({ user, setUser, close }) {
 
       <div className="grid grid-cols-3 gap-3">
         <div className="col-span-2">
-          <label className="block mb-1 text-sm font-medium">Calle</label>
-          <input
-            className="w-full border rounded-lg px-3 py-2"
-            required
-            value={calle}
-            onChange={e => setCalle(e.target.value)}
-          />
+          <label className="block text-sm mb-1 font-medium">Calle</label>
+          <input className="w-full border rounded-lg px-3 py-2" required value={calle} onChange={e=>setCalle(e.target.value)} />
         </div>
 
         <div>
-          <label className="block mb-1 text-sm font-medium">Número</label>
-          <input
-            className="w-full border rounded-lg px-3 py-2"
-            required
-            value={numero}
-            onChange={e => setNumero(e.target.value)}
-          />
+          <label className="block text-sm mb-1 font-medium">Número</label>
+          <input className="w-full border rounded-lg px-3 py-2" required value={numero} onChange={e=>setNumero(e.target.value)} />
         </div>
       </div>
 
       <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={close} className="px-4 py-2 border rounded-lg">
-          Cancelar
-        </button>
-
-        <button
-          type="submit" 
-          disabled={loading}
-          className="px-5 py-2 btn-primary rounded-lg"
-        >
+        <button type="button" onClick={close} className="px-4 py-2 border rounded-lg">Cancelar</button>
+        <button type="submit" disabled={loading} className="px-5 py-2 btn-primary rounded-lg">
           {loading ? "Guardando..." : "Guardar dirección"}
         </button>
       </div>

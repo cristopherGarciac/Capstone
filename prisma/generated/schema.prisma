@@ -22,6 +22,7 @@ model usuarios {
   fotoperfil  String?
   direcciones direcciones[]
   pedidos     pedidos[]
+  rol         String?
 }
 
 model direcciones {
@@ -89,14 +90,17 @@ model productos {
 }
 
 model regiones {
-  id     Int    @id @default(autoincrement())
-  nombre String @unique
+  id      Int       @id @default(autoincrement())
+  nombre  String    @unique
+  comunas comunas[]
 }
 
 model comunas {
   id        Int    @id @default(autoincrement())
   nombre    String
-  region_id Int?
+  region_id Int
+
+  region regiones @relation(fields: [region_id], references: [id])
 }
 
 model cupones {
