@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-// src/pages/api/pedidos/crear.js
+
 import prisma from "../../../../lib/prisma";
 
 
