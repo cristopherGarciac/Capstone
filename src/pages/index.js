@@ -285,16 +285,7 @@ export default function Home() {
     loadFeatured();
   }, [featuredIdsArr]);
 
-  // Chat Widget
-  useEffect(() => {
-    import("@n8n/chat/style.css");
-    import("@n8n/chat").then(({ createChat }) => {
-      createChat({
-        webhookUrl:
-          "https://blitzecommerce.app.n8n.cloud/webhook/c29af5d5-e7da-4f6e-a6be-194671bf2ac2/chat",
-      });
-    });
-  }, []);
+ 
 
   // Manejo de Login
   const handleLoginChange = (e) => {
