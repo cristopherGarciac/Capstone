@@ -1,20 +1,26 @@
-// /pages/api/productos/index.js
-import { Prisma } from "@prisma/client";
 import prisma from "../../../../lib/prisma";
+import { Prisma } from "@prisma/client";
 
-// Convierte Prisma.Decimal a number
+// Convierte Prisma.Decimal recursivamente
 function decimalToNumber(row) {
-  if (row instanceof Prisma.Decimal) return row.toNumber();
-  if (Array.isArray(row)) return row.map(decimalToNumber);
+  if (row && typeof row === "object" && typeof row.toNumber === "function") {
+    return row.toNumber();
+  }
+
+  if (Array.isArray(row)) {
+    return row.map(decimalToNumber);
+  }
+
   if (row && typeof row === "object") {
     const out = {};
     for (const k in row) out[k] = decimalToNumber(row[k]);
     return out;
   }
+
   return row;
 }
 
-// Normaliza precios tipo "12.345,67"
+// Normaliza precios "12.345,67"
 function normPrecio(v) {
   if (typeof v === "number") return v;
   if (typeof v !== "string") return Number(v || 0);
@@ -23,18 +29,19 @@ function normPrecio(v) {
 
 export default async function handler(req, res) {
   try {
-    // ============================
+    // ==========================
     // GET — Listado + paginación
-    // ============================
+    // ==========================
     if (req.method === "GET") {
       const skip = Number(req.query.skip ?? 0);
       const take = Number(req.query.take ?? 20);
 
+      // Ordenar por ID descendente para ver los nuevos primero
       const [items, total] = await Promise.all([
         prisma.productos.findMany({
           skip,
           take,
-          orderBy: { creado_en: "desc" },
+          orderBy: { id: "desc" }, 
         }),
         prisma.productos.count(),
       ]);
@@ -45,9 +52,9 @@ export default async function handler(req, res) {
       });
     }
 
-    // ============================
+    // ==========================
     // POST — Crear producto
-    // ============================
+    // ==========================
     if (req.method === "POST") {
       const body = req.body;
 
@@ -69,7 +76,8 @@ export default async function handler(req, res) {
           sku: body.sku,
           titulo: body.titulo,
           descripcion: body.descripcion || "",
-          precio: new Prisma.Decimal(precioNormalizado),
+          // CORRECCIÓN: Asignar el número directo. Prisma maneja la conversión a Decimal.
+          precio: precioNormalizado,
           stock: Number(body.stock ?? 0),
           categoria: body.categoria || "",
           imagenes: Array.isArray(body.imagenes)
@@ -81,9 +89,9 @@ export default async function handler(req, res) {
       return res.status(201).json(decimalToNumber(created));
     }
 
-    // ============================
-    // ERROR MÉTODO NO PERMITIDO
-    // ============================
+    // =======================================
+    // ERROR — MÉTODO NO PERMITIDO
+    // =======================================
     res.setHeader("Allow", ["GET", "POST"]);
     return res.status(405).json({ error: "Método no permitido" });
   } catch (err) {
