@@ -3,24 +3,12 @@ import { useState, useEffect, useRef } from "react";
 import { useThemeCuenta } from "../hooks/useThemeCuenta";
 import Link from "next/link";
 
-<<<<<<< HEAD
-=======
-/* ============================================================
-   MI CUENTA CON SISTEMA DE TEMAS + FOTO DE PERFIL + PEDIDOS
-============================================================ */
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
 export default function MiCuenta() {
   const { user, setUser, logout } = useUser();
-  
-  // Estados para modales
   const [showEditContacto, setShowEditContacto] = useState(false);
   const [showEditDireccion, setShowEditDireccion] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
-<<<<<<< HEAD
-=======
-  // Estados para Pedidos (Lógica traída de seguimiento.js)
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
   const [pedidos, setPedidos] = useState([]);
   const [loadingPedidos, setLoadingPedidos] = useState(false);
 
@@ -39,19 +27,15 @@ export default function MiCuenta() {
     user?.fotoperfil || "/images/default-user.jpg"
   );
 
-<<<<<<< HEAD
   // ============================================================
   // CARGAR FOTO PREVIA
   // ============================================================
-=======
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
   useEffect(() => {
     if (user?.fotoperfil) {
       setPreviewImg(user.fotoperfil);
     }
   }, [user]);
 
-<<<<<<< HEAD
   // ============================================================
   // CARGAR PEDIDOS AUTOMÁTICAMENTE
   // ============================================================
@@ -66,28 +50,11 @@ export default function MiCuenta() {
         setPedidos(data.pedidos || []);
       } catch (err) {
         console.error("Error cargando pedidos:", err);
-=======
-  // ---------------------------------------------
-  // CARGAR PEDIDOS AUTOMÁTICAMENTE
-  // ---------------------------------------------
-  useEffect(() => {
-    const cargarPedidos = async () => {
-      if (!user?.email) return;
-      setLoadingPedidos(true);
-      try {
-        // Usamos la misma API que seguimiento.js
-        const res = await fetch(`/api/obtener_pedidos?email=${user.email}`);
-        const data = await res.json();
-        setPedidos(data.pedidos || []);
-      } catch (error) {
-        console.error("Error cargando pedidos:", error);
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
       } finally {
         setLoadingPedidos(false);
       }
     };
 
-<<<<<<< HEAD
     cargarPedidos();
   }, [user?.email]);
 
@@ -145,64 +112,6 @@ export default function MiCuenta() {
     <div className="mi-cuenta-page min-h-screen py-10 px-4 transition-all">
       {/* TÍTULO */}
       <h1 className="text-3xl font-bold text-center mb-10">Mi Cuenta</h1>
-=======
-    if (user) {
-      cargarPedidos();
-    }
-  }, [user]);
-
-  const handleLogout = () => {
-    setLoggingOut(true);
-    // Esperar 2 segundos
-    setTimeout(() => {
-      logout();               // limpia el contexto
-      window.location.href = "/"; // redirige al index
-    }, 2000);
-  };
-
-  const handleImageChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // 1. Crear URL para vista previa
-    const imgURL = URL.createObjectURL(file);
-    setPreviewImg(imgURL);
-
-    // 2. Convertir imagen a base64 para guardarla en BD
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64 = reader.result; // 👈 FOTO BASE64 COMPLETA
-
-      try {
-        // 3. Guardar imagen en backend
-        const res = await fetch("/api/usuarios/foto", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: user.id, foto: base64 }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
-
-        // 4. Guardar en contexto + localStorage
-        setUser((prev) => ({
-          ...prev,
-          fotoperfil: base64,
-        }));
-
-      } catch (error) {
-        console.error("Error guardando foto:", error);
-      }
-    };
-
-    reader.readAsDataURL(file);
-  };
-
-  if (!user) return <p className="p-6 text-center mt-10">Cargando perfil...</p>;
-
-  return (
-    <div className="mi-cuenta-page min-h-screen py-10 px-4 transition-all bg-gray-50">
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
 
       {/* SELECTOR DE TEMA */}
       <div className="text-center mb-8">
@@ -226,18 +135,8 @@ export default function MiCuenta() {
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
-<<<<<<< HEAD
         {/* SIDEBAR */}
         <aside className="mi-cuenta-card shadow rounded-xl p-6 space-y-4">
-=======
-
-        {/* =========================
-            SIDEBAR (Columna Izquierda)
-        ========================== */}
-        <aside className="mi-cuenta-card shadow rounded-xl p-6 space-y-4 h-fit">
-
-          {/* FOTO DE PERFIL */}
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
           <div className="flex flex-col items-center mb-4">
             <img
               src={previewImg}
@@ -246,7 +145,7 @@ export default function MiCuenta() {
             />
 
             <button
-              className="mt-3 text-sm text-blue-500 underline hover:text-blue-700"
+              className="mt-3 text-sm text-blue-500 underline"
               onClick={() => fileInputRef.current.click()}
             >
               Cambiar imagen
@@ -261,47 +160,29 @@ export default function MiCuenta() {
             />
           </div>
 
-          <p className="font-semibold text-center">Resumen</p>
+          <p className="font-semibold">Resumen</p>
+
+          <button className="block text-left text-[var(--textSoft)] hover:text-[var(--text)]">
+            Mis pedidos
+          </button>
 
           <hr className="my-4" />
-<<<<<<< HEAD
 
           <div className="text-center mb-8">
             <Link
               href="/"
               className="inline-block px-5 py-2 rounded-lg font-medium bg-[var(--primary)] text-white shadow hover:opacity-90 transition"
-=======
-          
-          {/* Botón para volver al inicio */}
-          <div className="text-center mb-4">
-            <Link
-              href="/"
-              className="inline-block px-5 py-2 rounded-lg font-medium bg-[var(--primary)] text-white shadow hover:opacity-90 transition w-full"
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
             >
               ← Volver al inicio
             </Link>
           </div>
 
-<<<<<<< HEAD
-=======
-          <div className="text-center">
-            <button
-              onClick={() => handleLogout()}
-              className="text-red-600 font-medium flex items-center justify-center gap-2 w-full hover:bg-red-50 p-2 rounded transition"
-            >
-              🔒 Cerrar sesión
-            </button>
-          </div>
-
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
           {loggingOut && (
             <div className="fixed inset-0 bg-black/50 flex flex-col justify-center items-center text-white text-xl z-[99999]">
               <div className="loader mb-4"></div>
               Cerrando sesión… por favor espere
             </div>
           )}
-<<<<<<< HEAD
 
           <button
             onClick={handleLogout}
@@ -314,67 +195,47 @@ export default function MiCuenta() {
         {/* INFORMACIÓN DE CONTACTO */}
         <section className="mi-cuenta-card shadow rounded-xl p-6 md:col-span-2">
           <h2 className="text-lg font-semibold mb-4">Información de contacto</h2>
-=======
-        </aside>
 
-        {/* =========================
-            INFORMACIÓN DE CONTACTO (Centro)
-        ========================== */}
-        <section className="mi-cuenta-card shadow rounded-xl p-6 md:col-span-2 h-fit">
-          <h2 className="text-lg font-semibold mb-4 border-b pb-2">Información de contacto</h2>
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
-
-          <div className="space-y-3 text-sm">
-            <p className="grid grid-cols-3"><span className="font-medium text-[var(--textSoft)]">Nombre:</span> <span className="col-span-2">{user.nombre} {user.apellido}</span></p>
-            <p className="grid grid-cols-3"><span className="font-medium text-[var(--textSoft)]">Email:</span> <span className="col-span-2">{user.email}</span></p>
-            <p className="grid grid-cols-3"><span className="font-medium text-[var(--textSoft)]">Teléfono:</span> <span className="col-span-2">{user.telefono || "No registrado"}</span></p>
-            <p className="grid grid-cols-3"><span className="font-medium text-[var(--textSoft)]">RUT:</span> <span className="col-span-2">{user.rut || "No registrado"}</span></p>
+          <div className="space-y-2 text-sm">
+            <p><strong>Nombre:</strong> {user.nombre}</p>
+            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>Teléfono:</strong> {user.telefono}</p>
+            <p><strong>RUT:</strong> {user.rut}</p>
           </div>
 
           <button
             onClick={() => setShowEditContacto(true)}
-            className="mt-6 px-5 py-2 rounded-lg text-sm font-medium btn-primary"
+            className="mt-5 px-5 py-2 rounded-lg text-sm font-medium btn-primary"
           >
             Editar
           </button>
         </section>
 
-<<<<<<< HEAD
         {/* DIRECCIÓN */}
         <section className="mi-cuenta-card shadow rounded-xl p-6">
           <h2 className="text-lg font-semibold mb-4">Dirección de envío predeterminada</h2>
-=======
-        {/* =========================
-            DIRECCIÓN (Derecha)
-        ========================== */}
-        <section className="mi-cuenta-card shadow rounded-xl p-6 h-fit">
-          <h2 className="text-lg font-semibold mb-4 border-b pb-2">Dirección de envío</h2>
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
 
           {user.direccion ? (
-            <div className="space-y-2 text-sm">
-              <p><span className="font-medium text-[var(--textSoft)]">Calle:</span> {user.direccion.calle} {user.direccion.numero}</p>
-              <p><span className="font-medium text-[var(--textSoft)]">Comuna:</span> {user.direccion.comuna}</p>
-              <p><span className="font-medium text-[var(--textSoft)]">Región:</span> {user.direccion.region}</p>
-            </div>
+            <>
+              <p><strong>Calle:</strong> {user.direccion.calle} {user.direccion.numero}</p>
+              <p><strong>Comuna:</strong> {user.direccion.comuna}</p>
+              <p><strong>Región:</strong> {user.direccion.region}</p>
+            </>
           ) : (
-            <p className="text-[var(--textSoft)] text-sm italic">
+            <p className="text-[var(--textSoft)] text-sm">
               Aún no tienes dirección guardada.
             </p>
           )}
 
           <button
             onClick={() => setShowEditDireccion(true)}
-            className="mt-6 px-5 py-2 rounded-lg text-sm btn-primary"
+            className="mt-5 px-5 py-2 rounded-lg text-sm btn-primary"
           >
-            {user.direccion ? "Editar dirección" : "Agregar dirección"}
+            Editar dirección
           </button>
         </section>
 
-<<<<<<< HEAD
         
-=======
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
         {/* =================================================================
             🚀 NUEVA SECCIÓN: HISTORIAL DE PEDIDOS (Ocupa el ancho restante)
            ================================================================= */}
@@ -433,18 +294,9 @@ export default function MiCuenta() {
             </div>
           )}
         </section>
-<<<<<<< HEAD
       </div>
 
       {/* MODALES */}
-=======
-
-      </div>
-
-      {/* =========================
-          MODALES (Sin cambios en lógica interna)
-      ========================== */}
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
       {showEditContacto && (
         <Modal onClose={() => setShowEditContacto(false)}>
           <EditarContactoForm
@@ -474,10 +326,10 @@ export default function MiCuenta() {
 function Modal({ children, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-[9999]">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative animate-[zoomIn_.2s_ease-out]">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg relative">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 text-gray-500 hover:text-black text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+          className="absolute right-4 top-4 text-gray-500 hover:text-black text-xl"
         >
           ✕
         </button>
@@ -492,7 +344,6 @@ function Modal({ children, onClose }) {
 ============================================================ */
 function EditarContactoForm({ user, setUser, close }) {
   const [nombre, setNombre] = useState(user.nombre || "");
-  const [apellido, setApellido] = useState(user.apellido || ""); // Agregué apellido por si acaso
   const [telefono, setTelefono] = useState(user.telefono || "");
   const [rut, setRut] = useState(user.rut || "");
   const [loading, setLoading] = useState(false);
@@ -522,11 +373,6 @@ function EditarContactoForm({ user, setUser, close }) {
 
       setUser((prev) => ({ ...prev, nombre, telefono, rut }));
       setOk("Datos actualizados correctamente.");
-<<<<<<< HEAD
-=======
-      setTimeout(close, 1000);
-
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
     } catch (err) {
       setError(err.message);
     } finally {
@@ -536,55 +382,50 @@ function EditarContactoForm({ user, setUser, close }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="text-xl font-semibold mb-4 text-[var(--color-secondary)]">Editar Contacto</h3>
+      <h3 className="text-xl font-semibold mb-2">Editar información de contacto</h3>
 
-      {error && <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</p>}
-      {ok && <p className="text-sm text-green-600 bg-green-50 p-2 rounded">{ok}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      {ok && <p className="text-sm text-green-600">{ok}</p>}
 
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Nombre</label>
+        <label className="block mb-1 text-sm font-medium">Nombre</label>
         <input
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--primary)] outline-none"
+          className="w-full border rounded-lg px-3 py-2"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
         />
       </div>
 
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">Teléfono</label>
+        <label className="block mb-1 text-sm font-medium">Teléfono</label>
         <input
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--primary)] outline-none"
+          className="w-full border rounded-lg px-3 py-2"
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
         />
       </div>
 
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700">RUT</label>
+        <label className="block mb-1 text-sm font-medium">RUT</label>
         <input
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--primary)] outline-none"
+          className="w-full border rounded-lg px-3 py-2"
           value={rut}
           onChange={(e) => setRut(e.target.value)}
         />
       </div>
 
-<<<<<<< HEAD
       <div className="flex justify-end gap-3">
         <button
           type="button"
           onClick={close}
           className="px-4 py-2 border rounded-lg"
         >
-=======
-      <div className="flex justify-end gap-3 pt-2">
-        <button type="button" onClick={close} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
           Cancelar
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-5 py-2 bg-[var(--primary)] text-white rounded-lg hover:opacity-90 transition font-medium"
+          className="px-5 py-2 btn-primary rounded-lg"
         >
           {loading ? "Guardando..." : "Guardar cambios"}
         </button>
@@ -609,33 +450,20 @@ function EditarDireccionForm({ user, setUser, close }) {
   // Cargar regiones/comunas
   useEffect(() => {
     const load = async () => {
-      try {
-        const res = await fetch("/api/regionesComunas");
-        const data = await res.json();
+      const res = await fetch("/api/regionesComunas");
+      const data = await res.json();
 
-        if (Array.isArray(data)) {
-          setRegiones(data);
+      if (Array.isArray(data)) {
+        setRegiones(data);
 
-<<<<<<< HEAD
         if (user.direccion) {
           const r = data.find((reg) => reg.nombre === user.direccion.region);
           if (r) {
             setRegionId(r.id.toString());
             const c = r.comunas.find((co) => co.nombre === user.direccion.comuna);
             if (c) setComunaId(c.id.toString());
-=======
-          if (user.direccion) {
-            const r = data.find(reg => reg.nombre === user.direccion.region);
-            if (r) {
-              setRegionId(r.id.toString());
-              const c = r.comunas.find(co => co.nombre === user.direccion.comuna);
-              if (c) setComunaId(c.id.toString());
-            }
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
           }
         }
-      } catch (e) {
-        console.error(e);
       }
     };
 
@@ -661,11 +489,7 @@ function EditarDireccionForm({ user, setUser, close }) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-<<<<<<< HEAD
           direccionId,
-=======
-          direccionId: direccionId,
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
           comuna,
           region,
           calle,
@@ -691,11 +515,6 @@ function EditarDireccionForm({ user, setUser, close }) {
       }));
 
       setOk("Dirección actualizada correctamente.");
-<<<<<<< HEAD
-=======
-      setTimeout(close, 1000);
-      
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
     } catch (err) {
       setError(err.message);
     } finally {
@@ -709,25 +528,20 @@ function EditarDireccionForm({ user, setUser, close }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="text-xl font-semibold mb-4 text-[var(--color-secondary)]">Editar dirección</h3>
+      <h3 className="text-xl font-semibold mb-2">Editar dirección</h3>
 
-      {error && <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</p>}
-      {ok && <p className="text-sm text-green-600 bg-green-50 p-2 rounded">{ok}</p>}
+      {error && <p className="text-sm text-red-600">{error}</p>}
+      {ok && <p className="text-sm text-green-600">{ok}</p>}
 
       <div>
-        <label className="block text-sm mb-1 font-medium text-gray-700">Región</label>
+        <label className="block text-sm mb-1 font-medium">Región</label>
         <select
           value={regionId}
-<<<<<<< HEAD
           onChange={(e) => {
             setRegionId(e.target.value);
             setComunaId("");
           }}
           className="w-full border rounded-lg px-3 py-2"
-=======
-          onChange={e => { setRegionId(e.target.value); setComunaId(""); }}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--primary)] outline-none bg-white"
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
           required
         >
           <option value="">Selecciona región</option>
@@ -740,18 +554,12 @@ function EditarDireccionForm({ user, setUser, close }) {
       </div>
 
       <div>
-        <label className="block text-sm mb-1 font-medium text-gray-700">Comuna</label>
+        <label className="block text-sm mb-1 font-medium">Comuna</label>
         <select
           value={comunaId}
-<<<<<<< HEAD
           onChange={(e) => setComunaId(e.target.value)}
           className="w-full border rounded-lg px-3 py-2"
-=======
-          onChange={e => setComunaId(e.target.value)}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--primary)] outline-none bg-white"
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
           required
-          disabled={!regionId}
         >
           <option value="">Selecciona comuna</option>
           {comunas &&
@@ -765,7 +573,6 @@ function EditarDireccionForm({ user, setUser, close }) {
 
       <div className="grid grid-cols-3 gap-3">
         <div className="col-span-2">
-<<<<<<< HEAD
           <label className="block text-sm mb-1 font-medium">Calle</label>
           <input
             className="w-full border rounded-lg px-3 py-2"
@@ -799,21 +606,6 @@ function EditarDireccionForm({ user, setUser, close }) {
           disabled={loading}
           className="px-5 py-2 btn-primary rounded-lg"
         >
-=======
-          <label className="block text-sm mb-1 font-medium text-gray-700">Calle</label>
-          <input className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--primary)] outline-none" required value={calle} onChange={e=>setCalle(e.target.value)} />
-        </div>
-
-        <div>
-          <label className="block text-sm mb-1 font-medium text-gray-700">Número</label>
-          <input className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-[var(--primary)] outline-none" required value={numero} onChange={e=>setNumero(e.target.value)} />
-        </div>
-      </div>
-
-      <div className="flex justify-end gap-3 pt-4">
-        <button type="button" onClick={close} className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancelar</button>
-        <button type="submit" disabled={loading} className="px-5 py-2 bg-[var(--primary)] text-white rounded-lg hover:opacity-90 transition font-medium">
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
           {loading ? "Guardando..." : "Guardar dirección"}
         </button>
       </div>
