@@ -1,102 +1,104 @@
-import prisma from "../../../../lib/prisma";
+import { PrismaClient } from '@prisma/client';
 
-// Convierte Prisma.Decimal a number, profundo — SIN instanceof
-function deepTransform(row) {
-  if (row && row.toNumber && typeof row.toNumber === 'function') {
-    return row.toNumber();
-  }
-  if (Array.isArray(row)) return row.map(deepTransform);
-  if (row && typeof row === 'object') {
-    const o = {};
-    for (const k in row) o[k] = deepTransform(row[k]);
-    return o;
-  }
-  return row;
-}
-
-// Normaliza precios tipo "12.345,67" => 12345.67
-function normPrecio(v) {
-  if (typeof v === 'number') return v;
-  if (typeof v !== 'string') return Number(v || 0);
-  const s = v.replace(/\./g, '').replace(',', '.').trim();
-  return Number(s);
-}
+// Usamos la instancia global para evitar múltiples conexiones en desarrollo
+const prisma = global.prisma || new PrismaClient();
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
 
 export default async function handler(req, res) {
   const { id } = req.query;
 
+  // Validación básica del ID
   if (!id || typeof id !== 'string') {
     return res.status(400).json({ error: 'ID inválido o faltante' });
   }
 
-  try {
-    // -------------------------------- GET --------------------------------
-    if (req.method === 'GET') {
-      const prod = await prisma.productos.findUnique({ where: { id } });
-      if (!prod) return res.status(404).json({ error: 'No encontrado' });
-      return res.status(200).json(deepTransform(prod));
+  // --------------------------------------
+  // DELETE: Borrar producto
+  // --------------------------------------
+  if (req.method === 'DELETE') {
+    console.log("🗑️ Intentando borrar producto ID:", id);
+
+    try {
+      // 1. Verificar si existe el producto antes de intentar nada
+      const productoExiste = await prisma.productos.findUnique({
+        where: { id: id },
+      });
+
+      if (!productoExiste) {
+        console.warn("⚠️ Producto no encontrado para borrar:", id);
+        return res.status(404).json({ error: 'El producto no existe' });
+      }
+
+      // 2. Ejecutar transacción de borrado
+      await prisma.$transaction(async (tx) => {
+        // A. Borrar historial de este producto en pedidos (pedido_items)
+        // Esto es necesario porque la BD tiene onDelete: NoAction por defecto
+        const itemsBorrados = await tx.pedido_items.deleteMany({
+          where: { producto_id: id },
+        });
+        console.log(`   -> Historial limpiado: ${itemsBorrados.count} items eliminados.`);
+
+        // B. Borrar el producto de la tabla productos
+        await tx.productos.delete({
+          where: { id: id },
+        });
+        console.log("   -> Producto eliminado correctamente de la tabla maestra.");
+      });
+
+      // 3. Responder con éxito (200 OK con JSON explícito es más seguro para depurar que 204)
+      return res.status(200).json({ message: 'Producto eliminado correctamente' });
+
+    } catch (error) {
+      console.error('❌ Error FATAL al borrar producto:', error);
+      // Devolvemos el mensaje técnico para que lo veas en el alert
+      return res.status(500).json({ 
+        error: 'Error de base de datos al borrar', 
+        details: error.message 
+      });
     }
-
-    // -------------------------------- PUT --------------------------------
-    if (req.method === 'PUT') {
-      const body = req.body || {};
-      const data = {};
-
-      if ('sku' in body) data.sku = String(body.sku || '');
-      if ('titulo' in body) data.titulo = String(body.titulo || '');
-      if ('descripcion' in body) data.descripcion = String(body.descripcion || '');
-      if ('categoria' in body) data.categoria = String(body.categoria || '');
-      if ('destacado' in body) data.destacado = Boolean(body.destacado);
-
-      if ('imagenes' in body) {
-        data.imagenes = Array.isArray(body.imagenes)
-          ? body.imagenes.map(String)
-          : body.imagenes
-          ? [String(body.imagenes)]
-          : [];
-      }
-
-      if ('precio' in body) {
-        const n = normPrecio(body.precio);
-        if (!Number.isFinite(n)) {
-          return res.status(400).json({ error: 'precio debe ser numérico' });
-        }
-        // Solución al error Decimal: asignar el número directamente
-        data.precio = n; 
-      }
-
-      if ('stock' in body) {
-        const s = Number(body.stock);
-        if (!Number.isFinite(s) || s < 0) {
-          return res.status(400).json({ error: 'stock inválido' });
-        }
-        data.stock = s;
-      }
-
-      if (data.sku) {
-        const colision = await prisma.productos.findUnique({ where: { sku: data.sku } });
-        if (colision && colision.id !== id) {
-          return res.status(409).json({ error: 'SKU ya existe en otro producto' });
-        }
-      }
-
-      const updated = await prisma.productos.update({ where: { id }, data });
-      return res.status(200).json(deepTransform(updated));
-    }
-
-    // ------------------------------ DELETE -------------------------------
-    if (req.method === 'DELETE') {
-      await prisma.productos.delete({ where: { id } });
-      return res.status(204).end();
-    }
-
-    res.setHeader('Allow', ['GET', 'PUT', 'DELETE']);
-    return res.status(405).json({ error: 'Método no permitido' });
-
-  } catch (err) {
-    console.error('[/api/productos/[id]] error:', err);
-    if (err?.code === 'P2025') return res.status(404).json({ error: 'No encontrado' });
-    if (err?.code === 'P2002') return res.status(409).json({ error: 'SKU_DUPLICADO', details: err?.meta });
-    return res.status(500).json({ error: 'Error del servidor' });
   }
+
+  // --------------------------------------
+  // PUT: Actualizar producto
+  // --------------------------------------
+  if (req.method === 'PUT') {
+    try {
+      const { sku, titulo, descripcion, precio, stock, categoria, imagenes } = req.body;
+
+      const actualizado = await prisma.productos.update({
+        where: { id: id },
+        data: {
+          sku,
+          titulo,
+          descripcion,
+          categoria,
+          precio: precio !== undefined ? parseFloat(precio) : undefined,
+          stock: stock !== undefined ? parseInt(stock) : undefined,
+          imagenes: imagenes || [],
+        },
+      });
+
+      return res.status(200).json(actualizado);
+    } catch (error) {
+      console.error('Error actualizando:', error);
+      return res.status(500).json({ error: 'No se pudo actualizar', details: error.message });
+    }
+  }
+
+  // --------------------------------------
+  // GET: Obtener producto individual
+  // --------------------------------------
+  if (req.method === 'GET') {
+    try {
+      const producto = await prisma.productos.findUnique({
+        where: { id: id },
+      });
+      if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+      return res.status(200).json(producto);
+    } catch (error) {
+      return res.status(500).json({ error: 'Error al leer producto' });
+    }
+  }
+
+  return res.status(405).json({ error: 'Método no permitido' });
 }
