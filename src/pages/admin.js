@@ -27,7 +27,7 @@ export default function Admin() {
     imagenUrl: '', // se guardará como imagenes[0]
   });
 
-  // ---------- Config localStorage (tal como lo tenías) ----------
+  // ---------- Config localStorage ----------
   const [configTemp, setConfigTemp] = useState({
     nombrePagina: 'Mi E-commerce',
     colorHeader: '#afbbcfff',
@@ -37,6 +37,7 @@ export default function Admin() {
   const [config, setConfig] = useState(configTemp);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const configLS = JSON.parse(localStorage.getItem('config'));
     if (configLS) {
       setConfigTemp(configLS);
@@ -173,14 +174,18 @@ export default function Admin() {
     }
   }
 
+  // 🛑 CORRECCIÓN AQUÍ: Validación de respuesta DELETE más robusta
   async function borrarProductoConfirmado() {
     try {
       const id = confirmDelete.id;
       const res = await fetch(`/api/productos/${id}`, { method: 'DELETE' });
-      if (res.status !== 204) {
+      
+      // Antes verificaba solo !== 204, ahora verifica si la petición falló (!res.ok)
+      if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error(err.error || 'No se pudo borrar');
       }
+      
       setConfirmDelete(null);
       await cargarProductos();
     } catch (e) {
@@ -559,7 +564,7 @@ export default function Admin() {
   return (
     <div className="flex min-h-screen font-sans bg-gray-50">
       
-      {/* 1. SIDEBAR (PANEL LATERAL) - Idéntico a admin.js pero con rutas activas ajustadas */}
+      {/* 1. SIDEBAR (PANEL LATERAL) */}
       <aside className="w-64 bg-gray-900 text-white flex flex-col shadow-xl">
         <div className="p-6 border-b border-gray-800">
              <h1 className="text-2xl font-bold tracking-wider text-center text-blue-400">ADMIN PANEL</h1>
@@ -567,7 +572,6 @@ export default function Admin() {
         
         <nav className="flex-1 p-4 space-y-2">
           {/* Enlace a Admin principal */}
-          {/* Botón Activo Actual */}
           <button className="w-full text-left py-3 px-4 rounded bg-blue-600 text-white shadow-lg transition duration-200 flex items-center gap-3">
             📦 Productos
           </button>
@@ -611,7 +615,7 @@ export default function Admin() {
         {/* HEADER (BARRA SUPERIOR) */}
         <header className="flex items-center justify-between bg-white border-b px-8 py-4 shadow-sm">
           <h2 className="text-2xl font-bold text-gray-800 capitalize">
-            Gestión de Sucursales
+            Gestión de Productos
           </h2>
           
           <div className="flex items-center gap-4">
