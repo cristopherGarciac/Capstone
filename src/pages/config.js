@@ -511,11 +511,11 @@ export default function Configuracion() {
           </Link>
           {/* Botón Activo Actual */}
           <button className="w-full text-left py-3 px-4 rounded bg-blue-600 text-white shadow-lg transition duration-200 flex items-center gap-3">
-            ⚙️ Configuración
+            🎨 Personalizacion
           </button>
           
           <Link href="/configfooter" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
-            ⚙️ ConfigFooter
+            ⚙️ Edicion Paginas/Footer
           </Link>
           
           
