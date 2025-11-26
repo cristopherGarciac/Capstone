@@ -92,10 +92,10 @@ export default function Usuarios() {
             📦 Productos
           </Link>
          <Link href="/config" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
-            ⚙️ Configuración
+            🎨 Personalizacion
           </Link>
           <Link href="/configfooter" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
-            ⚙️ ConfigFooter
+            ⚙️ Edicion Paginas/Footer
           </Link>
           <Link href="/sucursalConfig" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
             🏪 Sucursales
