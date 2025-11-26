@@ -370,6 +370,25 @@ export default function Configuracion() {
     };
     if (typeof window !== "undefined") cargar();
   }, []);
+useEffect(() => {
+  const cargarCupones = async () => {
+    try {
+      const res = await fetch("/api/cupones");
+      if (!res.ok) throw new Error("No se pudieron obtener los cupones");
+
+      const lista = await res.json();
+
+      setConfigTemp(prev => ({
+        ...prev,
+        cupones: lista
+      }));
+    } catch (e) {
+      console.error("Error cargando cupones:", e);
+    }
+  };
+
+  cargarCupones();
+}, []);
 
   // Categorías disponibles
   const categoriasOpciones = useMemo(() => {
@@ -454,45 +473,69 @@ export default function Configuracion() {
     ? configTemp.cupones
     : [];
 
-  const crearCupon = () => {
-    const codigo = nuevoCupon.codigo.trim().toUpperCase();
-    const descuentoNum = Number(nuevoCupon.descuento);
-    const expiracion = nuevoCupon.expiracion;
+  const crearCupon = async () => {
+  const codigo = nuevoCupon.codigo.trim().toUpperCase();
+  const descuentoNum = Number(nuevoCupon.descuento);
+  const expiracion = nuevoCupon.expiracion;
 
-    if (!codigo || !descuentoNum || !expiracion) {
-      alert("Completa código, descuento y fecha de expiración.");
-      return;
-    }
+  if (!codigo || !descuentoNum || !expiracion) {
+    alert("Completa código, descuento y fecha de expiración.");
+    return;
+  }
 
-    if (isNaN(descuentoNum) || descuentoNum <= 0 || descuentoNum > 100) {
-      alert("El descuento debe ser un número entre 1 y 100.");
-      return;
-    }
-
-    setConfigTemp((prev) => {
-      const actuales = Array.isArray(prev.cupones) ? prev.cupones : [];
-      if (actuales.some((c) => c.codigo === codigo)) {
-        alert("Ya existe un cupón con ese código.");
-        return prev;
-      }
-      return {
-        ...prev,
-        cupones: [
-          ...actuales,
-          { codigo, descuento: descuentoNum, expiracion },
-        ],
-      };
+  try {
+    const res = await fetch("/api/cupones", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        codigo,
+        descuento: descuentoNum,
+        expiracion,
+      }),
     });
 
-    setNuevoCupon({ codigo: "", descuento: "", expiracion: "" });
-  };
+    if (!res.ok) {
+      throw new Error("No se pudo crear el cupón");
+    }
 
-  const eliminarCupon = (codigo) => {
-    setConfigTemp((prev) => ({
+    const nuevo = await res.json();
+
+    // ACTUALIZAR LISTA DESDE LA BD
+    setConfigTemp(prev => ({
       ...prev,
-      cupones: (prev.cupones || []).filter((c) => c.codigo !== codigo),
+      cupones: [...prev.cupones, nuevo],
     }));
-  };
+
+    setNuevoCupon({ codigo: "", descuento: "", expiracion: "" });
+
+    alert("Cupón creado correctamente 🎉");
+  } catch (e) {
+    console.error(e);
+    alert("Error al crear cupón");
+  }
+};
+
+const eliminarCupon = async (codigo) => {
+  if (!confirm("¿Eliminar este cupón?")) return;
+
+  try {
+    const res = await fetch(`/api/cupones/delete?codigo=${codigo}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) throw new Error("Error eliminando cupón");
+
+    setConfigTemp(prev => ({
+      ...prev,
+      cupones: prev.cupones.filter(c => c.codigo !== codigo)
+    }));
+
+    alert("Cupón eliminado correctamente");
+  } catch (e) {
+    console.error(e);
+    alert("No se pudo eliminar el cupón");
+  }
+};
 
   // --- RENDERIZADO COMPLETO CON LAYOUT DE ADMIN ---
   return (

@@ -53,14 +53,12 @@ export default function Carrito() {
   useEffect(() => {
     if (user) {
       console.log("📢 DEBUG USUARIO:", user);
-      console.log("🔑 ROL DETECTADO:", user.rol);
-      
       if (!user.rol) {
         console.warn("⚠️ El usuario existe pero NO tiene propiedad 'rol'. Revisa tu API.");
       } else if (user.rol.trim().toLowerCase() !== 'admin') {
-        console.warn(`⚠️ El rol es '${user.rol}', por eso no se muestra el menú Admin.`);
+        // console.warn(`⚠️ El rol es '${user.rol}', por eso no se muestra el menú Admin.`);
       } else {
-        console.log("✅ El rol es admin, el menú debería aparecer.");
+        // console.log("✅ El rol es admin, el menú debería aparecer.");
       }
     }
   }, [user]);
@@ -271,7 +269,7 @@ export default function Carrito() {
   const clampQty = (n, max = 999) => Math.max(1, Math.min(Number(n) || 1, max));
 
   // -------------------------------------------
-  // ELIMINAR ITEM (NUEVA FUNCIÓN)
+  // ELIMINAR ITEM
   // -------------------------------------------
   const removeItem = (id) => {
     const nextItems = items.filter((item) => item.id !== id);
@@ -279,13 +277,83 @@ export default function Carrito() {
   };
 
   // -------------------------------------------
+  // FUNCION AUXILIAR: CREAR PEDIDO EN BD
+  // -------------------------------------------
+  const createOrderInDB = async () => {
+    if (!user) {
+      alert("Debes iniciar sesión para crear el pedido.");
+      setLoginOpen(true);
+      return null;
+    }
+
+    try {
+      // CORRECCIÓN: Apunta a 'crear_pedido.js'
+      const API_URL = '/api/pedidos/crear_pedido';
+      console.log("Intentando crear pedido en:", API_URL);
+
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          usuarioId: user.id,
+          items: items,
+          total: total,
+          metodoPago: paymentMethod,
+          tipoEnvio: shippingMethod,
+          direccion: shippingAddress
+        })
+      });
+
+      const contentType = response.headers.get("content-type");
+      
+      // Verificar si es JSON antes de procesar
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || `Error del servidor (${response.status})`);
+        }
+        return data;
+      } else {
+        // Si recibimos HTML (error 404 o 500)
+        const text = await response.text();
+        console.error("❌ LA API DEVOLVIÓ HTML (Probable 404 o 500):", text);
+        
+        if (response.status === 404) {
+          throw new Error(`Error 404: No se encontró la API en '${API_URL}'. Verifica que el archivo exista en 'src/pages/api/pedidos/crear_pedido.js'.`);
+        } else if (response.status === 500) {
+          throw new Error(`Error 500: El servidor falló al procesar el pedido. Revisa la consola del servidor.`);
+        } else {
+          throw new Error(`Error ${response.status}: La API no respondió correctamente.`);
+        }
+      }
+
+    } catch (error) {
+      console.error("Error creando pedido:", error);
+      alert(error.message); // Muestra el mensaje detallado en la alerta
+      return null;
+    }
+  };
+
+  // -------------------------------------------
   // WEBPAY & MERCADOPAGO
   // -------------------------------------------
   const handlePay = async () => {
-    console.log("Iniciando pago con Webpay...");
     if (total <= 0) { alert("El total a pagar debe ser mayor a cero."); return; }
+    
+    const pedidoCreado = await createOrderInDB();
+    if (!pedidoCreado) return;
+
+    console.log("Pedido creado en BD con ID:", pedidoCreado.id);
+    console.log("Iniciando pago con Webpay...");
+
     const returnUrl = `${window.location.origin}/api/webpay/commit`;
-    const paymentData = { amount: total, sessionId: user?.id ? `user-${user.id}` : "guest-session", returnUrl: returnUrl, };
+    const paymentData = { 
+      amount: total, 
+      sessionId: `user-${user.id}`, 
+      buyOrder: `pedido-${pedidoCreado.id}`,
+      returnUrl: returnUrl, 
+    };
+
     try {
       const response = await fetch("/api/webpay/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(paymentData), });
       const data = await response.json();
@@ -302,8 +370,16 @@ export default function Carrito() {
   };
 
   const handlePayMP = async () => {
+    if (total <= 0) { alert("El total a pagar debe ser mayor a cero."); return; }
+
+    const pedidoCreado = await createOrderInDB();
+    if (!pedidoCreado) return;
+
+    console.log("Pedido creado en BD con ID:", pedidoCreado.id);
     console.log("Iniciando pago con Mercado Pago...");
-    const mpItemsFinal = [{ title: "Total de Compra de E-commerce", quantity: 1, unit_price: total, currency_id: "CLP", }];
+    
+    const mpItemsFinal = [{ title: `Pedido #${pedidoCreado.id} - E-commerce`, quantity: 1, unit_price: total, currency_id: "CLP", }];
+    
     try {
       const response = await fetch("/api/mercadopago/create", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ items: mpItemsFinal }), });
       const data = await response.json();
@@ -313,7 +389,7 @@ export default function Carrito() {
   };
 
   // -------------------------------------------
-  // LOGIN LOGIC (Actualizado para usar API Real)
+  // LOGIN LOGIC
   // -------------------------------------------
   const handleLoginChange = (e) => setLoginData((p) => ({ ...p, [e.target.name]: e.target.value }));
   
@@ -321,19 +397,15 @@ export default function Carrito() {
     e.preventDefault();
     setLoginError("");
     try {
-      // USAMOS LA API REAL QUE ACABAS DE CREAR/MODIFICAR
       const res = await fetch('/api/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', },
         body: JSON.stringify(loginData),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // Guardamos el usuario con el rol incluido
         setUser(data); 
         setLoginOpen(false);
       } else {
@@ -360,6 +432,12 @@ export default function Carrito() {
       setCheckoutPhase(2);
     } else if (checkoutPhase === 2) {
       if (!paymentMethod) { alert("Por favor, selecciona un método de pago."); return; }
+      if (!user) {
+        alert("Debes iniciar sesión o registrarte para completar la compra.");
+        setLoginOpen(true);
+        return;
+      }
+
       if (paymentMethod === 'webpay') handlePay();
       else if (paymentMethod === 'mercado-pago') handlePayMP();
       else setCheckoutPhase(3);
@@ -383,7 +461,6 @@ export default function Carrito() {
   // -------------------------------------------
   // RENDERIZADO DE COMPONENTES DE ESTRUCTURA
   // -------------------------------------------
-  
   const CheckoutProgress = ({ phase }) => (
     <div className="flex justify-center mb-6 text-sm font-semibold">
       {[1, 2, 3].map((step) => (
@@ -398,7 +475,6 @@ export default function Carrito() {
     </div>
   );
 
-  // Fase 1: Envío
   const ShippingPhase = () => {
     const hasPreloadedAddress = user && user.direccion;
     const handleAddNewAddress = () => { setIsEditingNewAddress(true); setShippingAddress({}); };
@@ -407,8 +483,6 @@ export default function Carrito() {
     return (
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-xl font-bold mb-6">1. Información de Envío</h2>
-        
-        {/* 1. SECCIÓN DE DIRECCIONES */}
         <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4">1. Dirección de Despacho</h3>
           {hasPreloadedAddress && (
@@ -420,7 +494,6 @@ export default function Carrito() {
           <button className={`mt-2 px-4 py-2 border rounded-lg font-semibold text-sm transition w-full md:w-auto ${isEditingNewAddress ? 'bg-purple-100 text-purple-700 border-purple-700' : 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-200'}`} onClick={handleAddNewAddress}> + NUEVA DIRECCIÓN </button>
         </div>
 
-        {/* 2. FORMULARIO DE DIRECCIÓN */}
         {(isEditingNewAddress || !hasPreloadedAddress) && shippingMethod === "home-delivery" && (
           <>
             <hr className="my-6" />
@@ -432,8 +505,6 @@ export default function Carrito() {
               <div><label className="block text-sm font-medium text-gray-700">Apellido *</label><input type="text" name="apellido" value={shippingAddress.apellido || ""} onChange={handleShippingAddressChange} placeholder="Apellido" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required /></div>
               <div className="md:col-span-2"><label className="block text-sm font-medium text-gray-700">Dirección (calle y número) *</label><input type="text" name="direccion" value={shippingAddress.direccion || ""} onChange={handleShippingAddressChange} placeholder="Ej: Avenida Principal 123" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required /></div>
               <div><label className="block text-sm font-medium text-gray-700">País *</label><select name="pais" value={shippingAddress.pais || "Chile"} onChange={handleShippingAddressChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"><option value="Chile">Chile</option></select></div>
-              
-              {/* SELECT DE REGIONES */}
               <div>
                 <label className="block text-sm font-medium text-gray-700">Región *</label>
                 <select name="region" value={selectedRegionId} onChange={handleShippingAddressChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
@@ -441,8 +512,6 @@ export default function Carrito() {
                   {regiones.map((region) => (<option key={region.id} value={region.id}> {region.nombre} </option>))}
                 </select>
               </div>
-              
-              {/* SELECT DE COMUNAS */}
               <div>
                 <label className="block text-sm font-medium text-gray-700">Comuna *</label>
                 <select name="comuna" value={shippingAddress.comuna || ""} onChange={handleShippingAddressChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required disabled={!selectedRegionId}>
@@ -455,11 +524,8 @@ export default function Carrito() {
           </>
         )}
 
-        {/* 3. MÉTODOS DE ENVÍO DINÁMICOS */}
         <h3 className="text-lg font-semibold mb-2 mt-8">3. Métodos de Envío</h3>
         <div className="mb-6 space-y-2">
-          
-          {/* OPCIÓN: RETIRO EN TIENDA (Solo si HAS_STORE_PICKUP es true) */}
           {storeConfig.HAS_STORE_PICKUP && (
             <label className="flex items-center justify-between cursor-pointer py-2 border-b border-gray-200">
               <div className="flex items-center">
@@ -469,8 +535,6 @@ export default function Carrito() {
               <span className="font-semibold text-sm">{precioCLP(storeConfig.SHIPPING_OPTIONS.STORE_PICKUP.cost)}</span>
             </label>
           )}
-
-          {/* OPCIÓN: DESPACHO DOMICILIO */}
           <label className="flex items-center justify-between cursor-pointer py-2 border-b border-gray-200">
             <div className="flex items-center">
               <input type="radio" name="shipping-method" value="home-delivery" checked={shippingMethod === "home-delivery"} onChange={(e) => setShippingMethod(e.target.value)} className="form-radio h-4 w-4 text-purple-600 mr-3" />
@@ -480,7 +544,6 @@ export default function Carrito() {
           </label>
         </div>
 
-        {/* SELECT DE SUCURSAL DINÁMICO */}
         {shippingMethod === "store-pickup" && (
           <>
             <h3 className="text-lg font-semibold mb-2">Selecciona Sucursal de Retiro *</h3>
@@ -500,7 +563,6 @@ export default function Carrito() {
     );
   };
 
-  // Fase 2: Pago
   const PaymentPhase = () => {
     const isStorePickup = shippingMethod === "store-pickup";
     const selectedStoreName = isStorePickup
@@ -522,8 +584,6 @@ export default function Carrito() {
           <button onClick={() => setCheckoutPhase(1)} className="mt-2 text-xs text-purple-600 hover:underline">Editar Envío</button>
         </div>
 
-        
-
         <div className="mb-6">
           <h3 className="text-lg font-semibold mb-2">Método de Pago</h3>
           <div className="flex flex-col space-y-2">
@@ -539,13 +599,11 @@ export default function Carrito() {
         </div>
 
         <div className="mt-8 text-right">
-          {/* Corrección: Eliminada la dependencia de documentType en el disabled */}
           <button onClick={handleNextPhase} className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" disabled={!paymentMethod || (isStorePickup && !selectedStore)}> Pagar {precioCLP(total)} </button>
         </div>
       </div>
     );
   };
- 
 
   const ReceiptPhase = () => (
     <div className="bg-white p-6 rounded-lg shadow text-center">
@@ -559,82 +617,48 @@ export default function Carrito() {
   // RENDER PRINCIPAL
   // -------------------------------------------
   return (
-    <main className="min-h-screen">
-
-      {/* TOP BAR */}
-      <div className="bg-[var(--color-secondary)] text-white text-center py-2 text-sm">
+    <div className="min-h-screen flex flex-col relative"
+      style={{
+        backgroundColor: fondo.fondoImagen ? undefined : fondo.colorFondo,
+        backgroundImage: fondo.fondoImagen ? `url(${fondo.fondoImagen})` : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      <div className="bg-[var(--color-secondary)] text-white text-center py-2 text-sm relative z-20">
         {promociones.map((p, i) => (
           <span key={i} className="mx-4">{p.texto}</span>
         ))}
       </div>
 
-      {/* NAVBAR (IGUAL A TU AMIGO, CON LOGIN TUYO) */}
-      <nav
-        className="shadow sticky top-0 z-50"
-        style={{ backgroundColor: colorHeader }}
-      >
+      <nav className="shadow sticky top-0 z-50" style={{ backgroundColor: colorHeader }}>
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-
-          {/* LOGO */}
           <Link href="/" className="logo text-2xl font-bold">
             <img src={logo} alt="logo" className="h-20 w-auto" />
           </Link>
-
-          {/* LINKS */}
           <div className="flex items-center space-x-6">
             <span className="text-2xl font-semibold">{nombrePagina}</span>
-
-            <Link href="/" className="text-gray-700 hover:text-[var(--color-primary)]">
-              Inicio
-            </Link>
-
-            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-primary)]">
-              Catálogo
-            </Link>
-
+            <Link href="/" className="text-gray-700 hover:text-[var(--color-primary)]">Inicio</Link>
+            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-primary)]">Catálogo</Link>
             <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-primary)]">
               <img src="/images/carrito.png" className="h-11" />
             </Link>
-
-            {/* SOLO ADMIN VE EL BOTÓN */}
-{user?.rol === "admin" && (
-  <Link
-    href="/admin"
-    className="text-gray-700 hover:text-[var(--color-primary)] font-semibold"
-  >
-    Admin
-  </Link>
-)}
-
-
+            {user?.rol === "admin" && (
+              <Link href="/admin" className="text-gray-700 hover:text-[var(--color-primary)] font-semibold">Admin</Link>
+            )}
             {user ? (
-  <div className="flex items-center space-x-4">
-
-
-<Link href="/mi_cuenta" className="text-gray-700 hover:text-[var(--color-primary)]">
-  Hola, {user.nombre}
-</Link>
-
-    {/* Ver mi cuenta */}
-    <Link href="/mi_cuenta" className="flex items-center">
-      <img
-        src={user.fotoperfil || "/images/default-user.jpg"}
-        alt="perfil"
-        className="h-10 w-10 rounded-full object-cover border border-gray-300 cursor-pointer hover:opacity-90"
-      />
-    </Link>
-
-
-  </div>
-) : (
-
-              <button
-                onClick={() => setLoginOpen(true)}
-                className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
-              >
+              <div className="flex items-center space-x-4">
+                <Link href="/mi_cuenta" className="text-gray-700 hover:text-[var(--color-primary)]">Hola, {user.nombre}</Link>
+                <Link href="/mi_cuenta" className="flex items-center">
+                  <img src={user.fotoperfil || "/images/default-user.jpg"} alt="perfil" className="h-10 w-10 rounded-full object-cover border border-gray-300 cursor-pointer hover:opacity-90" />
+                </Link>
+              </div>
+            ) : (
+              <button onClick={() => setLoginOpen(true)} className="text-gray-700 hover:text-[var(--color-accent)] flex items-center">
                 <svg className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z" />
                 </svg>
                 Iniciar sesión
               </button>
@@ -643,192 +667,103 @@ export default function Carrito() {
         </div>
       </nav>
 
-      {/* LOGIN MODAL — TU LOGIN */}
       {loginOpen && (
         <div className="fixed inset-0 bg-black/40 flex justify-center items-start pt-24 z-50">
           <div className="bg-white rounded-xl shadow-lg w-96 p-6 relative">
-            <button
-              onClick={() => setLoginOpen(false)}
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-            >
-              ✕
-            </button>
-
-            <h2 className="text-2xl font-bold text-[var(--color-secondary)] mb-4 text-center">
-              Iniciar Sesión
-            </h2>
-
+            <button onClick={() => setLoginOpen(false)} className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">✕</button>
+            <h2 className="text-2xl font-bold text-[var(--color-secondary)] mb-4 text-center">Iniciar Sesión</h2>
             <form onSubmit={handleLogin} className="flex flex-col gap-4">
-              <input
-                type="email"
-                name="email"
-                value={loginData.email}
-                onChange={handleLoginChange}
-                placeholder="Correo electrónico"
-                className="border p-2 rounded"
-                required
-              />
-
-              <input
-                type="password"
-                name="password"
-                value={loginData.password}
-                onChange={handleLoginChange}
-                placeholder="Contraseña"
-                className="border p-2 rounded"
-                required
-              />
-
-              <button type="submit" className="btn-primary w-full">
-                Iniciar Sesión
-              </button>
+              <input type="email" name="email" value={loginData.email} onChange={handleLoginChange} placeholder="Correo electrónico" className="border p-2 rounded" required />
+              <input type="password" name="password" value={loginData.password} onChange={handleLoginChange} placeholder="Contraseña" className="border p-2 rounded" required />
+              <button type="submit" className="btn-primary w-full">Iniciar Sesión</button>
             </form>
-
-            {loginError && (
-              <p className="text-red-500 text-sm mt-2 text-center">{loginError}</p>
-            )}
+            {loginError && <p className="text-red-500 text-sm mt-2 text-center">{loginError}</p>}
           </div>
         </div>
       )}
 
-      {/* CONTENIDO PRINCIPAL - CHECKOUT */}
-      <main className="max-w-7xl mx-auto p-6">
-        {items.length === 0 && checkoutPhase < 3 ? (
-           <div className="bg-white rounded-lg shadow p-6 text-gray-500">
-             <h1 className="text-2xl font-bold mb-6">Carrito de compras</h1>
-             Tu carrito está vacío. <Link className="text-purple-700 hover:underline ml-2" href="/catalogo"> Ir al catálogo </Link>
-           </div>
-        ) : (
-          <>
-            <h1 className="text-2xl font-bold mb-6">Proceso de Pago</h1>
-            <CheckoutProgress phase={checkoutPhase} />
-           
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              
-              {/* ASIDE LATERAL: ITEMS + TOTALES */}
-              <aside className="bg-white rounded-lg shadow p-5 h-max order-1 lg:col-span-1">
-                <h2 className="text-xl font-bold mb-4">Resumen del Pedido</h2>
-                
-                {/* 1. ITEMS (ACTUALIZADO CON BOTÓN DE ELIMINAR) */}
-                <div className="space-y-3 text-sm mb-6">
-                  <div className="mb-4">
-                    {items.map((item) => (
-                      <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-100 group">
-                        <div className="flex items-center">
-                          {/* Botón de eliminar (Trash Icon) */}
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="text-gray-400 hover:text-red-600 mr-2 transition-colors focus:outline-none"
-                            title="Eliminar producto"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                          
-                          <span className="text-gray-900 text-xs">
-                            {item.titulo} <strong>(x{item.qty})</strong>
-                          </span>
-                        </div>
-                        
-                        <span className="font-medium text-xs">
-                          {precioCLP(Number(item.precio || 0) * Number(item.qty || 0))}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <hr className="mb-6"/>
-
-                {/* 2. TOTALES */}
-                <h2 className="text-xl font-bold mb-4">Total del pedido</h2>
-
-                <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                        <span className="text-gray-600">Subtotal:</span>
-                        <span className="font-medium">{precioCLP(subtotal)}</span>
-                    </div>
-
-                    <div className="flex justify-between">
-                        <span className="text-gray-600">Impuestos:</span>
-                        <span className="font-medium">{precioCLP(impuestos)}</span>
-                    </div>
-
-                    {appliedCoupon && (
-                        <div className="flex justify-between text-green-600">
-                        <span>Descuento ({appliedCoupon.codigo}):</span>
-                        <span>-{precioCLP(descuento)}</span>
-                        </div>
-                    )}
-
-                    <hr />
-
-                    <div className="flex justify-between text-base font-bold">
-                        <span>Total:</span>
-                        <span>{precioCLP(total)}</span>
-                    </div>
-                </div>
-
-                {/* 3. CUPÓN */}
-                <div className="mt-4">
-                    <p className="text-sm font-semibold mb-1 text-gray-700">
-                        Tengo un código promocional
-                    </p>
-
-                    {!appliedCoupon ? (
-                        <>
-                        <input
-                            type="text"
-                            value={cuponIngresado}
-                            onChange={(e) => setCuponIngresado(e.target.value)}
-                            placeholder="Ingresa tu cupón"
-                            className="border w-full p-2 rounded mb-2"
-                        />
-
-                        <button
-                            onClick={aplicarCupon}
-                            className="bg-gray-800 hover:bg-black text-white text-sm px-3 py-2 rounded w-full"
-                        >
-                            Aplicar cupón
-                        </button>
-
-                        {errorCupon && (
-                            <p className="text-red-500 text-xs mt-1">
-                            {errorCupon}
-                            </p>
-                        )}
-                        </>
-                    ) : (
-                        <div className="p-3 bg-green-100 border border-green-300 rounded">
-                            <p className="font-semibold text-green-900 text-sm">
-                                Cupón aplicado: {appliedCoupon.codigo}
-                            </p>
-
-                            <button
-                                onClick={() => setAppliedCoupon(null)}
-                                className="text-red-600 text-xs mt-1 underline"
-                            >
-                                Quitar cupón
+      <div className="flex-grow w-full px-4 sm:px-6 lg:px-8 py-8 z-10">
+        <div className="max-w-7xl mx-auto rounded-xl shadow-2xl overflow-hidden min-h-[50vh] p-6 sm:p-8" style={{ backgroundColor: fondo.colorFondo }}>
+          {items.length === 0 && checkoutPhase < 3 ? (
+             <div className="bg-white rounded-lg shadow p-6 text-gray-500">
+               <h1 className="text-2xl font-bold mb-6">Carrito de compras</h1>
+               Tu carrito está vacío. <Link className="text-purple-700 hover:underline ml-2" href="/catalogo"> Ir al catálogo </Link>
+             </div>
+          ) : (
+            <>
+              <h1 className="text-2xl font-bold mb-6 text-gray-800">Proceso de Pago</h1>
+              <CheckoutProgress phase={checkoutPhase} />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <aside className="bg-white rounded-lg shadow p-5 h-max order-1 lg:col-span-1">
+                  <h2 className="text-xl font-bold mb-4">Resumen del Pedido</h2>
+                  <div className="space-y-3 text-sm mb-6">
+                    <div className="mb-4">
+                      {items.map((item) => (
+                        <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-100 group">
+                          <div className="flex items-center">
+                            <button onClick={() => removeItem(item.id)} className="text-gray-400 hover:text-red-600 mr-2 transition-colors focus:outline-none" title="Eliminar producto">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
                             </button>
+                            <span className="text-gray-900 text-xs">{item.titulo} <strong>(x{item.qty})</strong></span>
+                          </div>
+                          <span className="font-medium text-xs">{precioCLP(Number(item.precio || 0) * Number(item.qty || 0))}</span>
                         </div>
-                    )}
-                </div>
-              </aside>
+                      ))}
+                    </div>
+                  </div>
+                  <hr className="mb-6"/>
+                  <h2 className="text-xl font-bold mb-4">Total del pedido</h2>
+                  <div className="space-y-3 text-sm">
+                      <div className="flex justify-between">
+                          <span className="text-gray-600">Subtotal:</span>
+                          <span className="font-medium">{precioCLP(subtotal)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                          <span className="text-gray-600">Impuestos:</span>
+                          <span className="font-medium">{precioCLP(impuestos)}</span>
+                      </div>
+                      {appliedCoupon && (
+                          <div className="flex justify-between text-green-600">
+                          <span>Descuento ({appliedCoupon.codigo}):</span>
+                          <span>-{precioCLP(descuento)}</span>
+                          </div>
+                      )}
+                      <hr />
+                      <div className="flex justify-between text-base font-bold">
+                          <span>Total:</span>
+                          <span>{precioCLP(total)}</span>
+                      </div>
+                  </div>
+                  <div className="mt-4">
+                      <p className="text-sm font-semibold mb-1 text-gray-700">Tengo un código promocional</p>
+                      {!appliedCoupon ? (
+                          <>
+                          <input type="text" value={cuponIngresado} onChange={(e) => setCuponIngresado(e.target.value)} placeholder="Ingresa tu cupón" className="border w-full p-2 rounded mb-2" />
+                          <button onClick={aplicarCupon} className="bg-gray-800 hover:bg-black text-white text-sm px-3 py-2 rounded w-full">Aplicar cupón</button>
+                          {errorCupon && (<p className="text-red-500 text-xs mt-1">{errorCupon}</p>)}
+                          </>
+                      ) : (
+                          <div className="p-3 bg-green-100 border border-green-300 rounded">
+                              <p className="font-semibold text-green-900 text-sm">Cupón aplicado: {appliedCoupon.codigo}</p>
+                              <button onClick={() => setAppliedCoupon(null)} className="text-red-600 text-xs mt-1 underline">Quitar cupón</button>
+                          </div>
+                      )}
+                  </div>
+                </aside>
+                <section className="order-2 lg:col-span-2">
+                  {checkoutPhase === 1 && <ShippingPhase />}
+                  {checkoutPhase === 2 && <PaymentPhase />}
+                  {checkoutPhase === 3 && <ReceiptPhase />}
+                </section>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
-              {/* CONTENIDO DE FASES */}
-              <section className="order-2 lg:col-span-2">
-                {checkoutPhase === 1 && <ShippingPhase />}
-                {checkoutPhase === 2 && <PaymentPhase />}
-                {checkoutPhase === 3 && <ReceiptPhase />}
-              </section>
-            </div>
-          </>
-        )}
-      </main>
-
-      {/* FOOTER */}
-      <footer style={{ backgroundColor: colorFooter }} className="text-black mt-16 border-t border-gray-200">
+      <footer style={{ backgroundColor: colorFooter }} className="text-black mt-16 border-t border-gray-200 relative z-10">
         <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h4 className="text-xl font-semibold mb-4 border-l-4 border-purple-600 pl-3">Ayuda</h4>
@@ -837,7 +772,6 @@ export default function Carrito() {
               <li><Link href="/seguimiento" className="hover:text-purple-600">Seguimiento de mi compra</Link></li>
             </ul>
           </div>
-
           <div>
             <h4 className="text-xl font-semibold mb-4 border-l-4 border-purple-600 pl-3">Nosotros</h4>
             <ul className="space-y-2 text-gray-600">
@@ -845,26 +779,16 @@ export default function Carrito() {
               <li><Link href="/terminos" className="hover:text-purple-600">Términos y condiciones</Link></li>
             </ul>
           </div>
-
           <div>
             <h4 className="text-xl font-semibold mb-4 border-l-4 border-purple-600 pl-3">Comunidad</h4>
             <ul className="space-y-2 text-gray-600">
-              <li>
-                <a href="https://www.instagram.com/blitz.hardware" target="_blank" className="hover:text-purple-600 flex items-center">
-                  Instagram
-                </a>
-              </li>
+              <li><a href="https://www.instagram.com/blitz.hardware" target="_blank" className="hover:text-purple-600 flex items-center">Instagram</a></li>
             </ul>
           </div>
         </div>
-
         <hr className="border-gray-200" />
-
-        <div className="bg-gray-50 text-center text-xs py-4 text-gray-500">
-          © 2025 – Proyecto Capstone — Cristopher García & equipo
-        </div>
+        <div className="bg-gray-50 text-center text-xs py-4 text-gray-500">© 2025 – Proyecto Capstone — Cristopher García & equipo</div>
       </footer>
-    </main>
-    
+    </div>
   );
 }

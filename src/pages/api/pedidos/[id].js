@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Método no permitido" });
-    }
+  }
 
   try {
     const pedido = await prisma.pedidos.findUnique({
@@ -29,12 +29,6 @@ export default async function handler(req, res) {
             },
           },
         },
-        cupones: {
-          select: {
-            codigo: true,
-            descuento: true,
-          },
-        },
       },
     });
 
@@ -42,32 +36,19 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "Pedido no encontrado" });
     }
 
-    // --- CÁLCULOS ---
-    const subtotal = pedido.pedido_items.reduce(
-      (acc, item) => acc + item.subtotal,
-      0
-    );
-
-    const iva = Math.round(subtotal * 0.19);
-
-    const descuento = pedido.cupones
-      ? pedido.cupones.descuento
-      : 0;
-
-    const despacho = pedido.retiro_tienda ? 0 : 3500;
-
-    const total_final = subtotal + iva - descuento + despacho;
-
+    // === FORMATEAMOS RESPUESTA USANDO LOS CAMPOS DE LA BD ===
     const respuesta = {
       ...pedido,
-      subtotal,
-      iva,
-      descuento,
-      despacho,
-      total_final,
+      subtotal: Number(pedido.subtotal) || 0,
+      iva: Number(pedido.iva) || 0,
+      descuento: Number(pedido.descuento_total) || 0,
+      despacho: Number(pedido.costo_envio) || 0,
+      total_final: Number(pedido.total_final) || 0,
+      cupon_codigo: pedido.cupon_codigo || null,
     };
 
     res.status(200).json(respuesta);
+
   } catch (error) {
     console.error("❌ Error cargando pedido:", error);
     res.status(500).json({ error: "Error cargando pedido" });
