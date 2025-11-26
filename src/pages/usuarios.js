@@ -34,26 +34,32 @@ export default function Usuarios() {
   const paginasTotales = Math.ceil(filtered.length / perPage);
   const currentPageItems = filtered.slice((pagina - 1) * perPage, pagina * perPage);
 
-  const eliminarUsuario = async (id) => {
-    if (!confirm('¿Seguro que deseas eliminar este usuario?')) return;
-    const res = await fetch('/api/usuarios/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-    if (res.ok) setUsuarios(prev => prev.filter(u => u.id !== id));
-    else alert('Error eliminando usuario');
-  };
+ const eliminarUsuario = async (id) => {
+  if (!confirm('¿Seguro que deseas eliminar este usuario?')) return;
+
+  const res = await fetch('/api/usuarios/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id }),
+  });
+
+  if (res.ok)
+    setUsuarios(prev => prev.filter(u => u.id !== id));
+  else
+    alert('Error eliminando usuario');
+};
+
 
   const guardarEdicion = async () => {
     if (!editUsuario) return;
 
     try {
-      const res = await fetch('/api/usuarios/edit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editUsuario),
-      });
+     const res = await fetch('/api/usuarios/edit', {
+  method: 'PUT',   // ← ✔ CORRECTO
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(editUsuario),
+});
+
       if (res.ok) {
         setUsuarios(prev => prev.map(u => (u.id === editUsuario.id ? editUsuario : u)));
         setEditUsuario(null);

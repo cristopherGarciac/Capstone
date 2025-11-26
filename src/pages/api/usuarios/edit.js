@@ -1,15 +1,17 @@
 import prisma from "../../../../lib/prisma";
 
 export default async function handler(req, res) {
-  if (req.method !== 'PUT') {
-    res.setHeader('Allow', ['PUT']);
-    return res.status(405).end(`Método ${req.method} no permitido`);
+  if (req.method !== "PUT") {
+    res.setHeader("Allow", ["PUT"]);
+    res.status(405).json({ error: `Método ${req.method} no permitido` });
+    return; // ← evita que Next.js detecte retorno indebido
   }
 
   const { id, nombre, apellido, email, telefono, rut } = req.body;
 
   if (!id) {
-    return res.status(400).json({ error: "ID es obligatorio" });
+    res.status(400).json({ error: "ID es obligatorio" });
+    return;
   }
 
   try {
@@ -20,14 +22,16 @@ export default async function handler(req, res) {
         apellido,
         email,
         telefono,
-        rut
-      }
+        rut,
+      },
     });
 
-    return res.status(200).json(updated);
+    res.status(200).json(updated);
+    return;
 
   } catch (err) {
     console.error("Error al actualizar usuario:", err);
-    return res.status(500).json({ error: "Error al actualizar usuario" });
+    res.status(500).json({ error: "Error al actualizar usuario" });
+    return;
   }
 }
