@@ -149,10 +149,9 @@ const handleLogout = () => {
           </div>
 
           <p className="font-semibold">Resumen</p>
-
-          <button className="block text-left text-[var(--textSoft)] hover:text-[var(--text)]">
+<Link href="/seguimiento" className="block py-3 px-4 rounded text-gray-400 hover:bg-gray-800 hover:text-white transition duration-200 flex items-center gap-3">
             Mis pedidos
-          </button>
+          </Link>
 
           <hr className="my-4" />
           {/* Botón para volver al inicio */}

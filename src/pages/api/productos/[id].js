@@ -1,7 +1,4 @@
 import prisma from "../../../../lib/prisma";
-<<<<<<< HEAD
-=======
-import { Prisma } from "@prisma/client";
 
 // Convierte Prisma.Decimal a number, profundo — SIN instanceof
 function deepTransform(row) {
@@ -24,81 +21,10 @@ function normPrecio(v) {
   const s = v.replace(/\./g, '').replace(',', '.').trim();
   return Number(s);
 }
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
 
 export default async function handler(req, res) {
-  const { id_pedido } = req.query;
+  const { id } = req.query;
 
-<<<<<<< HEAD
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Método no permitido" });
-    }
-
-  try {
-    const pedido = await prisma.pedidos.findUnique({
-      where: { id: id_pedido },
-
-      include: {
-        usuarios: {
-          select: {
-            nombre: true,
-            apellido: true,
-            email: true,
-          },
-        },
-        pedido_items: {
-          include: {
-            productos: {
-              select: {
-                titulo: true,
-                sku: true,
-              },
-            },
-          },
-        },
-        cupones: {
-          select: {
-            codigo: true,
-            descuento: true,
-          },
-        },
-      },
-    });
-
-    if (!pedido) {
-      return res.status(404).json({ error: "Pedido no encontrado" });
-    }
-
-    // --- CÁLCULOS ---
-    const subtotal = pedido.pedido_items.reduce(
-      (acc, item) => acc + item.subtotal,
-      0
-    );
-
-    const iva = Math.round(subtotal * 0.19);
-
-    const descuento = pedido.cupones
-      ? pedido.cupones.descuento
-      : 0;
-
-    const despacho = pedido.retiro_tienda ? 0 : 3500;
-
-    const total_final = subtotal + iva - descuento + despacho;
-
-    const respuesta = {
-      ...pedido,
-      subtotal,
-      iva,
-      descuento,
-      despacho,
-      total_final,
-    };
-
-    res.status(200).json(respuesta);
-  } catch (error) {
-    console.error("❌ Error cargando pedido:", error);
-    res.status(500).json({ error: "Error cargando pedido" });
-=======
   if (!id || typeof id !== 'string') {
     return res.status(400).json({ error: 'ID inválido o faltante' });
   }
@@ -172,6 +98,5 @@ export default async function handler(req, res) {
     if (err?.code === 'P2025') return res.status(404).json({ error: 'No encontrado' });
     if (err?.code === 'P2002') return res.status(409).json({ error: 'SKU_DUPLICADO', details: err?.meta });
     return res.status(500).json({ error: 'Error del servidor' });
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
   }
 }
