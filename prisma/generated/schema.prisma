@@ -10,16 +10,21 @@ datasource db {
 }
 
 model usuarios {
-  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email       String        @unique
-  nombre      String?
-  hash_pwd    String
-  telefono    String?
-  creado_en   DateTime?     @default(now()) @db.Timestamptz(6)
-  apellido    String?
-  rut         String?
-  direcciones direcciones[]
-  pedidos     pedidos[]
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String        @unique
+  nombre           String?
+  hash_pwd         String
+  telefono         String?
+  creado_en        DateTime?     @default(now()) @db.Timestamptz(6)
+  apellido         String?
+  rut              String?
+  themecuenta      String?       @default("claro")
+  fotoperfil       String?
+  rol              String?       @default("usuario")
+  resetToken       String?
+  resetTokenExpiry DateTime?     @db.Timestamptz(6)
+  direcciones      direcciones[]
+  pedidos          pedidos[]
 }
 
 model direcciones {

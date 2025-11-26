@@ -208,7 +208,6 @@ export default function Seguimiento() {
                 <Link href="/mi_cuenta" className="flex items-center">
                   <img src={user.fotoperfil || "/images/default-user.jpg"} alt="perfil" className="h-10 w-10 rounded-full object-cover border border-gray-300 cursor-pointer hover:opacity-90" />
                 </Link>
-                <button onClick={logout} className="text-xs text-red-500 hover:text-red-700 underline">Salir</button>
               </div>
             ) : (
               <button onClick={() => setLoginOpen(true)} className="text-gray-700 hover:text-[var(--color-accent)] flex items-center">

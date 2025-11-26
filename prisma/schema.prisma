@@ -9,17 +9,23 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 model usuarios {
-  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email       String        @unique
-  nombre      String?
-  hash_pwd    String
-  telefono    String?
-  creado_en   DateTime?     @default(now()) @db.Timestamptz(6)
-  apellido    String?
-  rut         String?
-  direcciones direcciones[]
-  pedidos     pedidos[]
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email            String        @unique
+  nombre           String?
+  hash_pwd         String
+  telefono         String?
+  creado_en        DateTime?     @default(now()) @db.Timestamptz(6)
+  apellido         String?
+  rut              String?
+  themecuenta      String?       @default("claro")
+  fotoperfil       String?
+  rol              String?       @default("usuario")
+  resetToken       String?
+  resetTokenExpiry DateTime?     @db.Timestamptz(6)
+  direcciones      direcciones[]
+  pedidos          pedidos[]
 }
+
 
 model direcciones {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -62,11 +68,7 @@ model pedidos {
   usuario_id         String?        @db.Uuid
   total              Decimal?       @db.Decimal
   estado             String?        @default("creado")
-<<<<<<< HEAD
   fecha DateTime @default(now()) @db.Timestamptz(6)
-=======
-  fecha              DateTime       @default(now()) @db.Timestamptz(6)
->>>>>>> 66415a235943139a76d33da41e08fe2efff340c8
   direccion_envio_id String?        @db.Uuid
   Retiro_tienda      String
   trackingnumber     String?        @unique @db.VarChar(50)

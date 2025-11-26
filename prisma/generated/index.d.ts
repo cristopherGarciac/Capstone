@@ -1775,6 +1775,11 @@ export namespace Prisma {
     creado_en: Date | null
     apellido: string | null
     rut: string | null
+    themecuenta: string | null
+    fotoperfil: string | null
+    rol: string | null
+    resetToken: string | null
+    resetTokenExpiry: Date | null
   }
 
   export type UsuariosMaxAggregateOutputType = {
@@ -1786,6 +1791,11 @@ export namespace Prisma {
     creado_en: Date | null
     apellido: string | null
     rut: string | null
+    themecuenta: string | null
+    fotoperfil: string | null
+    rol: string | null
+    resetToken: string | null
+    resetTokenExpiry: Date | null
   }
 
   export type UsuariosCountAggregateOutputType = {
@@ -1797,6 +1807,11 @@ export namespace Prisma {
     creado_en: number
     apellido: number
     rut: number
+    themecuenta: number
+    fotoperfil: number
+    rol: number
+    resetToken: number
+    resetTokenExpiry: number
     _all: number
   }
 
@@ -1810,6 +1825,11 @@ export namespace Prisma {
     creado_en?: true
     apellido?: true
     rut?: true
+    themecuenta?: true
+    fotoperfil?: true
+    rol?: true
+    resetToken?: true
+    resetTokenExpiry?: true
   }
 
   export type UsuariosMaxAggregateInputType = {
@@ -1821,6 +1841,11 @@ export namespace Prisma {
     creado_en?: true
     apellido?: true
     rut?: true
+    themecuenta?: true
+    fotoperfil?: true
+    rol?: true
+    resetToken?: true
+    resetTokenExpiry?: true
   }
 
   export type UsuariosCountAggregateInputType = {
@@ -1832,6 +1857,11 @@ export namespace Prisma {
     creado_en?: true
     apellido?: true
     rut?: true
+    themecuenta?: true
+    fotoperfil?: true
+    rol?: true
+    resetToken?: true
+    resetTokenExpiry?: true
     _all?: true
   }
 
@@ -1916,6 +1946,11 @@ export namespace Prisma {
     creado_en: Date | null
     apellido: string | null
     rut: string | null
+    themecuenta: string | null
+    fotoperfil: string | null
+    rol: string | null
+    resetToken: string | null
+    resetTokenExpiry: Date | null
     _count: UsuariosCountAggregateOutputType | null
     _min: UsuariosMinAggregateOutputType | null
     _max: UsuariosMaxAggregateOutputType | null
@@ -1944,6 +1979,11 @@ export namespace Prisma {
     creado_en?: boolean
     apellido?: boolean
     rut?: boolean
+    themecuenta?: boolean
+    fotoperfil?: boolean
+    rol?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
     direcciones?: boolean | usuarios$direccionesArgs<ExtArgs>
     pedidos?: boolean | usuarios$pedidosArgs<ExtArgs>
     _count?: boolean | UsuariosCountOutputTypeDefaultArgs<ExtArgs>
@@ -1958,6 +1998,11 @@ export namespace Prisma {
     creado_en?: boolean
     apellido?: boolean
     rut?: boolean
+    themecuenta?: boolean
+    fotoperfil?: boolean
+    rol?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
   }, ExtArgs["result"]["usuarios"]>
 
   export type usuariosSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1969,6 +2014,11 @@ export namespace Prisma {
     creado_en?: boolean
     apellido?: boolean
     rut?: boolean
+    themecuenta?: boolean
+    fotoperfil?: boolean
+    rol?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
   }, ExtArgs["result"]["usuarios"]>
 
   export type usuariosSelectScalar = {
@@ -1980,9 +2030,14 @@ export namespace Prisma {
     creado_en?: boolean
     apellido?: boolean
     rut?: boolean
+    themecuenta?: boolean
+    fotoperfil?: boolean
+    rol?: boolean
+    resetToken?: boolean
+    resetTokenExpiry?: boolean
   }
 
-  export type usuariosOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "nombre" | "hash_pwd" | "telefono" | "creado_en" | "apellido" | "rut", ExtArgs["result"]["usuarios"]>
+  export type usuariosOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "nombre" | "hash_pwd" | "telefono" | "creado_en" | "apellido" | "rut" | "themecuenta" | "fotoperfil" | "rol" | "resetToken" | "resetTokenExpiry", ExtArgs["result"]["usuarios"]>
   export type usuariosInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     direcciones?: boolean | usuarios$direccionesArgs<ExtArgs>
     pedidos?: boolean | usuarios$pedidosArgs<ExtArgs>
@@ -2006,6 +2061,11 @@ export namespace Prisma {
       creado_en: Date | null
       apellido: string | null
       rut: string | null
+      themecuenta: string | null
+      fotoperfil: string | null
+      rol: string | null
+      resetToken: string | null
+      resetTokenExpiry: Date | null
     }, ExtArgs["result"]["usuarios"]>
     composites: {}
   }
@@ -2439,6 +2499,11 @@ export namespace Prisma {
     readonly creado_en: FieldRef<"usuarios", 'DateTime'>
     readonly apellido: FieldRef<"usuarios", 'String'>
     readonly rut: FieldRef<"usuarios", 'String'>
+    readonly themecuenta: FieldRef<"usuarios", 'String'>
+    readonly fotoperfil: FieldRef<"usuarios", 'String'>
+    readonly rol: FieldRef<"usuarios", 'String'>
+    readonly resetToken: FieldRef<"usuarios", 'String'>
+    readonly resetTokenExpiry: FieldRef<"usuarios", 'DateTime'>
   }
     
 
@@ -11987,7 +12052,12 @@ export namespace Prisma {
     telefono: 'telefono',
     creado_en: 'creado_en',
     apellido: 'apellido',
-    rut: 'rut'
+    rut: 'rut',
+    themecuenta: 'themecuenta',
+    fotoperfil: 'fotoperfil',
+    rol: 'rol',
+    resetToken: 'resetToken',
+    resetTokenExpiry: 'resetTokenExpiry'
   };
 
   export type UsuariosScalarFieldEnum = (typeof UsuariosScalarFieldEnum)[keyof typeof UsuariosScalarFieldEnum]
@@ -12243,6 +12313,11 @@ export namespace Prisma {
     creado_en?: DateTimeNullableFilter<"usuarios"> | Date | string | null
     apellido?: StringNullableFilter<"usuarios"> | string | null
     rut?: StringNullableFilter<"usuarios"> | string | null
+    themecuenta?: StringNullableFilter<"usuarios"> | string | null
+    fotoperfil?: StringNullableFilter<"usuarios"> | string | null
+    rol?: StringNullableFilter<"usuarios"> | string | null
+    resetToken?: StringNullableFilter<"usuarios"> | string | null
+    resetTokenExpiry?: DateTimeNullableFilter<"usuarios"> | Date | string | null
     direcciones?: DireccionesListRelationFilter
     pedidos?: PedidosListRelationFilter
   }
@@ -12256,6 +12331,11 @@ export namespace Prisma {
     creado_en?: SortOrderInput | SortOrder
     apellido?: SortOrderInput | SortOrder
     rut?: SortOrderInput | SortOrder
+    themecuenta?: SortOrderInput | SortOrder
+    fotoperfil?: SortOrderInput | SortOrder
+    rol?: SortOrderInput | SortOrder
+    resetToken?: SortOrderInput | SortOrder
+    resetTokenExpiry?: SortOrderInput | SortOrder
     direcciones?: direccionesOrderByRelationAggregateInput
     pedidos?: pedidosOrderByRelationAggregateInput
   }
@@ -12272,6 +12352,11 @@ export namespace Prisma {
     creado_en?: DateTimeNullableFilter<"usuarios"> | Date | string | null
     apellido?: StringNullableFilter<"usuarios"> | string | null
     rut?: StringNullableFilter<"usuarios"> | string | null
+    themecuenta?: StringNullableFilter<"usuarios"> | string | null
+    fotoperfil?: StringNullableFilter<"usuarios"> | string | null
+    rol?: StringNullableFilter<"usuarios"> | string | null
+    resetToken?: StringNullableFilter<"usuarios"> | string | null
+    resetTokenExpiry?: DateTimeNullableFilter<"usuarios"> | Date | string | null
     direcciones?: DireccionesListRelationFilter
     pedidos?: PedidosListRelationFilter
   }, "id" | "email">
@@ -12285,6 +12370,11 @@ export namespace Prisma {
     creado_en?: SortOrderInput | SortOrder
     apellido?: SortOrderInput | SortOrder
     rut?: SortOrderInput | SortOrder
+    themecuenta?: SortOrderInput | SortOrder
+    fotoperfil?: SortOrderInput | SortOrder
+    rol?: SortOrderInput | SortOrder
+    resetToken?: SortOrderInput | SortOrder
+    resetTokenExpiry?: SortOrderInput | SortOrder
     _count?: usuariosCountOrderByAggregateInput
     _max?: usuariosMaxOrderByAggregateInput
     _min?: usuariosMinOrderByAggregateInput
@@ -12302,6 +12392,11 @@ export namespace Prisma {
     creado_en?: DateTimeNullableWithAggregatesFilter<"usuarios"> | Date | string | null
     apellido?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
     rut?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
+    themecuenta?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
+    fotoperfil?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
+    rol?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
+    resetToken?: StringNullableWithAggregatesFilter<"usuarios"> | string | null
+    resetTokenExpiry?: DateTimeNullableWithAggregatesFilter<"usuarios"> | Date | string | null
   }
 
   export type direccionesWhereInput = {
@@ -12831,6 +12926,11 @@ export namespace Prisma {
     creado_en?: Date | string | null
     apellido?: string | null
     rut?: string | null
+    themecuenta?: string | null
+    fotoperfil?: string | null
+    rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     direcciones?: direccionesCreateNestedManyWithoutUsuarioInput
     pedidos?: pedidosCreateNestedManyWithoutUsuariosInput
   }
@@ -12844,6 +12944,11 @@ export namespace Prisma {
     creado_en?: Date | string | null
     apellido?: string | null
     rut?: string | null
+    themecuenta?: string | null
+    fotoperfil?: string | null
+    rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     direcciones?: direccionesUncheckedCreateNestedManyWithoutUsuarioInput
     pedidos?: pedidosUncheckedCreateNestedManyWithoutUsuariosInput
   }
@@ -12857,6 +12962,11 @@ export namespace Prisma {
     creado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     apellido?: NullableStringFieldUpdateOperationsInput | string | null
     rut?: NullableStringFieldUpdateOperationsInput | string | null
+    themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
+    fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     direcciones?: direccionesUpdateManyWithoutUsuarioNestedInput
     pedidos?: pedidosUpdateManyWithoutUsuariosNestedInput
   }
@@ -12870,6 +12980,11 @@ export namespace Prisma {
     creado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     apellido?: NullableStringFieldUpdateOperationsInput | string | null
     rut?: NullableStringFieldUpdateOperationsInput | string | null
+    themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
+    fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     direcciones?: direccionesUncheckedUpdateManyWithoutUsuarioNestedInput
     pedidos?: pedidosUncheckedUpdateManyWithoutUsuariosNestedInput
   }
@@ -12883,6 +12998,11 @@ export namespace Prisma {
     creado_en?: Date | string | null
     apellido?: string | null
     rut?: string | null
+    themecuenta?: string | null
+    fotoperfil?: string | null
+    rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
   }
 
   export type usuariosUpdateManyMutationInput = {
@@ -12894,6 +13014,11 @@ export namespace Prisma {
     creado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     apellido?: NullableStringFieldUpdateOperationsInput | string | null
     rut?: NullableStringFieldUpdateOperationsInput | string | null
+    themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
+    fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type usuariosUncheckedUpdateManyInput = {
@@ -12905,6 +13030,11 @@ export namespace Prisma {
     creado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     apellido?: NullableStringFieldUpdateOperationsInput | string | null
     rut?: NullableStringFieldUpdateOperationsInput | string | null
+    themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
+    fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type direccionesCreateInput = {
@@ -13519,6 +13649,11 @@ export namespace Prisma {
     creado_en?: SortOrder
     apellido?: SortOrder
     rut?: SortOrder
+    themecuenta?: SortOrder
+    fotoperfil?: SortOrder
+    rol?: SortOrder
+    resetToken?: SortOrder
+    resetTokenExpiry?: SortOrder
   }
 
   export type usuariosMaxOrderByAggregateInput = {
@@ -13530,6 +13665,11 @@ export namespace Prisma {
     creado_en?: SortOrder
     apellido?: SortOrder
     rut?: SortOrder
+    themecuenta?: SortOrder
+    fotoperfil?: SortOrder
+    rol?: SortOrder
+    resetToken?: SortOrder
+    resetTokenExpiry?: SortOrder
   }
 
   export type usuariosMinOrderByAggregateInput = {
@@ -13541,6 +13681,11 @@ export namespace Prisma {
     creado_en?: SortOrder
     apellido?: SortOrder
     rut?: SortOrder
+    themecuenta?: SortOrder
+    fotoperfil?: SortOrder
+    rol?: SortOrder
+    resetToken?: SortOrder
+    resetTokenExpiry?: SortOrder
   }
 
   export type UuidWithAggregatesFilter<$PrismaModel = never> = {
@@ -15167,6 +15312,11 @@ export namespace Prisma {
     creado_en?: Date | string | null
     apellido?: string | null
     rut?: string | null
+    themecuenta?: string | null
+    fotoperfil?: string | null
+    rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     pedidos?: pedidosCreateNestedManyWithoutUsuariosInput
   }
 
@@ -15179,6 +15329,11 @@ export namespace Prisma {
     creado_en?: Date | string | null
     apellido?: string | null
     rut?: string | null
+    themecuenta?: string | null
+    fotoperfil?: string | null
+    rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     pedidos?: pedidosUncheckedCreateNestedManyWithoutUsuariosInput
   }
 
@@ -15241,6 +15396,11 @@ export namespace Prisma {
     creado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     apellido?: NullableStringFieldUpdateOperationsInput | string | null
     rut?: NullableStringFieldUpdateOperationsInput | string | null
+    themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
+    fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     pedidos?: pedidosUpdateManyWithoutUsuariosNestedInput
   }
 
@@ -15253,6 +15413,11 @@ export namespace Prisma {
     creado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     apellido?: NullableStringFieldUpdateOperationsInput | string | null
     rut?: NullableStringFieldUpdateOperationsInput | string | null
+    themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
+    fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     pedidos?: pedidosUncheckedUpdateManyWithoutUsuariosNestedInput
   }
 
@@ -15556,6 +15721,11 @@ export namespace Prisma {
     creado_en?: Date | string | null
     apellido?: string | null
     rut?: string | null
+    themecuenta?: string | null
+    fotoperfil?: string | null
+    rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     direcciones?: direccionesCreateNestedManyWithoutUsuarioInput
   }
 
@@ -15568,6 +15738,11 @@ export namespace Prisma {
     creado_en?: Date | string | null
     apellido?: string | null
     rut?: string | null
+    themecuenta?: string | null
+    fotoperfil?: string | null
+    rol?: string | null
+    resetToken?: string | null
+    resetTokenExpiry?: Date | string | null
     direcciones?: direccionesUncheckedCreateNestedManyWithoutUsuarioInput
   }
 
@@ -15688,6 +15863,11 @@ export namespace Prisma {
     creado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     apellido?: NullableStringFieldUpdateOperationsInput | string | null
     rut?: NullableStringFieldUpdateOperationsInput | string | null
+    themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
+    fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     direcciones?: direccionesUpdateManyWithoutUsuarioNestedInput
   }
 
@@ -15700,6 +15880,11 @@ export namespace Prisma {
     creado_en?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     apellido?: NullableStringFieldUpdateOperationsInput | string | null
     rut?: NullableStringFieldUpdateOperationsInput | string | null
+    themecuenta?: NullableStringFieldUpdateOperationsInput | string | null
+    fotoperfil?: NullableStringFieldUpdateOperationsInput | string | null
+    rol?: NullableStringFieldUpdateOperationsInput | string | null
+    resetToken?: NullableStringFieldUpdateOperationsInput | string | null
+    resetTokenExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     direcciones?: direccionesUncheckedUpdateManyWithoutUsuarioNestedInput
   }
 

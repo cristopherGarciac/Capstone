@@ -413,12 +413,7 @@ export default function Home() {
                     className="h-10 w-10 rounded-full object-cover border border-gray-300 cursor-pointer hover:opacity-90"
                   />
                 </Link>
-                <button 
-                  onClick={logout} 
-                  className="text-xs text-red-500 hover:text-red-700 underline"
-                >
-                  Salir
-                </button>
+                
               </div>
             ) : (
               <button
@@ -497,7 +492,7 @@ export default function Home() {
                 </Link>
 
                 <Link
-                  href="/registro"
+                  href="/register"
                   className="text-[var(--color-secondary)] hover:underline font-semibold"
                 >
                   Crear una cuenta

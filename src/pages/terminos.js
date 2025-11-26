@@ -1,13 +1,68 @@
 // src/pages/terminos.js
-import { useState, useEffect } from "react";
+import { useState, useEffect,useContext} from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { UserContext } from "../context/UserContext";
 
 export default function Terminos() {
   const [loginOpen, setLoginOpen] = useState(false);
+    const [loginData, setLoginData] = useState({ email: "", password: "" });
+    const [loginError, setLoginError] = useState("");
+    const { user, setUser, logout } = useContext(UserContext);
+  
+    // Configuración general
+    const [logo, setLogo] = useState("/images/blitz.png");
+    const [nombrePagina, setNombrePagina] = useState("Mi E-commerce");
+    const [colorHeader, setColorHeader] = useState("#ffffff");
+    const [colorFooter, setColorFooter] = useState("#ffffff");
+    
+    // Configuración de Fondo
+    const [colorFondo, setColorFondo] = useState("#ffffff");
+    const [fondoImagen, setFondoImagen] = useState("");
+  
+    // Carrusel
+    const [images, setImages] = useState([]);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [autoPlay, setAutoPlay] = useState(true);
+    const [delayMs, setDelayMs] = useState(5000);
+    const [carruselFit, setCarruselFit] = useState("cover");
+  
+    // Hero y Textos
+    const [heroTitulo, setHeroTitulo] = useState("Productos Destacados");
+    const [heroSubtitulo, setHeroSubtitulo] = useState("Lo mejor para tu setup");
 
   const [config, setConfig] = useState(null);
   const [footerCfg, setFooterCfg] = useState(null);
+// Manejo de Login
+  const handleLoginChange = (e) => {
+    const { name, value } = e.target;
+    setLoginData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError("");
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(loginData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser(data);
+        setLoginOpen(false);
+      } else {
+        setLoginError(data.error || "Credenciales incorrectas");
+      }
+    } catch (err) {
+      console.error("Error login:", err);
+      setLoginError("Error del servidor.");
+    }
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -35,27 +90,157 @@ export default function Terminos() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* NAVBAR */}
+      {/* Navbar */}
       <nav
-        className="shadow sticky top-0 z-50"
-        style={{ backgroundColor: config?.colorHeader || "#fff" }}
+        className="shadow sticky top-0 z-50 transition-colors duration-300"
+        style={{ backgroundColor: colorHeader }}
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-          <Link href="/">
-            <img src="/images/blitz.png" alt="Blitz Logo" className="h-20" />
+          {/* Logo */}
+          <Link href="/" className="logo text-2xl font-bold">
+            <img src={logo} alt="logo" className="h-20 w-auto" />
           </Link>
 
+          {/* Enlaces */}
           <div className="flex items-center space-x-6">
-            <Link href="/">Inicio</Link>
-            <Link href="/catalogo">Catálogo</Link>
-            <Link href="/carrito">
-              <img src="/images/carrito.png" className="h-10" />
+            <span className="text-2xl font-semibold hidden md:block">
+              {nombrePagina}
+            </span>
+
+            <Link href="/" className="text-gray-700 hover:text-[var(--color-primary)]">
+              Inicio
             </Link>
 
-            <button onClick={() => setLoginOpen(true)}>Iniciar sesión</button>
+            <Link href="/catalogo" className="text-gray-700 hover:text-[var(--color-primary)]">
+              Catálogo
+            </Link>
+
+            <Link href="/carrito" className="text-gray-700 hover:text-[var(--color-primary)]">
+              <img src="/images/carrito.png" className="h-11" alt="carrito" />
+            </Link>
+
+            {/* Admin Link */}
+            {user?.rol === "admin" && (
+              <Link
+                href="/admin"
+                className="text-gray-700 hover:text-[var(--color-primary)] font-semibold"
+              >
+                Admin
+              </Link>
+            )}
+
+            {/* Usuario / Login */}
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <Link
+                  href="/mi_cuenta"
+                  className="text-gray-700 hover:text-[var(--color-primary)]"
+                >
+                  Hola, {user.nombre}
+                </Link>
+
+                <Link href="/mi_cuenta" className="flex items-center">
+                  <img
+                    src={user.fotoperfil || "/images/default-user.jpg"}
+                    alt="perfil"
+                    className="h-10 w-10 rounded-full object-cover border border-gray-300 cursor-pointer hover:opacity-90"
+                  />
+                </Link>
+                
+              </div>
+            ) : (
+              <button
+                onClick={() => setLoginOpen(true)}
+                className="text-gray-700 hover:text-[var(--color-accent)] flex items-center"
+              >
+                <svg
+                  className="h-5 w-5 mr-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5.121 17.804A9.001 9.001 0 0112 15a9.001 9.001 0 016.879 2.804M12 11a4 4 0 100-8 4 4 0 000 8z"
+                  />
+                </svg>
+                Iniciar sesión
+              </button>
+            )}
           </div>
         </div>
       </nav>
+
+      {/* Modal Login */}
+      {loginOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-[100]">
+          <div className="bg-white w-96 p-8 rounded-2xl shadow-xl relative animate-[zoomIn_.15s_ease-out]">
+            <button
+              onClick={() => setLoginOpen(false)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-3xl font-bold text-center mb-6 text-[var(--color-secondary)]">
+              Iniciar sesión
+            </h2>
+
+            <form onSubmit={handleLogin} className="flex flex-col gap-4">
+              <input
+                type="email"
+                name="email"
+                value={loginData.email}
+                onChange={handleLoginChange}
+                placeholder="Correo electrónico"
+                className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                required
+              />
+
+              <input
+                type="password"
+                name="password"
+                value={loginData.password}
+                onChange={handleLoginChange}
+                placeholder="Contraseña"
+                className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                required
+              />
+
+              <button
+                type="submit"
+                className="bg-[var(--color-primary)] text-white font-semibold py-3 rounded-lg hover:opacity-90 transition"
+              >
+                Iniciar sesión
+              </button>
+
+              <div className="flex flex-col items-center gap-2 mt-2 text-sm">
+                <Link
+                  href="/recuperar_password"
+                  className="text-[var(--color-primary)] hover:underline"
+                >
+                  Olvidé mi contraseña
+                </Link>
+
+                <Link
+                  href="/register"
+                  className="text-[var(--color-secondary)] hover:underline font-semibold"
+                >
+                  Crear una cuenta
+                </Link>
+              </div>
+            </form>
+
+            {loginError && (
+              <p className="text-red-500 text-center text-sm mt-3">
+                {loginError}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* CONTENIDO */}
       <div className="max-w-7xl mx-auto px-6 py-12 flex-grow">
